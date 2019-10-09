@@ -23,7 +23,7 @@
   cd ..
   ```
 
-1. Create the GKE clusters that will be used for deployment, CI, etc.
+1. Create the GKE clusters that will be used for prod, staging, CI, etc.
 
   ```shell
   cd 1_clusters
