@@ -7,10 +7,10 @@
 1. Replace your project ID in each of the terraform.tfvars files:
 
   ```shell
-  PROJECT=$(gcloud config get-value project)
-  sed -i 's/YOUR_PROJECT_ID/${PROJECT}/g' 0_foundation/terraform.tfvars
-  vi 1_clusters/terraform.tfvars
-  vi 2_gitlab/terraform.tfvars
+  export PROJECT=$(gcloud config get-value project)
+  sed -i "s/YOUR_PROJECT_ID/${PROJECT}/g" 0_foundation/terraform.tfvars
+  sed -i "s/YOUR_PROJECT_ID/${PROJECT}/g" 1_clusters/terraform.tfvars
+  sed -i "s/YOUR_PROJECT_ID/${PROJECT}/g" 2_gitlab/terraform.tfvars
   ```
 
 1. Create foundational infrastructure (networks, subnetworks, etc)
