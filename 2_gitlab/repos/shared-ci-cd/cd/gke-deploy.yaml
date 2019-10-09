@@ -1,0 +1,36 @@
+deploy-staging:
+  # Only deploy to staging env from $APP-env staging branch, kicking off rollout 
+  only:
+    refs:
+      - staging
+  stage: deploy-staging
+  image: gcr.io/cloud-builders/gke-deploy:stable
+  tags:
+  - cluster:staging
+  script:
+  - /gke-deploy run --filename kustomize-stg.yaml
+  
+deploy-prod-east:
+  # Only deploy when running on master in $APP-env
+  only:
+    refs:
+      - master
+  stage: deploy-prod-east
+  image: gcr.io/cloud-builders/gke-deploy:stable
+  tags:
+  - cluster:prod-east
+  script:
+  - /gke-deploy run --filename kustomize-prod.yaml
+
+deploy-prod-central:
+  # Only deploy when running on master in $APP-env
+  only:
+    refs:
+      - master
+  stage: deploy-prod-central
+  image: gcr.io/cloud-builders/gke-deploy:stable
+  tags:
+  - cluster:prod-central
+  script:
+  - |
+  - /gke-deploy run --filename kustomize-prod.yaml

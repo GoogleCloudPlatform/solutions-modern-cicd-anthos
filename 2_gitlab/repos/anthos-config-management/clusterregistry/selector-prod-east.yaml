@@ -1,0 +1,8 @@
+kind: ClusterSelector
+apiVersion: configmanagement.gke.io/v1
+metadata:
+  name: prod-east
+spec:
+  selector:
+    matchLabels:
+      clusterName: prod-east

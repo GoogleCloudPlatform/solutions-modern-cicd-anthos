@@ -1,0 +1,11 @@
+include:
+- project: 'platform-admins/shared-ci-cd'
+  file: 'ci/go-docker.yaml'
+- project: 'platform-admins/shared-ci-cd'
+  file: 'cd/kustomize.yaml'
+
+stages:
+  - test
+  - build
+  - hydrate-manifests
+  - push-manifests

@@ -1,0 +1,13 @@
+# config-management.yaml
+
+apiVersion: addons.sigs.k8s.io/v1alpha1
+kind: ConfigManagement
+metadata:
+  name: config-management
+spec:
+  # clusterName is required and must be unique among all managed clusters
+  clusterName: CLUSTERNAME
+  git:
+    syncRepo: git@gitlab.platform.1.vic.dev:platform-admins/anthos-config-management.git
+    syncBranch: master
+    secretType: ssh

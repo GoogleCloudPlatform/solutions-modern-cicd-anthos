@@ -1,0 +1,199 @@
+# ----- configmanagement_v1_configmanagement.yaml -----
+apiVersion: apiextensions.k8s.io/v1beta1
+kind: CustomResourceDefinition
+metadata:
+  creationTimestamp: null
+  labels:
+    controller-tools.k8s.io: "1.0"
+  name: configmanagements.configmanagement.gke.io
+spec:
+  group: configmanagement.gke.io
+  names:
+    kind: ConfigManagement
+    plural: configmanagements
+  scope: Cluster
+  versions:
+    - name: v1
+      served: true
+      storage: true
+  validation:
+    openAPIV3Schema:
+      properties:
+        apiVersion:
+          description: 'APIVersion defines the versioned schema of this representation
+            of an object. Servers should convert recognized schemas to the latest
+            internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/api-conventions.md#resources'
+          type: string
+        kind:
+          description: 'Kind is a string value representing the REST resource this
+            object represents. Servers may infer this from the endpoint the client
+            submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/api-conventions.md#types-kinds'
+          type: string
+        metadata:
+          type: object
+        spec:
+          properties:
+            clusterName:
+              description: ClusterName, if defined, sets the name for this cluster.  If
+                unset, the cluster is considered to be unnamed, and behaves just like
+                a legacy Nomos cluster that didn't support naming at all.
+              type: string
+            enableAggregateNamespaceQuotas:
+              description: EnableAggregateNamespaceQuotas is set to true to install
+                the hierarchical resource quota admission controller, that enforces
+                quota at a policyspace level (enforcing the sum of all resources across
+                the child namespaces does not exceed the policyspace quota). False
+                by default, as Syllogi currently does not support admission controllers
+                (b/119276179)
+              type: boolean
+            git:
+              description: Git contains configuration specific to importing policies
+                from a Git repo.
+              properties:
+                policyDir:
+                  description: 'PolicyDir is the absolute path of the directory that
+                    contains the local policy.  Default: the root directory of the
+                    repo.'
+                  type: string
+                secretType:
+                  pattern: ^(ssh|cookiefile|none)$
+                  type: string
+                syncBranch:
+                  description: 'SyncBranch is the branch to sync from.  Default: "master".'
+                  type: string
+                syncRepo:
+                  pattern: ^(((https?|git|ssh):\/\/)|git@)
+                  type: string
+                syncRev:
+                  description: 'SyncRev is the git revision (tag or hash) to check
+                    out. Default: HEAD.'
+                  type: string
+                syncWait:
+                  description: 'SyncWaitSeconds is the time duration in seconds between
+                    consecutive syncs.  Default: 15 seconds. Note that SyncWaitSecs
+                    is not a time.Duration on purpose. This provides a reminder to
+                    developers that customers specify this value using using integers
+                    like "3" in their ConfigManagement YAML. However, time.Duration
+                    is at a nanosecond granularity, and it''s easy to introduce a
+                    bug where it looks like the code is dealing with seconds but its
+                    actually nanoseconds (or vice versa).'
+                  format: int64
+                  type: integer
+              type: object
+          type: object
+        status:
+          properties:
+            configManagementVersion:
+              description: ConfigManagementVersion is the semantic version number
+                of the config management system enforced by the currently running
+                config management operator.
+              type: string
+            errors:
+              items:
+                type: string
+              type: array
+            healthy:
+              type: boolean
+          required:
+          - healthy
+          type: object
+      required:
+      - metadata
+      - spec
+status:
+  acceptedNames:
+    kind: ""
+    plural: ""
+  conditions: []
+  storedVersions: []
+
+---
+# ----- addons_rolebinding_rbac.yaml -----
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  labels:
+    k8s-app: config-management-operator
+  name: config-management-operator
+  namespace: kube-system
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: config-management-operator
+subjects:
+- kind: ServiceAccount
+  name: config-management-operator
+  namespace: kube-system
+
+---
+# ----- addons_role_rbac.yaml -----
+# The Nomos system creates RBAC rules, so it requires
+# full cluster-admin access. Thus, the operator needs
+# to be able to grant tha permission to the installed
+# Nomos components.
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  labels:
+    k8s-app: config-management-operator
+  name: config-management-operator
+rules:
+  - apiGroups: ["*"]
+    resources: ["*"]
+    verbs: ["*"]
+
+---
+# ----- manager.yaml -----
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  labels:
+    k8s-app: config-management-operator
+  name: config-management-operator
+  namespace: kube-system
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: config-management-operator
+  namespace: kube-system
+  labels:
+    k8s-app: config-management-operator
+spec:
+  strategy:
+    type: Recreate
+    # must be null due to 3-way merge, as
+    # rollingUpdate added to the resource by default by the APIServer
+    rollingUpdate: null
+  selector:
+    matchLabels:
+      k8s-app: config-management-operator
+      component: config-management-operator
+  template:
+    metadata:
+      labels:
+        k8s-app: config-management-operator
+        component: config-management-operator
+    spec:
+      containers:
+      - command:
+        - /manager
+        - --private-registry=
+        name: manager
+        image: gcr.io/config-management-release/config-management-operator:v1.1.1-rc.7
+        resources:
+          requests:
+            cpu: 100m
+            memory: 20Mi
+      serviceAccount: config-management-operator
+
+---
+# ----- namespace.yaml -----
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: config-management-system
+  labels:
+    configmanagement.gke.io/system: "true"
+
+---

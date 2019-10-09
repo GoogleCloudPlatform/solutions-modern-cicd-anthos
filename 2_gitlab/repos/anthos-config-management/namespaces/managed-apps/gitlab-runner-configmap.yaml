@@ -1,0 +1,96 @@
+---
+# Source: gitlab-runner/templates/configmap.yaml
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: release-name-gitlab-runner
+  labels:
+    app: release-name-gitlab-runner
+    chart: gitlab-runner-0.7.0
+    release: "release-name"
+    heritage: "Tiller"
+data:
+  entrypoint: |
+    #!/bin/bash
+    set -e
+    mkdir -p /home/gitlab-runner/.gitlab-runner/
+    cp /scripts/config.toml /home/gitlab-runner/.gitlab-runner/
+
+    # Register the runner
+    if [[ -f /secrets/accesskey && -f /secrets/secretkey ]]; then
+      export CACHE_S3_ACCESS_KEY=$(cat /secrets/accesskey)
+      export CACHE_S3_SECRET_KEY=$(cat /secrets/secretkey)
+    fi
+
+    if [[ -f /secrets/gcs-applicaton-credentials-file ]]; then
+      export GOOGLE_APPLICATION_CREDENTIALS="/secrets/gcs-applicaton-credentials-file"
+    else
+      if [[ -f /secrets/gcs-access-id && -f /secrets/gcs-private-key ]]; then
+        export CACHE_GCS_ACCESS_ID=$(cat /secrets/gcs-access-id)
+        # echo -e used to make private key multiline (in google json auth key private key is oneline with \n)
+        export CACHE_GCS_PRIVATE_KEY=$(echo -e $(cat /secrets/gcs-private-key))
+      fi
+    fi
+
+    if [[ -f /secrets/runner-registration-token ]]; then
+      export REGISTRATION_TOKEN=$(cat /secrets/runner-registration-token)
+    fi
+
+    if [[ -f /secrets/runner-token ]]; then
+      export CI_SERVER_TOKEN=$(cat /secrets/runner-token)
+    fi
+
+    if ! sh /scripts/register-the-runner; then
+      exit 1
+    fi
+
+    # Start the runner
+    /entrypoint run --user=gitlab-runner \
+      --working-directory=/home/gitlab-runner
+
+  config.toml: |
+    concurrent = 10
+    check_interval = 30
+    log_level = "info"
+    listen_address = '[::]:9252'
+    [[runners]]
+    executor = "kubernetes"
+    [runners.kubernetes]
+    [[runners.kubernetes.volumes.secret]]
+      name = "ci-secrets"
+      mount_path = "/ci-secrets"
+      read_only = true
+  configure: |
+    set -e
+    cp /init-secrets/* /secrets
+  register-the-runner: |
+    #!/bin/bash
+    MAX_REGISTER_ATTEMPTS=30
+
+    for i in $(seq 1 "${MAX_REGISTER_ATTEMPTS}"); do
+      echo "Registration attempt ${i} of ${MAX_REGISTER_ATTEMPTS}"
+      /entrypoint register \
+        --non-interactive
+
+      retval=$?
+
+      if [ ${retval} = 0 ]; then
+        break
+      elif [ ${i} = ${MAX_REGISTER_ATTEMPTS} ]; then
+        exit 1
+      fi
+
+      sleep 5 
+    done
+
+    exit 0
+
+  check-live: |
+    #!/bin/bash
+    if /usr/bin/pgrep -f .*register-the-runner; then
+      exit 0
+    elif /usr/bin/pgrep gitlab.*runner; then
+      exit 0
+    else
+      exit 1
+    fi

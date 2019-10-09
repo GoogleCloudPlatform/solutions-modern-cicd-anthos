@@ -1,0 +1,8 @@
+bases:
+- https://GITLAB_HOSTNAME/platform-admins/shared-kustomize-bases//golang?ref=master
+patches:
+- deployment.yaml
+namePrefix: "golang-template-"
+commonLabels:
+  app: golang-template
+  role: backend

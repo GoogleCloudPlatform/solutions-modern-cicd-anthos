@@ -1,0 +1,27 @@
+Vet ha-euro-prod:
+  image: registry.platform.1.vic.dev/platform-admins/anthos-config-management:v1.0.0-rc.45
+  tags:
+  - ha-euro-prod
+  - acm-tests
+  variables:
+    USER: root
+    KUBECONFIG: kubeconfig
+  script:
+  - sh generate_config.sh
+  - nomos version
+  #- nomos status
+  - nomos vet
+
+Vet packet-sjc1-smoke:
+  image: registry.platform.1.vic.dev/platform-admins/anthos-config-management:v1.0.0-rc.45
+  tags:
+  - packet-sjc1-smoke
+  - acm-tests
+  variables:
+    USER: root
+    KUBECONFIG: kubeconfig
+  script:
+  - sh generate_config.sh
+  - nomos version
+  #- nomos status
+  - nomos vet

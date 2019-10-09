@@ -1,0 +1,11 @@
+apiVersion: configmanagement.gke.io/v1
+kind: ConfigManagement
+metadata:
+  name: config-management
+spec:
+  # clusterName is required and must be unique among all managed clusters
+  clusterName: staging
+  git:
+    syncRepo: git@gitlab.34.66.36.188.xip.io:platform-admins/anthos-config-management.git
+    syncBranch: master
+    secretType: ssh

@@ -1,0 +1,20 @@
+include:
+- project: 'platform-admins/shared-ci-cd'
+  file: 'cd/gke-deploy.yaml'
+
+deploy-staging:
+  tags:
+  - cluster:staging, app:vic-test
+
+deploy-prod-central:
+  tags:
+  - cluster:prod-central, app:vic-test
+
+deploy-prod-east:
+  tags:
+  - cluster:prod-east, app:vic-test
+
+stages:
+  - deploy-staging
+  - deploy-prod-central
+  - deploy-prod-east

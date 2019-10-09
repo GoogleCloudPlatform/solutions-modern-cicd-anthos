@@ -1,0 +1,36 @@
+kind: Deployment
+apiVersion: apps/v1
+metadata:
+  name: app
+spec:
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxUnavailable: 0
+  template:
+    metadata:
+      name: app
+    spec:
+      imagePullSecrets:
+      - name: gitlab-registry
+      containers:
+      - name: app
+        image: app
+        resources:
+          limits:
+            memory: "512Mi"
+            cpu: "500m"
+        env:
+        - name: ENVIRONMENT
+          value: base
+        - name: LOG_LEVEL
+          value: info
+        readinessProbe:
+          initialDelaySeconds: 1
+          periodSeconds: 1
+          httpGet:
+            path: /healthz
+            port: 8080
+        ports:
+        - name: http
+          containerPort: 8080
