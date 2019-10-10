@@ -38,6 +38,7 @@
   ```shell
   cd 2_gitlab
   export DOMAIN=example.org
+  # Gitlab URL will be gitlab.$DOMAIN
   sed -i "s/YOUR_DOMAIN/${DOMAIN}/g" terraform.tfvars
   ```
 
@@ -52,6 +53,10 @@
 
 1. The GitLab domain and address will be printed after the commands complete. Setup DNS wildcard domain to point at the IP address.
 
+    *.$DOMAIN -> IP_ADDRESS
+
+1. Ensure that the DNS change has propagated by running a DNS query against gitlab.$DOMAIN, making sure that it returns your IP address from above.
+
 1. Get credentails for the GitLab cluster and get the initial root password.
 
   ```shell
@@ -61,20 +66,14 @@
 
 1. Log in to GitLab with the root user and password printed in the previous step.
 
-1. Go to https://${GITLAB_HOSTNAME}/profile/personal_access_tokens, to create a sudo access token for project creation:
+1. Go to https://${GITLAB_HOSTNAME}/profile/personal_access_tokens, to create an access token for project creation that has access to all scopes:
 
 ![](2_gitlab/images/access-token.png)
 
-1. Run the script to populate repos in GitLab.
+1. Run the script to populate repos in GitLab. It will ask you for the token you just created.
 
   ```shell
   ./create-repos.sh
-  ```
-
-1. Configure the repositories using the included script.
-
-  ```shell
-  ./configure-repos.sh
   cd ..
   ```
 

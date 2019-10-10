@@ -43,3 +43,8 @@ pushd repos
     popd
   done
 popd
+
+# TODO: Don't hardcode the number of repos, list them all first
+for i in `seq 1 7`;do
+  curl --header "Authorization: Bearer ${GITLAB_TOKEN}" -X PUT --form 'shared_runners_enabled=true' https://${GITLAB_HOSTNAME}/api/v4/projects/$i
+done
