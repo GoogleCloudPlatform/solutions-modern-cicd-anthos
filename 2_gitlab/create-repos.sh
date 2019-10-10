@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/bash -xe
 if [ -z ${GITLAB_HOSTNAME} ];then
   read -p "What is the GitLab hostname (i.e. my.gitlab.server)? " GITLAB_HOSTNAME
 fi
