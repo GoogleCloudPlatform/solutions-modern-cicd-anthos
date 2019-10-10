@@ -1,4 +1,15 @@
-# Installation
+# Anthos Platform Demo Setup Instructions
+
+For more information please visit:
+go/anthos-platform
+go/anthos-platform-tech-pitch
+
+For a user guide on what to do after the install, please go to:
+go/anthos-platform-demo
+
+### Pre-requisites
+
+1. Clone this repo to your local machine.
 
 1. Install Docker, Terraform, Helm and kubectl
 
@@ -13,6 +24,8 @@
   sed -i "s/YOUR_PROJECT_ID/${PROJECT}/g" 2_gitlab/terraform.tfvars
   ```
 
+### Provision infrastructure
+
 1. Create foundational infrastructure (networks, subnetworks, etc)
 
   ```shell
@@ -23,6 +36,8 @@
   cd ..
   ```
 
+### Provision GKE clusters
+
 1. Create the GKE clusters that will be used for prod, staging, CI, etc.
 
   ```shell
@@ -32,6 +47,8 @@
   terraform apply # type yes to confirm
   cd ..
   ```
+
+### Provision and configure GitLab
 
 1. Configure the domain you'll use for Gitlab in the terraform.tfvars file
 
@@ -77,6 +94,8 @@
   cd ..
   ```
 
+### Set up Anthos Config Management
+
 1. Install Anthos Config Management in all of your clusters:
 
   ```shell
@@ -85,5 +104,30 @@
   cd ..
   ```
 
+1. Go to the platform-admins/anthos-config-management repository.
+
+1. In the left nav, go to Settings->CI/CD. Expand the runners section.
+
+1. Copy the registration token in the Specific Runners section.
+
+1. Add a new app namespace in the ACM repo to run ACM tests. You'll be prompted to input the runner registration token. The name of the app must be `acm-tests`.
+
+  ```shell
+  cd 2_gitlab/repos/anthos-config-management/templates
+  export APP_NAME=acm-tests
+  ./new-app.sh
+  git add namespaces/managed-apps/acm-tests
+  git commit -m "Add acm-tests namespace"
+  GIT_SSH_COMMAND="ssh -i ../../../ssh-keys/anthos-config-management"    git push --set-upstream origin master
+  ```
+
+1. You should now be able to go to the ACM repo and re-run tests. In the left nav of the ACM repo, click CI/CD->Pipelines.
+
+1. Click the green "Run Pipeline" button.
+
+1. On the next page click the green "Run Pipeline" button.
+
 ## TODO
-- Add Anthos Config Management Docker image to repo (theochamely@)
+
+- Add Anthos Config Management Docker image to repo (theochamley@)
+- Add instructions on how to add a cluster (on-prem or GKE)
