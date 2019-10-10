@@ -8,13 +8,16 @@ read -p "What is the access token? " GITLAB_TOKEN
 fi
 
 REPOS="anthos-config-management shared-kustomize-bases shared-ci-cd golang-template golang-template-env kustomize-docker kaniko-docker"
-
+CLUSTERS="prod-central prod-east staging"
 pushd gitlab-repos
-  # Create deloy keys so we can push the source code
-  mkdir -p ../ssh-keys
-  pushd ../ssh-keys
+  # Create SSH keys so ACM syncers can read from the repos
+  mkdir -p ../../ssh-keys
+  pushd ../../ssh-keys
     for repo in ${REPOS}; do
        ssh-keygen -f ${repo} -N ''
+    done
+    for cluster in ${CLUSTERS}; do
+       ssh-keygen -f ${cluster} -N ''
     done
   popd
   terraform init
@@ -25,7 +28,7 @@ popd
 pushd repos
   for repo in ${REPOS}; do
     pushd ${repo}
-      export GIT_SSH_COMMAND="ssh -i ../../ssh-keys/${repo}"
+      export GIT_SSH_COMMAND="ssh -i ../../../ssh-keys/${repo}"
       rm -rf .git
       git init
       if [ "${repo}" == "golang-template" ];then
