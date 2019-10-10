@@ -4,6 +4,10 @@ provider "gitlab" {
     insecure = true
 }
 
+locals {
+  ssh-key-path = "../../ssh-keys"
+}
+
 resource "gitlab_group" "platform-admins" {
   name        = "platform-admins"
   path        = "platform-admins"
@@ -64,27 +68,27 @@ resource "gitlab_project" "shared-ci-cd" {
 resource "gitlab_deploy_key" "acm-staging" {
   project = "platform-admins/anthos-config-management"
   title   = "Staging deploy key"
-  key     = "${file("../../3_acm/ssh-keys/staging-ssh.pub")}"
+  key     = "${file("${local.ssh-key-path}/staging.pub")}"
   depends_on = ["gitlab_project.anthos-config-management"]
 }
 
 resource "gitlab_deploy_key" "acm-prod-central" {
   project = "platform-admins/anthos-config-management"
   title   = "Production Central deploy key"
-  key     = "${file("../../3_acm/ssh-keys/prod-central-ssh.pub")}"
+  key     = "${file("${local.ssh-key-path}/prod-central.pub")}"
   depends_on = ["gitlab_project.anthos-config-management"]
 }
 resource "gitlab_deploy_key" "acm-prod-east" {
   project = "platform-admins/anthos-config-management"
   title   = "Production East deploy key"
-  key     = "${file("../../3_acm/ssh-keys/prod-east-ssh.pub")}"
+  key     = "${file("${local.ssh-key-path}/prod-east.pub")}"
   depends_on = ["gitlab_project.anthos-config-management"]
 }
 
 resource "gitlab_deploy_key" "local-user-kaniko-docker-push" {
   project = "platform-admins/kaniko-docker"
   title   = "Local User deploy key"
-  key     = "${file("../ssh-keys/kaniko-docker.pub")}"
+  key     = "${file("${local.ssh-key-path}/kaniko-docker.pub")}"
   can_push = true
   depends_on = ["gitlab_project.kaniko-docker"]
 }
@@ -92,7 +96,7 @@ resource "gitlab_deploy_key" "local-user-kaniko-docker-push" {
 resource "gitlab_deploy_key" "local-user-kustomize-docker-push" {
   project = "platform-admins/kustomize-docker"
   title   = "Local User deploy key"
-  key     = "${file("../ssh-keys/kustomize-docker.pub")}"
+  key     = "${file("${local.ssh-key-path}/kustomize-docker.pub")}"
   can_push = true
   depends_on = ["gitlab_project.kustomize-docker"]
 }
@@ -100,7 +104,7 @@ resource "gitlab_deploy_key" "local-user-kustomize-docker-push" {
 resource "gitlab_deploy_key" "local-user-acm-push" {
   project = "platform-admins/anthos-config-management"
   title   = "Local User deploy key"
-  key     = "${file("../ssh-keys/anthos-config-management.pub")}"
+  key     = "${file("${local.ssh-key-path}/anthos-config-management.pub")}"
   can_push = true
   depends_on = ["gitlab_project.anthos-config-management"]
 }
@@ -108,7 +112,7 @@ resource "gitlab_deploy_key" "local-user-acm-push" {
 resource "gitlab_deploy_key" "local-user-kustomize-push" {
   project = "platform-admins/shared-kustomize-bases"
   title   = "Local User deploy key"
-  key     = "${file("../ssh-keys/shared-kustomize-bases.pub")}"
+  key     = "${file("${local.ssh-key-path}/shared-kustomize-bases.pub")}"
   depends_on = ["gitlab_project.shared-kustomize-bases"]
   can_push = true
 }
@@ -116,7 +120,7 @@ resource "gitlab_deploy_key" "local-user-kustomize-push" {
 resource "gitlab_deploy_key" "local-user-ci-cd-push" {
   project = "platform-admins/shared-ci-cd"
   title   = "Local User deploy key"
-  key     = "${file("../ssh-keys/shared-ci-cd.pub")}"
+  key     = "${file("${local.ssh-key-path}/shared-ci-cd.pub")}"
   depends_on = ["gitlab_project.shared-ci-cd"]
   can_push = true
 }
@@ -124,7 +128,7 @@ resource "gitlab_deploy_key" "local-user-ci-cd-push" {
 resource "gitlab_deploy_key" "local-user-golang-template-push" {
   project = "platform-admins/golang-template"
   title   = "Local User deploy key"
-  key     = "${file("../ssh-keys/golang-template.pub")}"
+  key     = "${file("${local.ssh-key-path}/golang-template.pub")}"
   depends_on = ["gitlab_project.golang-template"]
   can_push = true
 }
@@ -132,7 +136,7 @@ resource "gitlab_deploy_key" "local-user-golang-template-push" {
 resource "gitlab_deploy_key" "local-user-golang-template-env-push" {
   project = "platform-admins/golang-template-env"
   title   = "Local User deploy key"
-  key     = "${file("../ssh-keys/golang-template-env.pub")}"
+  key     = "${file("${local.ssh-key-path}/golang-template-env.pub")}"
   depends_on = ["gitlab_project.golang-template-env"]
   can_push = true
 }
