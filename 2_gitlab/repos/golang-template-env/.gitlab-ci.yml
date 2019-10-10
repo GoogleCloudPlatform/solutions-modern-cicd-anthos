@@ -4,15 +4,15 @@ include:
 
 deploy-staging:
   tags:
-  - cluster:staging, app:vic-test
+  - cluster:staging, app:APP_NAME
 
 deploy-prod-central:
   tags:
-  - cluster:prod-central, app:vic-test
+  - cluster:prod-central, app:APP_NAME
 
 deploy-prod-east:
   tags:
-  - cluster:prod-east, app:vic-test
+  - cluster:prod-east, app:APP_NAME
 
 stages:
   - deploy-staging
