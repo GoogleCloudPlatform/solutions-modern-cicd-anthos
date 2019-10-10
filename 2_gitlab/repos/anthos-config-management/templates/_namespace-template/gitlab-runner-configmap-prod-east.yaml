@@ -5,7 +5,7 @@ metadata:
   annotations:
     configmanagement.gke.io/cluster-selector: prod-east
 data:
-  CI_SERVER_URL: "https://gitlab.platform.1.vic.dev/"
+  CI_SERVER_URL: "https://GITLAB_HOSTNAME/"
   CLONE_URL: ""
   RUNNER_REQUEST_CONCURRENCY: "1"
   RUNNER_EXECUTOR: "kubernetes"
