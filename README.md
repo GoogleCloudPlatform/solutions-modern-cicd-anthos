@@ -78,18 +78,6 @@
   cd ..
   ```
 
-1. Get the Gitlab Runner registration from the Admin Panel. (Overview->Runners)
-
-1. Register a GitLab runner in the CI cluster.
-
-  ```shell
-  gcloud container clusters get-credentials anthos-platform-ci --region us-central1
-  helm repo add gitlab https://charts.gitlab.io
-  helm fetch gitlab/gitlab-runner --version 0.9.1
-  # Need to fix certs to be able to use https URL
-  helm template gitlab-runner-0.9.1.tgz -n ci --set gitlabUrl=http://${YOUR_GITLAB_HOSTNAME}/ --set runnerRegistrationToken=${TOKEN} --set rbac.create=true | kubectl apply -f -
-  ```
-
 1. Install Anthos Config Management in all of your clusters:
 
   ```shell
