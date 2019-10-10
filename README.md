@@ -1,5 +1,7 @@
 # Anthos Platform Demo Setup Instructions
 
+Feedback and questions: cloud-sa-anthos-platform@google.com
+
 For more information please visit:
 go/anthos-platform
 go/anthos-platform-tech-pitch
@@ -137,5 +139,6 @@ go/anthos-platform-demo
 
 ## TODO
 
+- Add instructions for locking down the ACM repo (theochamley@)
 - Add Anthos Config Management Docker image to repo (theochamley@)
 - Add instructions on how to add a cluster (on-prem or GKE)
