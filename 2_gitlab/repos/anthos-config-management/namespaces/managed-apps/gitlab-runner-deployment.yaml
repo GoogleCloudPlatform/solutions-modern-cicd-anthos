@@ -1,20 +1,18 @@
 apiVersion: apps/v1
 kind: Deployment     
 metadata:         
-  name: release-name-gitlab-runner        
+  name: gitlab-runner        
   labels:       
-    app: release-name-gitlab-runner
+    app: gitlab-runner
     chart: gitlab-runner-0.7.0
-    release: "release-name"
-    heritage: "Tiller"
 spec:
   selector:
     matchLabels:
-      app: release-name-gitlab-runner
+      app: gitlab-runner
   template:
     metadata:
       labels:
-        app: release-name-gitlab-runner
+        app: gitlab-runner
       annotations:
         checksum/configmap: c0a2bc3dca47b5a3a4f6177d06f7b70757d26f81b11aa5f4f7aa969623679c46
         checksum/secrets: 3893863238b3286f8a7495c529bac0e7a6068f253b59d0394388a8dacc4c5fff
@@ -46,7 +44,7 @@ spec:
           
       serviceAccountName: ""
       containers:
-      - name: release-name-gitlab-runner
+      - name: gitlab-runner
         image: gitlab/gitlab-runner:alpine-v12.1.0
         lifecycle:
           preStop:
@@ -97,10 +95,10 @@ spec:
         projected:
           sources:
             - secret:
-                name: "release-name-gitlab-runner"
+                name: "gitlab-runner"
                 items:
                   - key: runner-registration-token
                     path: runner-registration-token
       - name: scripts
         configMap:
-          name: release-name-gitlab-runner
+          name: gitlab-runner

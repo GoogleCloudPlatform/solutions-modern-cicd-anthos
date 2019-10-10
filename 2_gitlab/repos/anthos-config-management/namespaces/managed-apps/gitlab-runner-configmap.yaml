@@ -3,12 +3,10 @@
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: release-name-gitlab-runner
+  name: gitlab-runner
   labels:
-    app: release-name-gitlab-runner
+    app: gitlab-runner
     chart: gitlab-runner-0.7.0
-    release: "release-name"
-    heritage: "Tiller"
 data:
   entrypoint: |
     #!/bin/bash
