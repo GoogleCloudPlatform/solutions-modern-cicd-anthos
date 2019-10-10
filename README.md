@@ -86,19 +86,5 @@
   cd ..
   ```
 
-1. Configure a read only access token from your application repository that can be used for images to be pulled from GitLab. Go to Settings->Repository->Deploy Tokens, click "Expand".
-
-Name it "anthos-platform-reader" and enable the "read_registry" scope.
-
-Create a Kubernetes and add it to the ACM repo in your app namespace.
-
-kubectl create secret docker-registry- -docker-server=https://registry.${DOMAIN} --docker-username=gitlab+deploy-token-1 --docker-password=<PASSWORD_FROM_UI> --dry-run gitlab-registry -o yaml > 2_gitlab/repos/anthos-config-management/namespaces/managed-apps/vic-test/gitlab-registry-secret.yaml
-
-1. Commit that change back to the ACM repo.
-
-  ```shell
-  cd 2_gitlab/repos/anthos-config-management
-  git commit -m "Add gitlab registry secret"
-  git push origin master
-  cd ..
-  ```
+## TODO
+- Add Anthos Config Management Docker image to repo (theochamely@)
