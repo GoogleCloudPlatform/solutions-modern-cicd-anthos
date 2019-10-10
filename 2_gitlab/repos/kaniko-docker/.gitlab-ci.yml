@@ -1,8 +1,6 @@
 build-master-image:
   stage: build
   image: viglesiasce/kaniko-docker:latest
-  tags:
-  - gke-on-prem
   only:
   - master
   script:
