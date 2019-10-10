@@ -4,8 +4,13 @@ if [ -z ${GITLAB_HOSTNAME} ];then
   read -p "What is the GitLab hostname (i.e. my.gitlab.server)? " GITLAB_HOSTNAME
 fi
 
-read -p "What is the new app's name? " APP_NAME
-read -p "What is the repository group runner registration token? " RUNNER_REGISTRATION_TOKEN
+if [ -z ${APP_NAME} ];then
+  read -p "What is the new app's name? " APP_NAME
+fi
+
+if [ -z ${RUNNER_REGISTRATION_TOKEN} ];then
+  read -p "What is the repository group runner registration token? " RUNNER_REGISTRATION_TOKEN
+fi
 
 NAMESPACE_DIR=../namespaces/managed-apps/${APP_NAME}
 cp -a _namespace-template ${NAMESPACE_DIR}
