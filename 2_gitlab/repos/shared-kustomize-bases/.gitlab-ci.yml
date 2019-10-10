@@ -1,8 +1,6 @@
 kustomize-build:
   stage: build
   image: viglesiasce/kustomize
-  tags:
-  - gke-on-prem
   script:
   - mkdir -p output
   - kustomize build golang -o output/golang.yaml
