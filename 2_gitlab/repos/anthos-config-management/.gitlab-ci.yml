@@ -1,8 +1,8 @@
-Vet ha-euro-prod:
-  image: registry.platform.1.vic.dev/platform-admins/anthos-config-management:v1.0.0-rc.45
+Vet staging:
+  image: viglesiasce/anthos-config-management:v1.0.0-rc.45
   tags:
-  - ha-euro-prod
-  - acm-tests
+  - app:acm-tests
+  - cluster:staging
   variables:
     USER: root
     KUBECONFIG: kubeconfig
@@ -12,11 +12,25 @@ Vet ha-euro-prod:
   #- nomos status
   - nomos vet
 
-Vet packet-sjc1-smoke:
-  image: registry.platform.1.vic.dev/platform-admins/anthos-config-management:v1.0.0-rc.45
+Vet prod-central:
+  image: viglesiasce/anthos-config-management:v1.0.0-rc.45
   tags:
-  - packet-sjc1-smoke
-  - acm-tests
+  - app:acm-tests
+  - cluster:prod-central
+  variables:
+    USER: root
+    KUBECONFIG: kubeconfig
+  script:
+  - sh generate_config.sh
+  - nomos version
+  #- nomos status
+  - nomos vet
+
+Vet prod-east:
+  image: viglesiasce/anthos-config-management:v1.0.0-rc.45
+  tags:
+  - app:acm-tests
+  - cluster:prod-east
   variables:
     USER: root
     KUBECONFIG: kubeconfig
