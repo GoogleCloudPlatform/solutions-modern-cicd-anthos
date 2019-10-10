@@ -3,6 +3,7 @@ module "gke-gitlab" {
   project_id        = "${var.project_id}"
   domain            = "${var.domain}"
   certmanager_email = "no-reply@${var.project_id}.example.com"
+  gitlab_runner_install = true
 }
 
 data "google_container_cluster" "ci" {
