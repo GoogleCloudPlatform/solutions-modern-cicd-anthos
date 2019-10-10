@@ -7,13 +7,21 @@ go/anthos-platform-tech-pitch
 For a user guide on what to do after the install, please go to:
 go/anthos-platform-demo
 
-### Pre-requisites
+## Pre-requisites
+
+1. Install the following tools:
+
+- [Terraform](https://learn.hashicorp.com/terraform/getting-started/install.html)
+- [Helm](https://helm.sh/docs/using_helm/#installing-helm)
+- [kubectl](https://kubernetes.io/docs/tasks/tools/install-kubectl/)
 
 1. Clone this repo to your local machine.
 
-1. Install Docker, Terraform, Helm and kubectl
-
 1. Create a GCP project and activate it in your shell.
+
+1. Provision a domain that you can use to host GitLab, you'll need to be able to create a wildcard DNS entry for that domain pointing to an A record.
+
+## Install Anthos Platform
 
 1. Replace your project ID in each of the terraform.tfvars files:
 
