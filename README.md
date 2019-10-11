@@ -9,9 +9,17 @@ go/anthos-platform-tech-pitch
 For a user guide on what to do after the install, please go to:
 go/anthos-platform-demo
 
+## Contributing
+
 To contribute follows these instrcutions for the development flow:
 
-[Typical Developer Flow](https://docs.google.com/document/d/1DMIAlcSmh6LaqkGLNxDunP6O_zpwPSchA0ywcSWdlXQ/edit#heading=h.fovad3yfmh99)
+1. [Setup Local Repo](https://docs.google.com/document/d/1DMIAlcSmh6LaqkGLNxDunP6O_zpwPSchA0ywcSWdlXQ/edit#heading=h.w7ieayamciyz)
+
+1. [Configure the Gerrit Commit Hook Script](https://docs.google.com/document/d/1DMIAlcSmh6LaqkGLNxDunP6O_zpwPSchA0ywcSWdlXQ/edit#heading=h.csxq7bbwjeox)
+
+1. Make your changes and commit them. Make sure you commit includes a change ID.
+
+1. [Push the commit to Gerrit for review](https://docs.google.com/document/d/1DMIAlcSmh6LaqkGLNxDunP6O_zpwPSchA0ywcSWdlXQ/edit#heading=h.e4h88uajgibc)
 
 ## Pre-requisites
 
