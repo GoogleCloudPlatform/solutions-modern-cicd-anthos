@@ -9,6 +9,10 @@ go/anthos-platform-tech-pitch
 For a user guide on what to do after the install, please go to:
 go/anthos-platform-demo
 
+To contribute follows these instrcutions for the development flow:
+
+[Typical Developer Flow](https://docs.google.com/document/d/1DMIAlcSmh6LaqkGLNxDunP6O_zpwPSchA0ywcSWdlXQ/edit#heading=h.fovad3yfmh99)
+
 ## Pre-requisites
 
 1. Install the following tools:
