@@ -15,11 +15,31 @@ To contribute follows these instrcutions for the development flow:
 
 1. [Setup Local Repo](https://docs.google.com/document/d/1DMIAlcSmh6LaqkGLNxDunP6O_zpwPSchA0ywcSWdlXQ/edit#heading=h.w7ieayamciyz)
 
+  ```shell
+  git clone sso://cloudsolutionsarchitects/anthos-platform-setup
+  cd anthos-platform-setup
+  ```
+
 1. [Configure the Gerrit Commit Hook Script](https://docs.google.com/document/d/1DMIAlcSmh6LaqkGLNxDunP6O_zpwPSchA0ywcSWdlXQ/edit#heading=h.csxq7bbwjeox)
 
-1. Make your changes and commit them. Make sure you commit includes a change ID.
+  ```shell
+  hookfile=`git rev-parse --git-dir`/hooks/commit-msg
+  mkdir -p $(dirname $hookfile) 
+  curl -Lo $hookfile \
+    https://gerrit-review.googlesource.com/tools/hooks/commit-msg
+  chmod +x $hookfile
+  unset hookfile
+  ```
+
+1. Make your changes and commit them. Make sure your commit includes the auto-populated `Change-Id:` line in the message.
 
 1. [Push the commit to Gerrit for review](https://docs.google.com/document/d/1DMIAlcSmh6LaqkGLNxDunP6O_zpwPSchA0ywcSWdlXQ/edit#heading=h.e4h88uajgibc)
+
+  ```shell
+  git push origin HEAD:refs/for/master
+  ```
+
+  A link to your review request will be printed.
 
 ## Pre-requisites
 
