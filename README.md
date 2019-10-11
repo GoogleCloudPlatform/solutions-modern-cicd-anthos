@@ -137,8 +137,22 @@ go/anthos-platform-demo
 
 1. On the next page click the green "Run Pipeline" button.
 
-## TODO
+## TODOs
 
-- Add instructions for locking down the ACM repo (theochamley@)
+### Demo
+
+- Instructions for locking down the ACM repo (theochamley@)
 - Add Anthos Config Management Docker image to repo (theochamley@)
-- Add instructions on how to add a cluster (on-prem or GKE)
+- Instructions on how to add a cluster (on-prem or GKE) (smchgee@)
+
+### Sample repos
+
+- Add more kustomize bases (Java, Python, Ruby, etc), currently only have Go
+- Add more CI/CD patterns (Ruby Gems)
+
+### Alternative tools
+
+- Jenkins for CI/CD
+- GitHub Enterprise for SCM
+- Artifactory as the registry
+- App Delivery for CD/rollout
