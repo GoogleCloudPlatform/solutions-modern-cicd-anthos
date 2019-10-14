@@ -179,8 +179,8 @@ To contribute follows these instrcutions for the development flow:
 
 ### Sample repos
 
-- Add more kustomize bases (Java, Python, Ruby, etc), currently only have Go
-- Add more CI/CD patterns (Ruby Gems)
+- Add more [kustomize bases](2_gitlab/repos/shared-kustomize-bases) (Java, Python, Ruby, etc), currently only have Go
+- Add more [CI/CD patterns](2_gitlab/repos/shared-ci-cd) (Java, Ruby, Python, etc)
 
 ### Alternative tools
 
