@@ -45,7 +45,7 @@ To contribute follows these instrcutions for the development flow:
 
 1. Install the following tools:
 
-- [Terraform](https://learn.hashicorp.com/terraform/getting-started/install.html)
+- [Terraform 0.12+](https://learn.hashicorp.com/terraform/getting-started/install.html)
 - [Helm](https://helm.sh/docs/using_helm/#installing-helm)
 - [kubectl](https://kubernetes.io/docs/tasks/tools/install-kubectl/)
 
