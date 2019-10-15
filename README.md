@@ -169,6 +169,19 @@ To contribute follows these instrcutions for the development flow:
 
 1. On the next page click the green "Run Pipeline" button.
 
+### Re-run CI
+
+Some of the repositories created may have failed their first CI run due to missing runners. In this section you'll re-run CI on the repos that create images that other
+pipelines use.
+
+1. Go to the `platform-admins/kaniko-docker` repository in GitLab.
+
+1. Click CI/CD in the left nav, then click the "Run Pipeline" button at the top.
+
+1. Go to the `platform-admins/kustomize-docker` repository in GitLab.
+
+1. Click CI/CD in the left nav, then click the "Run Pipeline" button at the top.
+
 ## TODOs
 
 ### Demo
