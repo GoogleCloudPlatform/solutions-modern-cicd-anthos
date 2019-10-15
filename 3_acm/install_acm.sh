@@ -5,15 +5,15 @@ if [ -z ${GITLAB_HOSTNAME} ];then
 fi
 
 gcloud container clusters get-credentials anthos-platform-prod-central --region us-central1
-kubectl config delete-context prod-central
+! kubectl config delete-context prod-central
 kubectl config rename-context $(kubectl config current-context) prod-central
 
 gcloud container clusters get-credentials anthos-platform-prod-east --region us-east1
-kubectl config delete-context prod-east
+! kubectl config delete-context prod-east
 kubectl config rename-context $(kubectl config current-context) prod-east
 
 gcloud container clusters get-credentials anthos-platform-staging --region us-central1
-kubectl config delete-context staging
+! kubectl config delete-context staging
 kubectl config rename-context $(kubectl config current-context) staging
 
 for CONTEXT in prod-central prod-east staging; do

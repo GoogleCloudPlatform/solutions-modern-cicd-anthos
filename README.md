@@ -158,7 +158,7 @@ To contribute follows these instrcutions for the development flow:
   cd 2_gitlab/repos/anthos-config-management/templates
   export APP_NAME=acm-tests
   ./new-app.sh
-  git add namespaces/managed-apps/acm-tests
+  git add ../namespaces/managed-apps/acm-tests
   git commit -m "Add acm-tests namespace"
   GIT_SSH_COMMAND="ssh -i ../../../ssh-keys/anthos-config-management"    git push --set-upstream origin master
   ```
