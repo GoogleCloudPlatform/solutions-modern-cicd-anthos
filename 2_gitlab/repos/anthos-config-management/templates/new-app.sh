@@ -13,7 +13,8 @@ if [ -z ${RUNNER_REGISTRATION_TOKEN} ];then
 fi
 
 NAMESPACE_DIR=../namespaces/managed-apps/${APP_NAME}
-cp -a _namespace-template ${NAMESPACE_DIR}
+mkdir -p ${NAMESPACE_DIR}
+cp -a _namespace-template/* ${NAMESPACE_DIR}/
 
 pushd ${NAMESPACE_DIR}
   # Set the APP_NAME
