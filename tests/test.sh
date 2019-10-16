@@ -5,4 +5,6 @@ set -e
 # Display commands being run.
 set -x
 
+docker build -t anthos-platform-setup .
+
 echo "All passed"
