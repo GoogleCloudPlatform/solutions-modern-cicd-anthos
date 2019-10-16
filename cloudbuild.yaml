@@ -1,0 +1,82 @@
+timeout: 3600s
+steps:
+- name: 'gcr.io/cloud-builders/gsutil'
+  id: 'create-tf-state-bucket'
+  entrypoint: 'bash'
+  args:
+  - '-xe'
+  - '-c'
+  - |
+    gsutil mb gs://${PROJECT_ID}-anthos-platform-tf-state || true
+- name: 'gcr.io/kaniko-project/executor:latest'
+  id: 'build-installer-image'
+  args:
+  - --destination=gcr.io/${PROJECT_ID}/anthos-platform-installer
+  - --cache=true
+  - --cache-ttl=12h
+- name: 'gcr.io/${PROJECT_ID}/anthos-platform-installer'
+  id: 'set-terraform-vars'
+  entrypoint: 'bash'
+  args:
+  - '-xe'
+  - '-c'
+  - |
+    sed -i "s/YOUR_PROJECT_ID/${PROJECT_ID}/g" 0_foundation/terraform.tfvars
+    sed -i "s/YOUR_PROJECT_ID/${PROJECT_ID}/g" 1_clusters/terraform.tfvars
+    sed -i "s/YOUR_PROJECT_ID/${PROJECT_ID}/g" 2_gitlab/terraform.tfvars
+- name: 'gcr.io/${PROJECT_ID}/anthos-platform-installer'
+  id: 'create-foundation'
+  entrypoint: 'bash'
+  args:
+  - '-xe'
+  - '-c'
+  - |
+    cd 0_foundation
+    cat > backend.tf <<EOF
+    terraform {
+      backend "gcs" {
+        bucket  = "${PROJECT_ID}-anthos-platform-tf-state"
+        prefix  = "foundation"
+      }
+    }
+    EOF
+    terraform init
+    terraform apply -auto-approve
+- name: 'gcr.io/${PROJECT_ID}/anthos-platform-installer'
+  id: 'create-clusters'
+  entrypoint: 'bash'
+  args:
+  - '-xe'
+  - '-c'
+  - |
+    cd 1_clusters
+    cat > backend.tf <<EOF
+    terraform {
+      backend "gcs" {
+        bucket  = "${PROJECT_ID}-anthos-platform-tf-state"
+        prefix  = "clusters"
+      }
+    }
+    EOF
+    terraform init
+    terraform apply -auto-approve
+- name: 'gcr.io/${PROJECT_ID}/anthos-platform-installer'
+  id: 'setup-gitlab'
+  entrypoint: 'bash'
+  args:
+  - '-xe'
+  - '-c'
+  - |
+    cd 2_gitlab
+    cat > backend.tf <<EOF
+    terraform {
+      backend "gcs" {
+        bucket  = "${PROJECT_ID}-anthos-platform-tf-state"
+        prefix  = "gitlab"
+      }
+    }
+    EOF
+    # Gitlab URL will be gitlab.$_DOMAIN
+    sed -i "s/YOUR_DOMAIN/${_DOMAIN}/g" terraform.tfvars
+    terraform init
+    terraform apply -auto-approve
