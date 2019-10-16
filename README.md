@@ -1,6 +1,7 @@
 # Anthos Platform Demo Setup Instructions
 
 Feedback and questions: cloud-sa-anthos-platform@google.com
+Open an issue: [New issue in Buganizer](https://b.corp.google.com/issues/new?component=759009&template=1357580)
 
 For more information please visit:
 go/anthos-platform
