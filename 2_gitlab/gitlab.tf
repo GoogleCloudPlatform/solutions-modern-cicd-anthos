@@ -5,4 +5,3 @@ module "gke-gitlab" {
   certmanager_email = "no-reply@${var.project_id}.example.com"
   gitlab_runner_install = true
 }
-

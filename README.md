@@ -42,6 +42,30 @@ To contribute follows these instrcutions for the development flow:
 
   A link to your review request will be printed.
 
+## Quick Start
+
+1. Install gcloud SDK and create a new project.
+
+1. Run the following commands to setup Cloud Build
+```
+
+```shell
+export PROJECT_ID=<INSERT_YOUR_PROJECT_ID>
+export DOMAIN=<INSERT_YOUR_DOMAIN>
+gcloud config set project ${PROJECT_ID}
+export PROJECT_NUMBER=$(gcloud projects describe ${PROJECT_ID} --format 'value(projectNumber)')
+gcloud services enable cloudbuild.googleapis.com
+gcloud projects add-iam-policy-binding ${PROJECT_ID} --member serviceAccount:${PROJECT_NUMBER}@cloudbuild.gserviceaccount.com --role roles/owner
+```
+
+1. Run Cloud Build to create the necessary resources.
+
+  ```shell
+  gcloud builds submit --substitutions=_DOMAIN=${DOMAIN}
+  ```
+
+1. Jump to the [Configure GitLab section](#configure-gitlab)
+
 ## Pre-requisites
 
 1. Install the following tools:
@@ -91,7 +115,7 @@ To contribute follows these instrcutions for the development flow:
   cd ..
   ```
 
-### Provision and configure GitLab
+### Provision GitLab
 
 1. Configure the domain you'll use for Gitlab in the terraform.tfvars file
 
@@ -110,6 +134,8 @@ To contribute follows these instrcutions for the development flow:
   terraform apply # type yes to confirm
   cd ..
   ```
+
+### Configure GitLab
 
 1. The GitLab domain and address will be printed after the commands complete. Setup DNS wildcard domain to point at the IP address.
 
