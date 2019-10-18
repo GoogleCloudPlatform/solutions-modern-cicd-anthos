@@ -1,4 +1,3 @@
----
 # Source: gitlab-runner/templates/configmap.yaml
 apiVersion: v1
 kind: ConfigMap
@@ -51,13 +50,6 @@ data:
     check_interval = 30
     log_level = "info"
     listen_address = '[::]:9252'
-    [[runners]]
-    executor = "kubernetes"
-    [runners.kubernetes]
-    [[runners.kubernetes.volumes.secret]]
-      name = "ci-secrets"
-      mount_path = "/ci-secrets"
-      read_only = true
   configure: |
     set -e
     cp /init-secrets/* /secrets

@@ -2,7 +2,7 @@ apiVersion: apps/v1
 kind: Deployment     
 metadata:         
   name: gitlab-runner        
-  labels:       
+  labels:
     app: gitlab-runner
     chart: gitlab-runner-0.7.0
 spec:
@@ -28,7 +28,7 @@ spec:
         image: gitlab/gitlab-runner:alpine-v12.1.0
         envFrom:
         - configMapRef:
-            name: gitlab-runner-config
+            name: gitlab-runner-config-acm
         volumeMounts:
         - name: runner-secrets
           mountPath: /secrets
@@ -44,7 +44,7 @@ spec:
           
       serviceAccountName: ""
       containers:
-      - name: gitlab-runner
+      - name: release-name-gitlab-runner
         image: gitlab/gitlab-runner:alpine-v12.1.0
         lifecycle:
           preStop:
@@ -54,7 +54,7 @@ spec:
         command: ["/bin/bash", "/scripts/entrypoint"]
         envFrom:
         - configMapRef:
-            name: gitlab-runner-config
+            name: gitlab-runner-config-acm
         livenessProbe:
           exec:
             command: ["/bin/bash", "/scripts/check-live"]
