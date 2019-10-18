@@ -27,7 +27,7 @@ resource "google_compute_subnetwork" "anthos-platform-central" {
       ip_cidr_range = "172.17.0.0/16"
     },
     {
-      range_name    = "anthos-platform-pods-ci"
+      range_name    = "anthos-platform-pods-dev"
       ip_cidr_range = "172.18.0.0/16"
     },
     {
@@ -39,7 +39,7 @@ resource "google_compute_subnetwork" "anthos-platform-central" {
       ip_cidr_range = "192.168.1.0/24"
     },
     {
-      range_name    = "anthos-platform-services-ci"
+      range_name    = "anthos-platform-services-dev"
       ip_cidr_range = "192.168.2.0/24"
     }
   ]

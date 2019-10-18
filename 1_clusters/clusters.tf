@@ -62,3 +62,18 @@ module "anthos-platform-staging" {
   create_service_account = false
   service_account        = "${var.compute_engine_service_account}"
 }
+
+
+module "anthos-platform-dev" {
+  source                 = "github.com/terraform-google-modules/terraform-google-kubernetes-engine"
+  project_id             = "${var.project_id}"
+  name                   = "anthos-platform-dev"
+  regional               = true
+  region                 = "us-central1"
+  network                = "${data.google_compute_network.anthos-platform.name}"
+  subnetwork             = "${data.google_compute_subnetwork.anthos-platform-central.name}"
+  ip_range_pods          = "anthos-platform-pods-dev"
+  ip_range_services      = "anthos-platform-services-dev"
+  create_service_account = false
+  service_account        = "${var.compute_engine_service_account}"
+}
