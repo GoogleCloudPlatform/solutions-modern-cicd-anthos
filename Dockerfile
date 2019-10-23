@@ -1,7 +1,8 @@
 FROM ubuntu:18.04
 RUN apt-get update && \
     apt-get install -y wget gnupg2 unzip git jq \
-                       apt-transport-https ca-certificates
+                       apt-transport-https ca-certificates \
+                       dnsutils curl gettext
 
 ENV TERRAFORM_VERSION=0.12.10
 ENV HELM_VERSION=2.14.3

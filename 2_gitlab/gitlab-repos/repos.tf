@@ -20,6 +20,7 @@ resource "gitlab_project" "anthos-config-management" {
   description  = "Anthos Config Management repo"
   namespace_id = "${gitlab_group.platform-admins.id}"
   visibility_level = "internal"
+  default_branch = "master"
 }
 
 resource "gitlab_project" "golang-template" {
@@ -27,6 +28,7 @@ resource "gitlab_project" "golang-template" {
   description  = "Template for new Go applications"
   namespace_id = "${gitlab_group.platform-admins.id}"
   visibility_level = "internal"
+  default_branch = "master"
 }
 
 resource "gitlab_project" "golang-template-env" {
@@ -34,6 +36,7 @@ resource "gitlab_project" "golang-template-env" {
   description  = "Template for new Go app environment repos"
   namespace_id = "${gitlab_group.platform-admins.id}"
   visibility_level = "internal"
+  default_branch = "master"
 }
 
 resource "gitlab_project" "shared-kustomize-bases" {
@@ -41,6 +44,7 @@ resource "gitlab_project" "shared-kustomize-bases" {
   description  = "Kubernetes Application Configuration Bases"
   namespace_id = "${gitlab_group.platform-admins.id}"
   visibility_level = "internal"
+  default_branch = "master"
 }
 
 resource "gitlab_project" "kaniko-docker" {
@@ -48,6 +52,7 @@ resource "gitlab_project" "kaniko-docker" {
   description  = "Docker+Kaniko Docker image"
   namespace_id = "${gitlab_group.platform-admins.id}"
   visibility_level = "internal"
+  default_branch = "master"
 }
 
 resource "gitlab_project" "kustomize-docker" {
@@ -55,6 +60,7 @@ resource "gitlab_project" "kustomize-docker" {
   description  = "Kustomize Docker image"
   namespace_id = "${gitlab_group.platform-admins.id}"
   visibility_level = "internal"
+  default_branch = "master"
 }
 
 resource "gitlab_project" "shared-ci-cd" {
@@ -62,6 +68,7 @@ resource "gitlab_project" "shared-ci-cd" {
   description  = "Shared CI/CD configurations"
   namespace_id = "${gitlab_group.platform-admins.id}"
   visibility_level = "internal"
+  default_branch = "master"
 }
 
 

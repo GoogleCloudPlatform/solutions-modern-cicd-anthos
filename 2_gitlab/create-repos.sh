@@ -22,36 +22,43 @@ pushd gitlab-repos
   popd
   terraform init
   terraform plan -var gitlab_token=${GITLAB_TOKEN} -var gitlab_hostname=${GITLAB_HOSTNAME}
-  terraform apply -var gitlab_token=${GITLAB_TOKEN} -var gitlab_hostname=${GITLAB_HOSTNAME}
+  if [ -z ${TERRAFORM_AUTO_APPROVE} ];then
+    terraform apply -var gitlab_token=${GITLAB_TOKEN} -var gitlab_hostname=${GITLAB_HOSTNAME}
+  else
+    terraform apply -auto-approve -var gitlab_token=${GITLAB_TOKEN} -var gitlab_hostname=${GITLAB_HOSTNAME}
+  fi
 popd
 
 # TODO: Don't hardcode the number of repos, list them all first
 for i in `seq 1 7`;do
-  curl --header "Authorization: Bearer ${GITLAB_TOKEN}" -X PUT --form 'shared_runners_enabled=true' https://${GITLAB_HOSTNAME}/api/v4/projects/$i
+  curl --header "PRIVATE-TOKEN: ${GITLAB_TOKEN}" -X PUT --form 'shared_runners_enabled=true' https://${GITLAB_HOSTNAME}/api/v4/projects/$i
 done
 
 pushd repos
   for repo in ${REPOS}; do
     pushd ${repo}
-      export GIT_SSH_COMMAND="ssh -i ../../../ssh-keys/${repo}"
+      export GIT_SSH_COMMAND="ssh -o \"StrictHostKeyChecking=no\" -i ../../../ssh-keys/${repo}"
       rm -rf .git
       git init
-      if [ "${repo}" == "golang-template" ];then
-        sed -i.bak "s/GITLAB_HOSTNAME/${GITLAB_HOSTNAME}/g" k8s/stg/kustomization.yaml
-        sed -i.bak "s/GITLAB_HOSTNAME/${GITLAB_HOSTNAME}/g" k8s/prod/kustomization.yaml
-        sed -i.bak "s/GITLAB_HOSTNAME/${GITLAB_HOSTNAME}/g" k8s/dev/kustomization.yaml
-        rm k8s/stg/kustomization.yaml.bak
-        rm k8s/prod/kustomization.yaml.bak
-        rm k8s/dev/kustomization.yaml.bak
-      fi
-      if [ "${repo}" == "anthos-config-management" ]; then
-        sed -i.bak "s/GITLAB_HOSTNAME/${GITLAB_HOSTNAME}/g" namespaces/acm-tests/gitlab-runner-configmap-per-cluster.yaml
-        rm namespaces/acm-tests/gitlab-runner-configmap-per-cluster.yaml.bak
-      fi
-      git add .
-      git commit -m "Initial commit"
       git remote add origin git@${GITLAB_HOSTNAME}:platform-admins/${repo}.git
-      git push origin master
+      # Check if the repo has already been pushed to GitLab, if so skip this part.
+      if ! git ls-remote --exit-code --heads origin master; then
+        if [ "${repo}" == "golang-template" ];then
+          sed -i.bak "s/GITLAB_HOSTNAME/${GITLAB_HOSTNAME}/g" k8s/stg/kustomization.yaml
+          sed -i.bak "s/GITLAB_HOSTNAME/${GITLAB_HOSTNAME}/g" k8s/prod/kustomization.yaml
+          sed -i.bak "s/GITLAB_HOSTNAME/${GITLAB_HOSTNAME}/g" k8s/dev/kustomization.yaml
+          rm k8s/stg/kustomization.yaml.bak
+          rm k8s/prod/kustomization.yaml.bak
+          rm k8s/dev/kustomization.yaml.bak
+        fi
+        if [ "${repo}" == "anthos-config-management" ]; then
+          sed -i.bak "s/GITLAB_HOSTNAME/${GITLAB_HOSTNAME}/g" namespaces/acm-tests/gitlab-runner-configmap-per-cluster.yaml
+          rm namespaces/acm-tests/gitlab-runner-configmap-per-cluster.yaml.bak
+        fi
+        git add .
+        git commit -m "Initial commit"
+        git push origin master
+      fi
     popd
   done
 popd

@@ -10,35 +10,50 @@ if [ -z ${ACM_RUNNER_TOKEN} ]; then
 fi
 
 gcloud container clusters get-credentials anthos-platform-prod-central --region us-central1
-! kubectl config delete-context prod-central
+
+! kubectl config delete-context prod-central > /dev/null 2>&1
 kubectl config rename-context $(kubectl config current-context) prod-central
 
 gcloud container clusters get-credentials anthos-platform-prod-east --region us-east1
-! kubectl config delete-context prod-east
+! kubectl config delete-context prod-east > /dev/null 2>&1
 kubectl config rename-context $(kubectl config current-context) prod-east
 
 gcloud container clusters get-credentials anthos-platform-staging --region us-central1
-! kubectl config delete-context staging
+! kubectl config delete-context staging > /dev/null 2>&1
 kubectl config rename-context $(kubectl config current-context) staging
 
 for CONTEXT in prod-central prod-east staging; do
   kubectl config use-context ${CONTEXT}
   # We need to have this namespace before enabling ACM, because we need to create
   # a secret in it
-  kubectl delete ns acm-tests && sleep 30 || true
-  kubectl create ns acm-tests
-  kubectl -n acm-tests create secret generic gitlab-runner \
-    --from-literal=runner-registration-token=${ACM_RUNNER_TOKEN}
+  # Check it GitLab Runner is already running
+  if ! kubectl get deployments -n acm-tests gitlab-runner; then
+    kubectl delete ns acm-tests --wait=true || true
+    kubectl create ns acm-tests
+    kubectl -n acm-tests create secret generic gitlab-runner \
+      --from-literal=runner-registration-token=${ACM_RUNNER_TOKEN}
 
-  kubectl apply -f config-management-operator.yaml
-  KEYNAME=${CONTEXT}
-  kubectl delete secret git-creds --namespace=config-management-system || true
-  kubectl create secret generic git-creds --namespace=config-management-system \
-          --from-file=ssh=../ssh-keys/${KEYNAME}
-  GITLAB_ADDRESS=$(gcloud compute addresses describe gitlab --region us-central1 --format 'value(address)')
-  export GITLAB_HOSTNAME=${GITLAB_HOSTNAME}
-  export CONTEXT=${CONTEXT}
-  cat config-management.yaml.tpl | envsubst > config-management-${CONTEXT}.yaml
-  kubectl apply -f config-management-${CONTEXT}.yaml
-  rm config-management-${CONTEXT}.yaml
+    kubectl apply -f config-management-operator.yaml
+    KEYNAME=${CONTEXT}
+    kubectl delete secret git-creds --namespace=config-management-system > /dev/null 2>&1 || true
+    kubectl create secret generic git-creds --namespace=config-management-system \
+            --from-file=ssh=../ssh-keys/${KEYNAME}
+    GITLAB_ADDRESS=$(gcloud compute addresses describe gitlab --region us-central1 --format 'value(address)')
+    export GITLAB_HOSTNAME=${GITLAB_HOSTNAME}
+    export CONTEXT=${CONTEXT}
+    cat config-management.yaml.tpl | envsubst > config-management-${CONTEXT}.yaml
+    kubectl apply -f config-management-${CONTEXT}.yaml
+    rm config-management-${CONTEXT}.yaml
+  # Runner is already installed, make sure the token is up to date
+  # If not up to date, re-create the secret and restart the runner pod
+  else
+    export ACM_RUNNER_TOKEN_BASE64=$(echo ${ACM_RUNNER_TOKEN} | base64)
+    export CURRENT_ACM_TOKEN_BASE64=$(kubectl get secret -n acm-tests gitlab-runner -o jsonpath='{.data.runner-registration-token}' || true)
+    if [ "${ACM_RUNNER_TOKEN_BASE64}" != "${CURRENT_ACM_TOKEN_BASE64}" ];then
+      kubectl -n acm-tests delete secret gitlab-runner --ignore-not-found=true
+      kubectl -n acm-tests create secret generic gitlab-runner \
+              --from-literal=runner-registration-token=${ACM_RUNNER_TOKEN}
+      kubectl -n acm-tests delete pod -l app=gitlab-runner
+    fi
+  fi
 done

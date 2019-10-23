@@ -64,7 +64,9 @@ To contribute follows these instrcutions for the development flow:
     gcloud builds submit --substitutions=_DOMAIN=${DOMAIN}
     ```
 
-1. Jump to the [Configure GitLab section](#configure-gitlab)
+1. Log in to your GitLab instance with the URL, username and password printed at the end of the build.
+
+1. Follow the steps in go/anthos-platform-guide to go through a user journey (add, deploy, and change applications).
 
 ## Pre-requisites
 
