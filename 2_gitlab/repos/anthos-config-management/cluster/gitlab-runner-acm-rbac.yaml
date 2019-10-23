@@ -5,15 +5,8 @@ metadata:
   name: gitlab-runner-acm
 rules:
 - apiGroups:
-  - "addons.sigs.k8s.io"
-  resources: ["configmanagements"]
-  verbs:
-  - get
-  - list
-  - watch
-- apiGroups:
   - "configmanagement.gke.io"
-  resources: ["configmanagements"]
+  resources: ["*"]
   verbs:
   - get
   - list

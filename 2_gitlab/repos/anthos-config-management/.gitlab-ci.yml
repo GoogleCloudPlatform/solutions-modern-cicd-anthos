@@ -1,5 +1,5 @@
 Vet staging:
-  image: viglesiasce/anthos-config-management:v1.0.0-rc.45
+  image: gcr.io/config-management-release/nomos:v1.2.0-rc.11
   tags:
   - app:acm-tests
   - cluster:staging
@@ -9,11 +9,11 @@ Vet staging:
   script:
   - sh generate_config.sh
   - nomos version
-  #- nomos status
+  - nomos status
   - nomos vet
 
 Vet prod-central:
-  image: viglesiasce/anthos-config-management:v1.0.0-rc.45
+  image: gcr.io/config-management-release/nomos:v1.2.0-rc.11
   tags:
   - app:acm-tests
   - cluster:prod-central
@@ -23,11 +23,11 @@ Vet prod-central:
   script:
   - sh generate_config.sh
   - nomos version
-  #- nomos status
+  - nomos status
   - nomos vet
 
 Vet prod-east:
-  image: viglesiasce/anthos-config-management:v1.0.0-rc.45
+  image: gcr.io/config-management-release/nomos:v1.2.0-rc.11
   tags:
   - app:acm-tests
   - cluster:prod-east
@@ -37,5 +37,5 @@ Vet prod-east:
   script:
   - sh generate_config.sh
   - nomos version
-  #- nomos status
+  - nomos status
   - nomos vet

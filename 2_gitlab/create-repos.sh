@@ -4,7 +4,7 @@ if [ -z ${GITLAB_HOSTNAME} ];then
 fi
 
 if [ -z ${GITLAB_TOKEN} ];then
-read -p "What is the access token? " GITLAB_TOKEN
+read -s -p "What is the access token? " GITLAB_TOKEN
 fi
 
 REPOS="anthos-config-management shared-kustomize-bases shared-ci-cd golang-template golang-template-env kustomize-docker kaniko-docker"
@@ -14,10 +14,10 @@ pushd gitlab-repos
   mkdir -p ../../ssh-keys
   pushd ../../ssh-keys
     for repo in ${REPOS}; do
-       ssh-keygen -f ${repo} -N ''
+       test -f ${repo} || ssh-keygen -f ${repo} -N ''
     done
     for cluster in ${CLUSTERS}; do
-       ssh-keygen -f ${cluster} -N ''
+       test -f ${cluster} || ssh-keygen -f ${cluster} -N ''
     done
   popd
   terraform init
@@ -37,9 +37,16 @@ pushd repos
       rm -rf .git
       git init
       if [ "${repo}" == "golang-template" ];then
-        sed -i s/GITLAB_HOSTNAME/${GITLAB_HOSTNAME}/g k8s/stg/kustomization.yaml
-        sed -i s/GITLAB_HOSTNAME/${GITLAB_HOSTNAME}/g k8s/prod/kustomization.yaml
-        sed -i s/GITLAB_HOSTNAME/${GITLAB_HOSTNAME}/g k8s/dev/kustomization.yaml
+        sed -i.bak "s/GITLAB_HOSTNAME/${GITLAB_HOSTNAME}/g" k8s/stg/kustomization.yaml
+        sed -i.bak "s/GITLAB_HOSTNAME/${GITLAB_HOSTNAME}/g" k8s/prod/kustomization.yaml
+        sed -i.bak "s/GITLAB_HOSTNAME/${GITLAB_HOSTNAME}/g" k8s/dev/kustomization.yaml
+        rm k8s/stg/kustomization.yaml.bak
+        rm k8s/prod/kustomization.yaml.bak
+        rm k8s/dev/kustomization.yaml.bak
+      fi
+      if [ "${repo}" == "anthos-config-management" ]; then
+        sed -i.bak "s/GITLAB_HOSTNAME/${GITLAB_HOSTNAME}/g" namespaces/acm-tests/gitlab-runner-configmap-per-cluster.yaml
+        rm namespaces/acm-tests/gitlab-runner-configmap-per-cluster.yaml.bak
       fi
       git add .
       git commit -m "Initial commit"
