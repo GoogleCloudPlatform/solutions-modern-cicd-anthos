@@ -64,6 +64,9 @@ To contribute follows these instrcutions for the development flow:
     gcloud builds submit --substitutions=_DOMAIN=${DOMAIN}
     ```
 
+1. The build will run for 10-15 minutes and in the middle will idle and present
+   you with an IP address and DNS name that you will need to wire up in your DNS provider. Once the DNS name resolves properly, the install will continue.
+
 1. Log in to your GitLab instance with the URL, username and password printed at the end of the build.
 
 1. Follow the steps in go/anthos-platform-guide to go through a user journey (add, deploy, and change applications).
