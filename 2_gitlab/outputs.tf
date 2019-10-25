@@ -1,6 +1,6 @@
 
 output "gitlab_address" {
-  value       = "${module.gke-gitlab.gitlab_address}"
+  value       = "${data.google_compute_address.gitlab.address}"
   description = "Point your wildcard domain to this IP address as an A record"
 }
 
