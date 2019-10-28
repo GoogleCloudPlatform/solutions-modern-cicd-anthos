@@ -11,6 +11,8 @@ For more information please visit:
 For a user guide on what to do after the install, please go to:
 [go/anthos-platform-demo](http://go/anthos-platform-demo)
 
+![Anthos Platform High Level Architecture](images/anthos-platform-arch.png)
+
 ## Quick Start
 
 1. Install gcloud SDK and create a new project.
