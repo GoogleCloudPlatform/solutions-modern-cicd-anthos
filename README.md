@@ -167,7 +167,7 @@ To contribute follows these instrcutions for the development flow:
 
 1. Go to <https://${GITLAB_HOSTNAME}/profile/personal_access_tokens> to create an access token for project creation that has access to all scopes:
 
-    ![Access token creation page](2_gitlab/images/access-token.png)
+    ![Access token creation page](images/access-token.png)
 
 1. Run the script to populate repos in GitLab. It will ask you for the token you just created.
 
