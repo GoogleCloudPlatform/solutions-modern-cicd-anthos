@@ -230,10 +230,10 @@ pipelines use.
 
 * Instructions on how to add a cluster (on-prem or GKE) (smchgee@)
 
-### Sample repos
+### Starter repos
 
-* Add more [kustomize bases](2_gitlab/repos/shared-kustomize-bases) (Java, Python, Ruby, etc), currently only have Go
-* Add more [CI/CD patterns](2_gitlab/repos/shared-ci-cd) (Java, Ruby, Python, etc)
+* Add more [kustomize bases](starter-repos/shared-kustomize-bases) (Java, Python, Ruby, etc), currently only have Go
+* Add more [CI/CD patterns](starter-repos/shared-ci-cd) (Java, Ruby, Python, etc)
 
 ### Alternative tools
 

@@ -34,10 +34,10 @@ for i in `seq 1 7`;do
   curl --header "PRIVATE-TOKEN: ${GITLAB_TOKEN}" -X PUT --form 'shared_runners_enabled=true' https://${GITLAB_HOSTNAME}/api/v4/projects/$i
 done
 
-pushd repos
+pushd ../starter-repos
   for repo in ${REPOS}; do
     pushd ${repo}
-      export GIT_SSH_COMMAND="ssh -o \"StrictHostKeyChecking=no\" -i ../../../ssh-keys/${repo}"
+      export GIT_SSH_COMMAND="ssh -o \"StrictHostKeyChecking=no\" -i ../../ssh-keys/${repo}"
       rm -rf .git
       git init
       git remote add origin git@${GITLAB_HOSTNAME}:platform-admins/${repo}.git
