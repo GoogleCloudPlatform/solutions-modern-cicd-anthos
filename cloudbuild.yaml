@@ -15,22 +15,14 @@ steps:
   - --cache=true
   - --cache-ttl=12h
 - name: 'gcr.io/${PROJECT_ID}/anthos-platform-installer'
-  id: 'set-terraform-vars'
-  entrypoint: 'bash'
-  args:
-  - '-xe'
-  - '-c'
-  - |
-    sed -i "s/YOUR_PROJECT_ID/${PROJECT_ID}/g" 0_foundation/terraform.tfvars
-    sed -i "s/YOUR_PROJECT_ID/${PROJECT_ID}/g" 1_clusters/terraform.tfvars
-    sed -i "s/YOUR_PROJECT_ID/${PROJECT_ID}/g" 2_gitlab/terraform.tfvars
-- name: 'gcr.io/${PROJECT_ID}/anthos-platform-installer'
   id: 'create-foundation'
   entrypoint: 'bash'
   args:
   - '-xe'
   - '-c'
   - |
+    sed -i "s/YOUR_PROJECT_ID/${PROJECT_ID}/g" 0_foundation/terraform.tfvars
+
     cd 0_foundation
     cat > backend.tf <<EOF
     terraform {
@@ -49,6 +41,8 @@ steps:
   - '-xe'
   - '-c'
   - |
+    sed -i "s/YOUR_PROJECT_ID/${PROJECT_ID}/g" 1_clusters/terraform.tfvars
+
     cd 1_clusters
     cat > backend.tf <<EOF
     terraform {
@@ -67,6 +61,8 @@ steps:
   - '-xe'
   - '-c'
   - |
+    sed -i "s/YOUR_PROJECT_ID/${PROJECT_ID}/g" 2_gitlab/terraform.tfvars
+
     cd 2_gitlab
     cat > backend.tf <<EOF
     terraform {
