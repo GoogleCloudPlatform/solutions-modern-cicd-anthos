@@ -4,7 +4,7 @@ variables:
 
 kustomize:
   stage: hydrate-manifests
-  image: ${CI_REGISTRY}/platform-admins/kustomize-docker
+  image: gcr.io/cloud-solutions-images/kustomize
   script:
   # Add auth to git urls
   - git config --global url."https://gitlab-ci-token:${CI_JOB_TOKEN}@${CI_SERVER_HOST}".insteadOf "https://${CI_SERVER_HOST}"
@@ -29,7 +29,7 @@ push-manifests:
     refs:
       - master
   stage: push-manifests
-  image: ${CI_REGISTRY}/platform-admins/kustomize-docker
+  image: gcr.io/cloud-solutions-images/kustomize
   script:
   - |
     env

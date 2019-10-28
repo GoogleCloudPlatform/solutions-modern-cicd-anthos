@@ -1,6 +1,6 @@
 kustomize-build:
   stage: build
-  image: viglesiasce/kustomize
+  image: gcr.io/cloud-solutions-images/kustomize
   script:
   - mkdir -p output
   - kustomize build golang -o output/golang.yaml

@@ -13,7 +13,7 @@ unit-test:
 
 build-master-image:
   stage: build
-  image: ${CI_REGISTRY}/platform-admins/kaniko-docker:latest
+  image: gcr.io/cloud-solutions-images/kaniko
   only:
   - master
   script:
