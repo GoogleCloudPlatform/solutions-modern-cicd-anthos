@@ -1,6 +1,6 @@
 # Anthos Platform Demo Setup Instructions
 
-Feedback and questions: cloud-sa-anthos-platform@google.com, or 
+Feedback and questions: cloud-sa-anthos-platform@google.com, or
 open an issue: [New issue in Buganizer](https://b.corp.google.com/issues/new?component=759009&template=1357580)
 
 For more information please visit:
@@ -81,10 +81,10 @@ To contribute follows these instrcutions for the development flow:
 ## Pre-requisites
 
 1. Install the following tools:
-   - [Terraform 0.12+](https://learn.hashicorp.com/terraform/ getting-started/install.html)
-   - [Helm](https://helm.sh/docs/using_helm/#installing-helm)
-   - [kubectl](https://kubernetes.io/docs/tasks/tools/ install-kubectl/)
-   - envsubst (use Homebrew for macOS: `brew install gettext`)
+   * [Terraform 0.12+](https://learn.hashicorp.com/terraform/getting-started/install.html)
+   * [Helm](https://helm.sh/docs/using_helm/#installing-helm)
+   * [kubectl](https://kubernetes.io/docs/tasks/tools/install-kubectl/)
+   * envsubst (use Homebrew for macOS: `brew install gettext`)
 
 1. Clone this repo to your local machine.
 
@@ -165,9 +165,9 @@ To contribute follows these instrcutions for the development flow:
 
 1. Log in to GitLab with the root user and password printed in the previous step.
 
-1. Go to https://${GITLAB_HOSTNAME}/profile/personal_access_tokens, to create an access token for project creation that has access to all scopes:
+1. Go to <https://${GITLAB_HOSTNAME}/profile/personal_access_tokens> to create an access token for project creation that has access to all scopes:
 
-    ![](2_gitlab/images/access-token.png)
+    ![Access token creation page](2_gitlab/images/access-token.png)
 
 1. Run the script to populate repos in GitLab. It will ask you for the token you just created.
 
@@ -228,16 +228,16 @@ pipelines use.
 
 ### Demo
 
-- Instructions on how to add a cluster (on-prem or GKE) (smchgee@)
+* Instructions on how to add a cluster (on-prem or GKE) (smchgee@)
 
 ### Sample repos
 
-- Add more [kustomize bases](2_gitlab/repos/shared-kustomize-bases) (Java, Python, Ruby, etc), currently only have Go
-- Add more [CI/CD patterns](2_gitlab/repos/shared-ci-cd) (Java, Ruby, Python, etc)
+* Add more [kustomize bases](2_gitlab/repos/shared-kustomize-bases) (Java, Python, Ruby, etc), currently only have Go
+* Add more [CI/CD patterns](2_gitlab/repos/shared-ci-cd) (Java, Ruby, Python, etc)
 
 ### Alternative tools
 
-- Jenkins for CI/CD
-- GitHub Enterprise for SCM
-- Artifactory as the registry
-- App Delivery for CD/rollout
+* Jenkins for CI/CD
+* GitHub Enterprise for SCM
+* Artifactory as the registry
+* App Delivery for CD/rollout
