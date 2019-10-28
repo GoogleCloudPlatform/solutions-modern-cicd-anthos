@@ -58,14 +58,21 @@ To contribute follows these instrcutions for the development flow:
     gcloud projects add-iam-policy-binding ${PROJECT_ID} --member serviceAccount:${PROJECT_NUMBER}@cloudbuild.gserviceaccount.com   --role roles/owner
     ```
 
+1. Provision the address that GitLab will use.
+
+    ```shell
+    gcloud services enable compute.googleapis.com
+    gcloud compute addresses create --region us-central1 gitlab
+    gcloud compute addresses list --filter="name=('gitlab')"
+    ```
+
+1. Configure a DNS A record pointing *.<YOUR DOMAIN> to the address you just created.
+
 1. Run Cloud Build to create the necessary resources.
 
     ```shell
     gcloud builds submit --substitutions=_DOMAIN=${DOMAIN}
     ```
-
-1. The build will run for 10-15 minutes and in the middle will idle and present
-   you with an IP address and DNS name that you will need to wire up in your DNS provider. Once the DNS name resolves properly, the install will continue.
 
 1. Log in to your GitLab instance with the URL, username and password printed at the end of the build.
 
