@@ -13,15 +13,28 @@ For a user guide on what to do after the install, please go to:
 
 ![Anthos Platform High Level Architecture](images/anthos-platform-arch.png)
 
-## Quick Start
+## Pre-requisites
 
-1. Install gcloud SDK and create a new project.
+1. [Download](https://cloudsolutionsarchitects.git.corp.google.com/anthos-platform-setup/+archive/refs/heads/master.tar.gz) this repo to your local machine.
+
+1. Untar the repo and go into the directory.
+
+    ```shell
+    mkdir -p anthos-platform-setup
+    tar zxfv anthos-platform-setup-refs_heads_master.tar.gz -C anthos-platform-setup/
+    cd anthos-platform-setup
+    ```
+
+1. [Install gcloud SDK](https://cloud.google.com/sdk/install).
+
+1. [Create a new GCP project.](https://cloud.google.com/resource-manager/docs/creating-managing-projects#creating_a_project)
+
+## Quick Start
 
 1. Run the following commands to setup Cloud Build
 
     ```shell
     export PROJECT_ID=<INSERT_YOUR_PROJECT_ID>
-    export DOMAIN=<INSERT_YOUR_DOMAIN>
     gcloud config set project ${PROJECT_ID}
     export PROJECT_NUMBER=$(gcloud projects describe ${PROJECT_ID} --format 'value(projectNumber)')
     gcloud services enable cloudbuild.googleapis.com
@@ -33,20 +46,44 @@ For a user guide on what to do after the install, please go to:
     ```shell
     gcloud services enable compute.googleapis.com
     gcloud compute addresses create --region us-central1 gitlab
-    gcloud compute addresses list --filter="name=('gitlab')"
     ```
 
-1. Configure a DNS A record pointing *.<YOUR DOMAIN> to the address you just created.
+1. Create a DNS sub-domain using cloud-tutorial.dev
+
+    ```shell
+    # Set this to a custom subdomain if youd like it to be more memorable
+    export SUBDOMAIN=ap-$(date +%s)
+    wget https://cloud-tutorial.dev/claim.sh
+    chmod +x claim.sh
+    ./claim.sh ${SUBDOMAIN}
+    ```
+
+1. Map your gitlab address above to your domain.
+
+    ```shell
+    export GITLAB_ADDRESS=$(gcloud compute addresses list --filter="name=('gitlab')" --format "value(address)")
+    gcloud dns record-sets transaction start --zone ${SUBDOMAIN}-zone
+    gcloud dns record-sets transaction add ${GITLAB_ADDRESS} --name "*.${SUBDOMAIN}.cloud-tutorial.dev" --type A --zone ${SUBDOMAIN}-zone --ttl 300
+    gcloud dns record-sets transaction execute --zone ${SUBDOMAIN}-zone
+    ```
 
 1. Run Cloud Build to create the necessary resources.
 
     ```shell
+    export DOMAIN=${SUBDOMAIN}.cloud-tutorial.dev
     gcloud builds submit --substitutions=_DOMAIN=${DOMAIN}
     ```
 
 1. Log in to your GitLab instance with the URL, username and password printed at the end of the build.
 
 1. Follow the steps in go/anthos-platform-guide to go through a user journey (add, deploy, and change applications).
+
+## Securing the ACM repository
+
+At this stage, you should have a working ACM installation good enough for most
+demos. If you want to follow production best practices, read
+[Policy management with Anthos Config Management and GitLab](https://docs.google.com/document/d/1KlFDhgVTAD_LRvhdvdhV5AwkV_3k9baT01B-ouJpWSQ/edit) (this is a draft, not yet
+shareable with customers).
 
 ## Contributing
 
@@ -79,152 +116,6 @@ To contribute follows these instrcutions for the development flow:
     ```
 
   A link to your review request will be printed.
-
-## Pre-requisites
-
-1. Install the following tools:
-   * [Terraform 0.12+](https://learn.hashicorp.com/terraform/getting-started/install.html)
-   * [Helm](https://helm.sh/docs/using_helm/#installing-helm)
-   * [kubectl](https://kubernetes.io/docs/tasks/tools/install-kubectl/)
-   * envsubst (use Homebrew for macOS: `brew install gettext`)
-
-1. Clone this repo to your local machine.
-
-1. Create a GCP project and activate it in your shell.
-
-1. Provision a domain that you can use to host GitLab, you'll need to be able to create a wildcard DNS entry for that domain pointing to an A record.
-
-## Install Anthos Platform
-
-1. Replace your project ID in each of the terraform.tfvars files:
-
-  ```shell
-  export PROJECT=$(gcloud config get-value project)
-  sed -i "s/YOUR_PROJECT_ID/${PROJECT}/g" 0_foundation/terraform.tfvars
-  sed -i "s/YOUR_PROJECT_ID/${PROJECT}/g" 1_clusters/terraform.tfvars
-  sed -i "s/YOUR_PROJECT_ID/${PROJECT}/g" 2_gitlab/terraform.tfvars
-  ```
-
-### Provision infrastructure
-
-1. Create foundational infrastructure (networks, subnetworks, etc)
-
-  ```shell
-  cd 0_foundation
-  terraform init
-  terraform plan # ensure no errors
-  terraform apply # type yes to confirm
-  cd ..
-  ```
-
-### Provision GKE clusters
-
-1. Create the GKE clusters that will be used for prod, staging, CI, etc.
-
-  ```shell
-  cd 1_clusters
-  terraform init
-  terraform plan # ensure no errors
-  terraform apply # type yes to confirm
-  cd ..
-  ```
-
-### Provision GitLab
-
-1. Configure the domain you'll use for Gitlab in the terraform.tfvars file
-
-    ```shell
-    cd 2_gitlab
-    export DOMAIN=example.org
-    # Gitlab URL will be gitlab.$DOMAIN
-    sed -i "s/YOUR_DOMAIN/${DOMAIN}/g" terraform.tfvars
-    ```
-
-1. Apply the terraform config to your project
-
-    ```shell
-    terraform init
-    terraform plan # ensure no errors
-    terraform apply # type yes to confirm
-    cd ..
-    ```
-
-### Configure GitLab
-
-1. The GitLab domain and address will be printed after the commands complete. Setup DNS wildcard domain to point at the IP address.
-
-    *.$DOMAIN -> IP_ADDRESS
-
-1. Ensure that the DNS change has propagated by running a DNS query against gitlab.$DOMAIN, making sure that it returns your IP address from above.
-
-1. Get credentails for the GitLab cluster and get the initial root password.
-   Use `base64 -D` instead of `base64 -d` in the command below if you are running macOS.
-
-    ```shell
-    gcloud container clusters get-credentials gitlab --region   us-central1
-    kubectl get secrets gitlab-gitlab-initial-root-password   -o jsonpath="{.data.password}" | base64 -d
-    ```
-
-1. Log in to GitLab with the root user and password printed in the previous step.
-
-1. Go to <https://${GITLAB_HOSTNAME}/profile/personal_access_tokens> to create an access token for project creation that has access to all scopes:
-
-    ![Access token creation page](images/access-token.png)
-
-1. Run the script to populate repos in GitLab. It will ask you for the token you just created.
-
-    ```shell
-    cd 2_gitlab
-    ./create-repos.sh
-    cd ..
-    ```
-
-### Set up Anthos Config Management
-
-1. Install Anthos Config Management in all of your clusters:
-
-1. Go to the platform-admins/anthos-config-management repository.
-
-1. In the left nav, go to Settings->CI/CD. Expand the runners section and copy
-   the registration token found in the Specific Runners section.
-
-1. Run the following commands.
-
-   ```shell
-   cd 3_acm
-   ./install_acm.sh
-   cd ..
-   ```
-
-1. You should now be able to go to the ACM repo and re-run tests. In the left nav of the ACM repo, click CI/CD->Pipelines.
-
-1. Click the green "Run Pipeline" button.
-
-#### Troubleshooting
-
-If the jobs in the pipeline don't launch after a few minutes, take a look at the
-`acm-tests` namespace in each cluster. You should have a running GitLab runner.
-Look in "Settings > CI/CD > Runners", you should see 3 runner registered.
-
-#### Securing the ACM repository
-
-At this stage, you should have a working ACM installation good enough for most
-demos. If you want to follow production best practices, read
-[Policy management with Anthos Config Management and GitLab](https://docs.google.com/document/d/1KlFDhgVTAD_LRvhdvdhV5AwkV_3k9baT01B-ouJpWSQ/edit) (this is a draft, not yet
-shareable with customers).
-
-### Re-run CI
-
-Some of the repositories created may have failed their first CI run due to missing runners. In this section you'll re-run CI on the repos that create images that other
-pipelines use.
-
-1. Go to the `platform-admins/kaniko-docker` repository in GitLab.
-
-1. Click CI/CD in the left nav, then click the "Run Pipeline" button at the top.
-
-1. Go to the `platform-admins/kustomize-docker` repository in GitLab.
-
-1. Click CI/CD in the left nav, then click the "Run Pipeline" button at the top.
 
 ## TODOs
 
