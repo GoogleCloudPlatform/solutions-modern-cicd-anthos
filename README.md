@@ -76,7 +76,7 @@ For a user guide on what to do after the install, please go to:
 
 1. Log in to your GitLab instance with the URL, username and password printed at the end of the build.
 
-1. Follow the steps in go/anthos-platform-guide to go through a user journey (add, deploy, and change applications).
+1. Follow the steps in [go/anthos-platform-demo](http://go/anthos-platform-demo) to go through a user journey (add, deploy, and change applications).
 
 ## Securing the ACM repository
 
