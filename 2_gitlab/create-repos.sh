@@ -8,7 +8,7 @@ read -s -p "What is the access token? " GITLAB_TOKEN
 fi
 
 REPOS="anthos-config-management shared-kustomize-bases shared-ci-cd golang-template golang-template-env kustomize-docker kaniko-docker"
-CLUSTERS="prod-central prod-east staging"
+CLUSTERS="prod-us-central1 prod-us-east1 staging-us-central1"
 pushd gitlab-repos
   # Create SSH keys so ACM syncers can read from the repos
   mkdir -p ../../ssh-keys

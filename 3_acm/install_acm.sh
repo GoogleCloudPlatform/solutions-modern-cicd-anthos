@@ -9,21 +9,14 @@ if [ -z ${ACM_RUNNER_TOKEN} ]; then
   read -s -p "What is the runner registration token for ACM (see Settings > CI/CD > Runners in the anthos-config-management project)?" ACM_RUNNER_TOKEN
 fi
 
-gcloud container clusters get-credentials anthos-platform-prod-central --region us-central1
+CLUSTERS="prod-us-central1 prod-us-east1 staging-us-central1"
 
-! kubectl config delete-context prod-central > /dev/null 2>&1
-kubectl config rename-context $(kubectl config current-context) prod-central
+for CONTEXT in ${CLUSTERS}; do
+  REGION=$(echo ${CONTEXT} | cut -d'-' -f 2-)
+  gcloud container clusters get-credentials ${CONTEXT} --region ${REGION}
+  ! kubectl config delete-context ${CONTEXT}  > /dev/null 2>&1
+  kubectl config rename-context $(kubectl config current-context) ${CONTEXT} 
 
-gcloud container clusters get-credentials anthos-platform-prod-east --region us-east1
-! kubectl config delete-context prod-east > /dev/null 2>&1
-kubectl config rename-context $(kubectl config current-context) prod-east
-
-gcloud container clusters get-credentials anthos-platform-staging --region us-central1
-! kubectl config delete-context staging > /dev/null 2>&1
-kubectl config rename-context $(kubectl config current-context) staging
-
-for CONTEXT in prod-central prod-east staging; do
-  kubectl config use-context ${CONTEXT}
   # We need to have this namespace before enabling ACM, because we need to create
   # a secret in it
   # Check it GitLab Runner is already running

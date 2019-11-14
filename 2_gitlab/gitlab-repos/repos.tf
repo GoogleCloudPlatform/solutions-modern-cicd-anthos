@@ -72,23 +72,23 @@ resource "gitlab_project" "shared-ci-cd" {
 }
 
 
-resource "gitlab_deploy_key" "acm-staging" {
+resource "gitlab_deploy_key" "acm-staging-us-central1" {
   project = "platform-admins/anthos-config-management"
   title   = "Staging deploy key"
-  key     = "${file("${local.ssh-key-path}/staging.pub")}"
+  key     = "${file("${local.ssh-key-path}/staging-us-central1.pub")}"
   depends_on = ["gitlab_project.anthos-config-management"]
 }
 
-resource "gitlab_deploy_key" "acm-prod-central" {
+resource "gitlab_deploy_key" "acm-prod-us-central1" {
   project = "platform-admins/anthos-config-management"
-  title   = "Production Central deploy key"
-  key     = "${file("${local.ssh-key-path}/prod-central.pub")}"
+  title   = "Production us-central1 deploy key"
+  key     = "${file("${local.ssh-key-path}/prod-us-central1.pub")}"
   depends_on = ["gitlab_project.anthos-config-management"]
 }
-resource "gitlab_deploy_key" "acm-prod-east" {
+resource "gitlab_deploy_key" "acm-prod-us-east1" {
   project = "platform-admins/anthos-config-management"
   title   = "Production East deploy key"
-  key     = "${file("${local.ssh-key-path}/prod-east.pub")}"
+  key     = "${file("${local.ssh-key-path}/prod-us-east1.pub")}"
   depends_on = ["gitlab_project.anthos-config-management"]
 }
 
