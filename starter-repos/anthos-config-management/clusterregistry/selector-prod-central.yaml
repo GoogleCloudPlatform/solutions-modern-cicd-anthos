@@ -1,8 +1,8 @@
 kind: ClusterSelector
 apiVersion: configmanagement.gke.io/v1
 metadata:
-  name: prod-central
+  name: prod-us-central1
 spec:
   selector:
     matchLabels:
-      clusterName: prod-central
+      clusterName: prod-us-central1

@@ -1,8 +1,8 @@
-Vet staging:
+Vet staging-us-central1:
   image: gcr.io/config-management-release/nomos:v1.2.0-rc.11
   tags:
   - app:acm-tests
-  - cluster:staging
+  - cluster:staging-us-central1
   variables:
     USER: root
     KUBECONFIG: kubeconfig
@@ -12,11 +12,11 @@ Vet staging:
   - nomos status
   - nomos vet
 
-Vet prod-central:
+Vet prod-us-central1:
   image: gcr.io/config-management-release/nomos:v1.2.0-rc.11
   tags:
   - app:acm-tests
-  - cluster:prod-central
+  - cluster:prod-us-central1
   variables:
     USER: root
     KUBECONFIG: kubeconfig
@@ -26,11 +26,11 @@ Vet prod-central:
   - nomos status
   - nomos vet
 
-Vet prod-east:
+Vet prod-us-east1:
   image: gcr.io/config-management-release/nomos:v1.2.0-rc.11
   tags:
   - app:acm-tests
-  - cluster:prod-east
+  - cluster:prod-us-east1
   variables:
     USER: root
     KUBECONFIG: kubeconfig

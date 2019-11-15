@@ -2,19 +2,19 @@ include:
 - project: 'platform-admins/shared-ci-cd'
   file: 'cd/gke-deploy.yaml'
 
-deploy-staging:
+deploy-staging-us-central1:
   tags:
-  - cluster:staging, app:APP_NAME
+  - cluster:staging-us-central1, app:APP_NAME
 
-deploy-prod-central:
+deploy-prod-us-central1:
   tags:
-  - cluster:prod-central, app:APP_NAME
+  - cluster:prod-us-central1, app:APP_NAME
 
-deploy-prod-east:
+deploy-prod-us-east1:
   tags:
-  - cluster:prod-east, app:APP_NAME
+  - cluster:prod-us-east1, app:APP_NAME
 
 stages:
-  - deploy-staging
-  - deploy-prod-central
-  - deploy-prod-east
+  - deploy-staging-us-central1
+  - deploy-prod-us-central1
+  - deploy-prod-us-east1

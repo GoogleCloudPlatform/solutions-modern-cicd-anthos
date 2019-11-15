@@ -3,14 +3,14 @@ kind: ConfigMap
 metadata:
   name: gitlab-runner-config
   annotations:
-    configmanagement.gke.io/cluster-selector: staging
+    configmanagement.gke.io/cluster-selector: staging-us-central1
 data:
   CI_SERVER_URL: "https://GITLAB_HOSTNAME/"
   CLONE_URL: ""
   RUNNER_REQUEST_CONCURRENCY: "1"
   RUNNER_EXECUTOR: "kubernetes"
   REGISTER_LOCKED: "true"
-  RUNNER_TAG_LIST: "app:APP_NAME, cluster:staging"
+  RUNNER_TAG_LIST: "app:APP_NAME, cluster:staging-us-central1"
   KUBERNETES_IMAGE: "ubuntu:16.04"
   KUBERNETES_NAMESPACE: "APP_NAME"
   KUBERNETES_CPU_LIMIT: ""

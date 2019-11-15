@@ -3,7 +3,7 @@ kind: ConfigMap
 metadata:
   name: gitlab-runner-config-acm
   annotations:
-    configmanagement.gke.io/cluster-selector: prod-central
+    configmanagement.gke.io/cluster-selector: prod-us-central1
 data:
   CI_SERVER_URL: https://GITLAB_HOSTNAME
   CLONE_URL: ""
@@ -27,14 +27,14 @@ data:
   REGISTER_LOCKED: "true"
   RUNNER_EXECUTOR: kubernetes
   RUNNER_REQUEST_CONCURRENCY: "1"
-  RUNNER_TAG_LIST: app:acm-tests, cluster:prod-central
+  RUNNER_TAG_LIST: app:acm-tests, cluster:prod-us-central1
 ---
 apiVersion: v1
 kind: ConfigMap
 metadata:
   name: gitlab-runner-config-acm
   annotations:
-    configmanagement.gke.io/cluster-selector: prod-east
+    configmanagement.gke.io/cluster-selector: prod-us-east1
 data:
   CI_SERVER_URL: https://GITLAB_HOSTNAME
   CLONE_URL: ""
@@ -58,14 +58,14 @@ data:
   REGISTER_LOCKED: "true"
   RUNNER_EXECUTOR: kubernetes
   RUNNER_REQUEST_CONCURRENCY: "1"
-  RUNNER_TAG_LIST: app:acm-tests, cluster:prod-east
+  RUNNER_TAG_LIST: app:acm-tests, cluster:prod-us-east1
 ---
 apiVersion: v1
 kind: ConfigMap
 metadata:
   name: gitlab-runner-config-acm
   annotations:
-    configmanagement.gke.io/cluster-selector: staging
+    configmanagement.gke.io/cluster-selector: staging-us-central1
 data:
   CI_SERVER_URL: https://GITLAB_HOSTNAME
   CLONE_URL: ""
@@ -89,4 +89,4 @@ data:
   REGISTER_LOCKED: "true"
   RUNNER_EXECUTOR: kubernetes
   RUNNER_REQUEST_CONCURRENCY: "1"
-  RUNNER_TAG_LIST: app:acm-tests, cluster:staging
+  RUNNER_TAG_LIST: app:acm-tests, cluster:staging-us-central1
