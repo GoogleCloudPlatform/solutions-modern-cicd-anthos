@@ -1,0 +1,6 @@
+helm:
+  stage: hydrate-manifests
+  image: alpine/helm:3.0.0
+  script:
+    helm template -f k8s/stg/values.yaml k8s/chart -n ${CI_PROJECT_NAME} > stg.yaml
+    helm template -f k8s/prod/values.yaml k8s/chart -n ${CI_PROJECT_NAME} > prod.yaml

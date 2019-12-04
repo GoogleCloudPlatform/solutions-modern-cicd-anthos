@@ -3,6 +3,8 @@ include:
   file: 'ci/go-docker.yaml'
 - project: 'platform-admins/shared-ci-cd'
   file: 'cd/kustomize.yaml'
+- project: 'platform-admins/shared-ci-cd'
+  file: 'cd/push-manifests.yaml'
 
 stages:
   - test

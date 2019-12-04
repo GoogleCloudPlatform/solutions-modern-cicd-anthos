@@ -1,0 +1,29 @@
+push-manifests:
+  only:
+    refs:
+      - master
+  stage: push-manifests
+  image: gcr.io/cloud-solutions-images/kustomize
+  script:
+  - |
+    env
+    cat > deploy-key <<EOF
+    ${MANIFEST_WRITER_KEY}
+    EOF
+  - chmod 400 deploy-key
+  - export GIT_SSH_COMMAND="ssh -i ${PWD}/deploy-key -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no"
+  - git config --global user.email "${CI_PROJECT_NAME}-ci@${CI_SERVER_HOST}"
+  - git config --global user.name "${CI_PROJECT_NAMESPACE}/${CI_PROJECT_NAME}"
+  - git clone git@${CI_SERVER_HOST}:${CI_PROJECT_NAMESPACE}/${CI_PROJECT_NAME}-env.git -b staging
+  - cd ${CI_PROJECT_NAME}-env
+  - cp ../hydrated-manifests/stg.yaml stg.yaml
+  - cp ../hydrated-manifests/prod.yaml prod.yaml
+  - |
+    # If files have changed, commit them back to the env repo in the staging branch
+    if [ -z "$(git status --porcelain)" ]; then
+      echo "No changes found in env repository."
+    else
+      git add stg.yaml prod.yaml
+      git commit -m "${CI_COMMIT_REF_SLUG} -- ${CI_PIPELINE_URL}"
+      git push origin staging
+    fi

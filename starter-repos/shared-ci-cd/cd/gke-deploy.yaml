@@ -8,8 +8,8 @@ deploy-staging-us-central1:
   tags:
   - cluster:staging-us-central1
   script:
-  - /gke-deploy run --filename kustomize-stg.yaml
-  
+  - /gke-deploy run --filename stg.yaml
+
 deploy-prod-us-east1:
   # Only deploy when running on master in $APP-env
   only:
@@ -20,7 +20,7 @@ deploy-prod-us-east1:
   tags:
   - cluster:prod-us-east1
   script:
-  - /gke-deploy run --filename kustomize-prod.yaml
+  - /gke-deploy run --filename prod.yaml
 
 deploy-prod-us-central1:
   # Only deploy when running on master in $APP-env
@@ -33,7 +33,7 @@ deploy-prod-us-central1:
   - cluster:prod-us-central1
   script:
   - |
-  - /gke-deploy run --filename kustomize-prod.yaml
+  - /gke-deploy run --filename prod.yaml
 
 rollout-approval:
   # Only require manual approval on master in $APP-env
