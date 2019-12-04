@@ -34,3 +34,13 @@ deploy-prod-us-central1:
   script:
   - |
   - /gke-deploy run --filename kustomize-prod.yaml
+
+rollout-delay:
+  # Only deploy when running on master in $APP-env
+  only:
+    refs:
+      - master
+  stage: rollout-delay
+  script: echo 'Delaying rollout for 2 minutes to let the deploy settle'
+  when: delayed
+  start_in: 2 minutes

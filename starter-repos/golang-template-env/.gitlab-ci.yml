@@ -17,4 +17,5 @@ deploy-prod-us-east1:
 stages:
   - deploy-staging-us-central1
   - deploy-prod-us-central1
+  - rollout-delay
   - deploy-prod-us-east1
