@@ -82,8 +82,7 @@ For a user guide on what to do after the install, please go to:
 
 At this stage, you should have a working ACM installation good enough for most
 demos. If you want to follow production best practices, read
-[Policy management with Anthos Config Management and GitLab](https://docs.google.com/document/d/1KlFDhgVTAD_LRvhdvdhV5AwkV_3k9baT01B-ouJpWSQ/edit) (this is a draft, not yet
-shareable with customers).
+[Best practices for policy management with Anthos Config Management and GitLab](https://cloud.google.com/solutions/best-practices-for-policy-management-with-anthos-config-management).
 
 ## Contributing
 
