@@ -32,6 +32,7 @@ module "anthos-platform-prod-central" {
   ip_range_services      = "anthos-platform-services-prod"
   create_service_account = false
   service_account        = "${var.compute_engine_service_account}"
+  kubernetes_version     = "${var.gke_kubernetes_version}"
 }
 
 module "anthos-platform-prod-east" {
@@ -46,6 +47,7 @@ module "anthos-platform-prod-east" {
   ip_range_services      = "anthos-platform-services-prod"
   create_service_account = false
   service_account        = "${var.compute_engine_service_account}"
+  kubernetes_version     = "${var.gke_kubernetes_version}"
 }
 
 module "anthos-platform-staging" {
@@ -60,6 +62,7 @@ module "anthos-platform-staging" {
   ip_range_services      = "anthos-platform-services-staging"
   create_service_account = false
   service_account        = "${var.compute_engine_service_account}"
+  kubernetes_version     = "${var.gke_kubernetes_version}"
 }
 
 
@@ -75,4 +78,5 @@ module "anthos-platform-dev" {
   ip_range_services      = "anthos-platform-services-dev"
   create_service_account = false
   service_account        = "${var.compute_engine_service_account}"
+  kubernetes_version     = "${var.gke_kubernetes_version}"
 }

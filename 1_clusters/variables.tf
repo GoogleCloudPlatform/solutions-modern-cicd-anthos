@@ -27,3 +27,8 @@ variable "compute_engine_service_account" {
   description = "Service account to associate to the nodes in the cluster"
   default     = "default"
 }
+
+variable "gke_kubernetes_version" {
+  description = "Kubernetes version to deploy Masters and Nodes with"
+  default     = "1.14"
+}
