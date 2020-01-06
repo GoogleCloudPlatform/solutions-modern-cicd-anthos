@@ -1,0 +1,17 @@
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: deny-from-other-namespaces
+spec:
+  podSelector:
+    # Apply policy to all pods in this namespace.
+    matchLabels: {}
+  ingress:
+    - from:
+        # Allow traffic between all pods in this namespace.
+        - podSelector: {}
+    # Example that allows traffic from another app's namespace.
+    #- from:
+    #    - namespaceSelector:
+    #        matchLabels:
+    #          app: another-app-namespace
