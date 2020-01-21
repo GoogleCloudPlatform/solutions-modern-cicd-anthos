@@ -1,5 +1,5 @@
 module "gke-gitlab" {
-  source            = "github.com/terraform-google-modules/terraform-google-gke-gitlab?ref=workaround-helm-6361"
+  source            = "github.com/terraform-google-modules/terraform-google-gke-gitlab?ref=master"
   project_id        = "${var.project_id}"
   domain            = "${var.domain}"
   certmanager_email = "no-reply@${var.project_id}.example.com"
