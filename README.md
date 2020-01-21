@@ -53,7 +53,7 @@ For a user guide on what to do after the install, please go to:
     ```shell
     # Set this to a custom subdomain if youd like it to be more memorable
     export SUBDOMAIN=ap-$(date +%s)
-    wget https://cloud-tutorial.dev/claim.sh
+    curl -o claim.sh https://cloud-tutorial.dev/claim.sh
     chmod +x claim.sh
     ./claim.sh ${SUBDOMAIN}
     ```
