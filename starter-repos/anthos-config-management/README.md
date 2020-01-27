@@ -21,3 +21,11 @@ to manage to test ACM's configuration.
    a ConfigMap for each of your clusters, with the right cluster selection
    annotation, and the right GitLab Runner tag.
 1. In `.gitlab-ci.yml`, add a job for each cluster, modifying the tag each time.
+
+### Restrictions
+
+The `namespaces/managed-apps` directory is an [abstract namespace directory](https://cloud.google.com/anthos-config-management/docs/concepts/namespace-inheritance).
+This means that all the resources defined in this directory are inherited by
+the namespaces that are defined within that directory. `managed-apps` is *not*
+a real directory. You need to define at least one real namespace within this
+directory for ACM to work.

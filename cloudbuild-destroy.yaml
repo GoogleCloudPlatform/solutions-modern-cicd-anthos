@@ -10,6 +10,13 @@ steps:
     sed -i "s/YOUR_PROJECT_ID/${PROJECT_ID}/g" 0_foundation/terraform.tfvars
     sed -i "s/YOUR_PROJECT_ID/${PROJECT_ID}/g" 1_clusters/terraform.tfvars
     sed -i "s/YOUR_PROJECT_ID/${PROJECT_ID}/g" 2_gitlab/terraform.tfvars
+- name: gcr.io/cloud-builders/gsutil
+  id: 'clean-buckets'
+  entrypoint: 'bash'
+  args:
+  - -c
+  - |
+    gsutil -m rm gs://${PROJECT_ID}-gitlab-artifacts/** gs://${PROJECT_ID}-registry/** || exit 0
 - name: 'gcr.io/${PROJECT_ID}/anthos-platform-installer'
   id: 'destroy-gitlab'
   entrypoint: 'bash'

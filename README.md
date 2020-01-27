@@ -56,6 +56,7 @@ For a user guide on what to do after the install, please go to:
     curl -o claim.sh https://cloud-tutorial.dev/claim.sh
     chmod +x claim.sh
     ./claim.sh ${SUBDOMAIN}
+    rm claim.sh
     ```
 
 1. Map your gitlab address above to your domain.
@@ -67,7 +68,7 @@ For a user guide on what to do after the install, please go to:
     gcloud dns record-sets transaction execute --zone ${SUBDOMAIN}-zone
     ```
 
-1. Run Cloud Build to create the necessary resources.
+1. Run Cloud Build to create the necessary resources. This takes around 30 minutes.
 
     ```shell
     export DOMAIN=${SUBDOMAIN}.cloud-tutorial.dev
@@ -83,6 +84,9 @@ For a user guide on what to do after the install, please go to:
 At this stage, you should have a working ACM installation good enough for most
 demos. If you want to follow production best practices, read
 [Best practices for policy management with Anthos Config Management and GitLab](https://cloud.google.com/solutions/best-practices-for-policy-management-with-anthos-config-management).
+
+Always leave at least one namespace defined in `namespaces/managed-apps`, otherwise ACM will
+stop syncing.
 
 ## Contributing
 

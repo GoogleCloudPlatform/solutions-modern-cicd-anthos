@@ -144,6 +144,11 @@ steps:
     ./install_acm.sh
     cd ..
 
+    # Install microservices-demo
+    cd 4_microservices-demo
+    ./install-microservices-demo.sh
+    cd ..
+
     # Output final notes
     echo -e "\e[32mLog in to your GitLab instance at: https://gitlab.${_DOMAIN}"
     echo -e "\e[32mUsername: root"
