@@ -1,0 +1,67 @@
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  namespace: istio-operator
+  name: istio-operator
+...
+---
+apiVersion: v1
+kind: Service
+metadata:
+  namespace: istio-operator
+  labels:
+    name: istio-operator
+  name: istio-operator-metrics
+spec:
+  ports:
+  - name: http-metrics
+    port: 8383
+    targetPort: 8383
+  selector:
+    name: istio-operator
+...
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  namespace: istio-operator
+  name: istio-operator
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      name: istio-operator
+  template:
+    metadata:
+      labels:
+        name: istio-operator
+    spec:
+      serviceAccountName: istio-operator
+      containers:
+        - name: istio-operator
+          image: docker.io/istio/operator:1.4.0
+          command:
+          - istio-operator
+          - server
+          imagePullPolicy: Always
+          resources:
+            limits:
+              cpu: 200m
+              memory: 256Mi
+            requests:
+              cpu: 50m
+              memory: 128Mi
+          env:
+            - name: WATCH_NAMESPACE
+              value: ""
+            - name: LEADER_ELECTION_NAMESPACE
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.namespace
+            - name: POD_NAME
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.name
+            - name: OPERATOR_NAME
+              value: "istio-operator"
