@@ -1,0 +1,17 @@
+prepare-config:
+  stage: prepare-config
+  image: gcr.io/kpt-dev/kpt:v0.4.0
+  script:
+  - |
+    kpt pkg get https://gitlab-ci-token:${CI_JOB_TOKEN}@${CI_SERVER_HOST}/platform-admins/anthos-config-management.git/constraints/apps app-constraints
+    kpt fn source app-constraints/ hydrated-manifests/ > hydrated-manifests/kpt-manifests.yaml
+  artifacts:
+    paths:
+      - hydrated-manifests/
+
+validate-config:
+  stage: validate-config
+  image: gcr.io/kpt-functions/gatekeeper-validate
+  script:
+  - |
+    /app/gatekeeper_validate --input hydrated-manifests/kpt-manifests.yaml

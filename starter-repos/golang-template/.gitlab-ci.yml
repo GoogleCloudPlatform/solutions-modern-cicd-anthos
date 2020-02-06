@@ -4,10 +4,14 @@ include:
 - project: 'platform-admins/shared-ci-cd'
   file: 'cd/kustomize.yaml'
 - project: 'platform-admins/shared-ci-cd'
+  file: 'cd/validate.yaml'
+- project: 'platform-admins/shared-ci-cd'
   file: 'cd/push-manifests.yaml'
 
 stages:
   - test
   - build
   - hydrate-manifests
+  - prepare-config
+  - validate-config
   - push-manifests

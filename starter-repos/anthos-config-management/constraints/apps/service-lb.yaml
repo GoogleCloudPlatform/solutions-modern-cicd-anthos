@@ -1,0 +1,50 @@
+## this constraint is intended to run in a pre-commit hook which prevents
+## teams to create specific kinds in their config.  the example of this is
+## services in an org, say, that centrally manages them so they can monitor
+## ingress.
+
+## TODO make sure it's only looking at Services, right now it only checks the type
+## TODO consider making it take a GVK and a type
+
+apiVersion: templates.gatekeeper.sh/v1beta1
+kind: ConstraintTemplate
+metadata:
+  name: k8sdisallowservicetypes
+spec:
+  crd:
+    spec:
+      names:
+        kind: K8sDisallowServiceTypes
+        listKind: K8sDisallowServiceTypesList
+        plural: K8sDisallowServiceTypes
+        singular: K8sDisallowServiceTypes
+      validation:
+        # Schema for the `parameters` field
+        openAPIV3Schema:
+          properties:
+            serviceTypes:
+              type: array
+              items:
+                type: string
+  targets:
+    - target: admission.k8s.gatekeeper.sh
+      rego: |
+        package k8sdisallowservicetypes
+
+        violation[{"msg": msg}] {
+          disallowed := {serviceTypes | serviceTypes := input.parameters.serviceTypes[_]}
+          input.review.kind.kind == "Service"
+          input.review.kind.group == ""
+                obj := input.review.object
+          disallowed[obj.spec.type]
+                msg := sprintf("Object %v is using disallowed type %s of kind %s", [obj.metadata.name, obj.spec.type, obj.kind])
+        }
+---
+apiVersion: constraints.gatekeeper.sh/v1beta1
+kind: K8sDisallowServiceTypes
+metadata:
+  name: no-load-balancers
+spec:
+  parameters:
+    serviceTypes:
+      - "LoadBalancer"
