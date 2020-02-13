@@ -5,6 +5,8 @@ metadata:
 spec:
   # clusterName is required and must be unique among all managed clusters
   clusterName: ${CONTEXT}
+  policyController:
+    enabled: true
   git:
     syncRepo: git@${GITLAB_HOSTNAME}:platform-admins/anthos-config-management.git
     syncBranch: master
