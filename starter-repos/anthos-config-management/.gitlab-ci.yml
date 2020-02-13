@@ -1,5 +1,11 @@
+stages:
+- vet
+- prepare
+- read
+- validate
+
 Vet staging-us-central1:
-  image: gcr.io/config-management-release/nomos:v1.2.0-rc.11
+  image: gcr.io/config-management-release/nomos:v1.2.0-rc.60
   tags:
   - app:acm-tests
   - cluster:staging-us-central1
@@ -13,7 +19,7 @@ Vet staging-us-central1:
   - nomos vet
 
 Vet prod-us-central1:
-  image: gcr.io/config-management-release/nomos:v1.2.0-rc.11
+  image: gcr.io/config-management-release/nomos:v1.2.0-rc.60
   tags:
   - app:acm-tests
   - cluster:prod-us-central1
@@ -27,7 +33,7 @@ Vet prod-us-central1:
   - nomos vet
 
 Vet prod-us-east1:
-  image: gcr.io/config-management-release/nomos:v1.2.0-rc.11
+  image: gcr.io/config-management-release/nomos:v1.2.0-rc.60
   tags:
   - app:acm-tests
   - cluster:prod-us-east1
@@ -39,3 +45,48 @@ Vet prod-us-east1:
   - nomos version
   - nomos status
   - nomos vet
+
+Prepare:
+  stage: prepare
+  image: gcr.io/config-management-release/nomos:v1.2.0-rc.60
+  tags:
+  - app:acm-tests
+  variables:
+    USER: root
+    KUBECONFIG: kubeconfig
+  script:
+  - sh generate_config.sh
+  - nomos hydrate --path . --output ./hydrated-configs
+  artifacts:
+    paths:
+    - hydrated-configs/
+    expire_in: 1 hour
+
+Read YAML:
+  stage: read
+  image: gcr.io/kpt-functions/read-yaml
+  tags:
+  - app:acm-tests
+  script:
+  - |
+    cat <<EOF >./kpt.yaml
+    apiVersion: v1
+    kind: ConfigMap
+    data:
+      source_dir: $(pwd)/hydrated-configs
+    metadata:
+      name: my-config
+    EOF
+  - node /home/node/app/dist/read_yaml_run.js -f kpt.yaml --output source.yaml
+  artifacts:
+    paths:
+    - source.yaml
+    expire_in: 1 hour
+
+Validate:
+  stage: validate
+  image: gcr.io/kpt-functions/gatekeeper-validate
+  tags:
+  - app:acm-tests
+  script:
+  - /app/gatekeeper_validate --input source.yaml
