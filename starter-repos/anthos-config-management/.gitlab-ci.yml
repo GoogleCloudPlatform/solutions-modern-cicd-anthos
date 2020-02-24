@@ -5,6 +5,7 @@ stages:
 - validate
 
 Vet staging-us-central1:
+  stage: vet
   image: gcr.io/config-management-release/nomos:v1.2.0-rc.60
   tags:
   - app:acm-tests
@@ -19,6 +20,7 @@ Vet staging-us-central1:
   - nomos vet
 
 Vet prod-us-central1:
+  stage: vet
   image: gcr.io/config-management-release/nomos:v1.2.0-rc.60
   tags:
   - app:acm-tests
@@ -33,6 +35,7 @@ Vet prod-us-central1:
   - nomos vet
 
 Vet prod-us-east1:
+  stage: vet
   image: gcr.io/config-management-release/nomos:v1.2.0-rc.60
   tags:
   - app:acm-tests
