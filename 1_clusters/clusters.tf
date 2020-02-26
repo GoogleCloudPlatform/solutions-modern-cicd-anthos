@@ -21,7 +21,7 @@ data "google_compute_subnetwork" "anthos-platform-east" {
 }
 
 module "anthos-platform-prod-central" {
-  source                 = "github.com/terraform-google-modules/terraform-google-kubernetes-engine?ref=v6.2.0"
+  source                 = "github.com/terraform-google-modules/terraform-google-kubernetes-engine?ref=v7.2.0"
   project_id             = "${var.project_id}"
   name                   = "prod-us-central1"
   regional               = true
@@ -36,7 +36,7 @@ module "anthos-platform-prod-central" {
 }
 
 module "anthos-platform-prod-east" {
-  source                 = "github.com/terraform-google-modules/terraform-google-kubernetes-engine?ref=v6.2.0"
+  source                 = "github.com/terraform-google-modules/terraform-google-kubernetes-engine?ref=v7.2.0"
   project_id             = "${var.project_id}"
   name                   = "prod-us-east1"
   regional               = true
@@ -51,7 +51,7 @@ module "anthos-platform-prod-east" {
 }
 
 module "anthos-platform-staging" {
-  source                 = "github.com/terraform-google-modules/terraform-google-kubernetes-engine?ref=v6.2.0"
+  source                 = "github.com/terraform-google-modules/terraform-google-kubernetes-engine?ref=v7.2.0"
   project_id             = "${var.project_id}"
   name                   = "staging-us-central1"
   regional               = true
@@ -67,7 +67,7 @@ module "anthos-platform-staging" {
 
 
 module "anthos-platform-dev" {
-  source                 = "github.com/terraform-google-modules/terraform-google-kubernetes-engine?ref=v6.2.0"
+  source                 = "github.com/terraform-google-modules/terraform-google-kubernetes-engine?ref=v7.2.0"
   project_id             = "${var.project_id}"
   name                   = "dev-us-central1"
   regional               = true
