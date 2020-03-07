@@ -12,7 +12,7 @@ lint-files:
   script:
     - npm install -g yaml-lint
     - yamllint **/*.yaml
-    - yamllint **/*.yml 
+    - yamllint **/*.yml
   artifacts:
     paths:
       - node_modules/
