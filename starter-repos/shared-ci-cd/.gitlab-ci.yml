@@ -1,0 +1,21 @@
+image: node:latest
+
+stages:
+  - lint
+
+cache:
+  paths:
+    - node_modules/
+
+lint-files:
+  stage: lint
+  script:
+    - npm install -g yaml-lint
+    - yamllint **/*.yaml
+    - yamllint **/*.yml 
+  artifacts:
+    paths:
+      - node_modules/
+
+
+
