@@ -1,0 +1,7 @@
+bases:
+- https://GITLAB_HOSTNAME/platform-admins/shared-kustomize-bases//java?ref=master
+patches:
+- deployment.yaml
+commonLabels:
+  env: stg
+namePrefix: java-template-

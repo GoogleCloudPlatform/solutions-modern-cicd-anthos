@@ -1,0 +1,8 @@
+bases:
+- https://GITLAB_HOSTNAME/platform-admins/shared-kustomize-bases//java?ref=master
+patches:
+- deployment.yaml
+namePrefix: "java-template-"
+commonLabels:
+  app: java-template
+  role: backend

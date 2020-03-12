@@ -1,3 +1,6 @@
 ssh-keys/
 .terraform/
 terraform.tfstate*
+
+.vscode/
+target/

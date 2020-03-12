@@ -1,0 +1,34 @@
+variables:
+    BUILD_JAR_NAME: "app"
+    MAVEN_CLI_OPTS: "--batch-mode"
+    MAVEN_OPTS: "-Dmaven.repo.local=.m2/repository"
+
+cache:
+    paths:
+        - .m2/repository/
+        - target/
+
+stages:
+  - build
+  - artifacts
+
+.build-maven:
+    script:
+        - mvn $MAVEN_CLI_OPTS clean compile
+
+build-test-project:
+  before_script:
+      - mkdir -p .m2/repository
+  stage: test
+  image: maven:3.6.3-jdk-13
+  script:
+    - mvn $MAVEN_CLI_OPTS -Djar.finalName=$BUILD_JAR_NAME clean verify
+  artifacts:
+    expire_in: 30 minutes
+    paths:
+      - target/app.jar
+
+push-artifacts:
+  stage: build
+  script:
+    - echo "mvn deploy (simulating future implementation when using gcp artifact repository)"

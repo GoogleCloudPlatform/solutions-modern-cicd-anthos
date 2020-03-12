@@ -1,6 +1,6 @@
 include:
 - project: 'platform-admins/shared-ci-cd'
-  file: 'ci/go-docker.yaml'
+  file: 'ci/java-docker.yaml'
 - project: 'platform-admins/shared-ci-cd'
   file: 'ci/kaniko.yaml'
 - project: 'platform-admins/shared-ci-cd'
