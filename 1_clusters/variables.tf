@@ -32,3 +32,15 @@ variable "gke_kubernetes_version" {
   description = "Kubernetes version to deploy Masters and Nodes with"
   default     = "1.14"
 }
+
+variable "minimum_node_pool_instances" {
+  type        = number
+  description = "Number of node-pool instances to have active"
+  default     = 1
+}
+
+variable "maximum_node_pool_instances" {
+  type        = number
+  description = "Maximum number of node-pool instances to scale to"
+  default     = 3
+}
