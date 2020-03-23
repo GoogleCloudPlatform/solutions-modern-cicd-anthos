@@ -116,7 +116,7 @@ To contribute follows these instrcutions for the development flow:
 1. [Push the commit to Gerrit for review](https://docs.google.com/document/d/1DMIAlcSmh6LaqkGLNxDunP6O_zpwPSchA0ywcSWdlXQ/edit#heading=h.e4h88uajgibc)
 
     ```shell
-    git push origin HEAD:refs/for/master
+    git push origin HEAD:refs/for/devel
     ```
 
   A link to your review request will be printed.
