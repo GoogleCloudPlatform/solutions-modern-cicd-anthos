@@ -26,7 +26,7 @@ deploy-prod-us-east1:
   tags:
   - cluster:prod-us-east1
   script:
-  - /gke-deploy run --filename prod.yaml
+  - if [ -f ./prod.yaml ]; then /gke-deploy run --filename prod.yaml; fi
 
 deploy-prod-us-central1:
   # Only deploy when running on master in $APP-env
@@ -39,7 +39,7 @@ deploy-prod-us-central1:
   - cluster:prod-us-central1
   script:
   - |
-  - /gke-deploy run --filename prod.yaml
+  - if [ -f ./prod.yaml ]; then /gke-deploy run --filename prod.yaml; fi
 
 rollout-approval:
   # Only require manual approval on master in $APP-env
