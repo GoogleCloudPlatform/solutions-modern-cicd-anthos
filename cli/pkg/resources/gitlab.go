@@ -88,7 +88,7 @@ func CreateBranch(client *gitlab.Client, pid interface{}, branch string, ref str
 
 func AddDeployKey(client *gitlab.Client, pid interface{}, path string, title string, canPush bool) {
 	project := GetProject(client, pid)
-	log.Debugf("Adding deploy key (%v) to project: %v", title ,project.Name)
+	log.Debugf("Adding deploy key (%v) to project: %v", title, project.Name)
 	publicKey, err := ioutil.ReadFile(path)
 	if err != nil {
 		log.Fatal("Unable to read public key: " + path)
@@ -124,12 +124,12 @@ func DeleteDeployKey(client *gitlab.Client, pid interface{}, title string) {
 	} else {
 		resp, err := client.DeployKeys.DeleteDeployKey(pid, keyID)
 		if err != nil {
-			log.Fatalf("Unable to delete deploy key from project %v: (%v) %v", pid,  resp.StatusCode, err)
+			log.Fatalf("Unable to delete deploy key from project %v: (%v) %v", pid, resp.StatusCode, err)
 		}
 	}
 }
 
-func CopyProject(client *gitlab.Client, sshKeyPath string, sourceNamespace string, sourceName string, destNamespace string, destName string, mutateRepo ...func(*git.Worktree) (*git.Worktree)) *gitlab.Project {
+func CopyProject(client *gitlab.Client, sshKeyPath string, sourceNamespace string, sourceName string, destNamespace string, destName string, mutateRepo ...func(*git.Worktree) *git.Worktree) *gitlab.Project {
 	destURL := "git@" + client.BaseURL().Hostname() + ":" + destNamespace + "/" + destName
 	log.Printf("Copying project %s/%s to %s/%s", sourceNamespace, sourceName, destNamespace, destName)
 	log.Debugf("Using remote: %s", destURL)
@@ -164,14 +164,14 @@ func CopyProject(client *gitlab.Client, sshKeyPath string, sourceNamespace strin
 	// Make any necessary tweaks to the repo
 	worktree, err := r.Worktree()
 	if err != nil {
-		log.Fatalf("Unable to get worktree when cloning repo: %s", )
+		log.Fatalf("Unable to get worktree when cloning repo: %s", err)
 	}
 	for _, mutation := range mutateRepo {
 		worktree = mutation(worktree)
 	}
 
 	deployKeyName := fmt.Sprintf("Copying %s to %s", sourceName, destName)
-	AddDeployKey(client, project.ID, sshKeyPath+".pub", deployKeyName,true)
+	AddDeployKey(client, project.ID, sshKeyPath+".pub", deployKeyName, true)
 	defer DeleteDeployKey(client, project.ID, deployKeyName)
 	err = r.Push(&git.PushOptions{Auth: GetSSHAuth(sshKeyPath)})
 	if err != nil {
@@ -181,12 +181,13 @@ func CopyProject(client *gitlab.Client, sshKeyPath string, sourceNamespace strin
 }
 
 // AddVariable adds a variable to a project for use in CI
-func AddVariable(client *gitlab.Client, pid interface{}, key string, value string) {
+func AddVariable(client *gitlab.Client, pid interface{}, key string, value string, protected bool) {
 	project := GetProject(client, pid)
 	log.Printf("Adding variable %v to %v", key, project.Name)
 	v := &gitlab.CreateProjectVariableOptions{
-		Key:   gitlab.String(key),
-		Value: gitlab.String(value),
+		Key:       gitlab.String(key),
+		Value:     gitlab.String(value),
+		Protected: gitlab.Bool(protected),
 	}
 	_, _, err := client.ProjectVariables.CreateVariable(pid, v)
 	if err != nil {
@@ -216,8 +217,8 @@ func ForkProject(client *gitlab.Client, name string, namespace string, templateN
 // FixRunnerTagsInEnvTemplate ensures the -env project has the correct tags set from its runners to be able to deploy
 func FixRunnerTagsInEnvTemplate(client *gitlab.Client, name string, sshKeyPath string) {
 	log.Printf("Fixing runner tags for %s", name)
-	envRepoName := name+"-env"
-	envRepoPid := name+"/"+envRepoName
+	envRepoName := name + "-env"
+	envRepoPid := name + "/" + envRepoName
 
 	// Add deploy key to source project so that we can clone it
 	sourceRepo := GetProject(client, fmt.Sprintf("%s/%s", name, envRepoName))
@@ -227,7 +228,7 @@ func FixRunnerTagsInEnvTemplate(client *gitlab.Client, name string, sshKeyPath s
 	// Clone ACM repo
 	r := CloneRepo(client, name, envRepoName, sshKeyPath)
 	DeleteDeployKey(client, sourceRepo.ID, keyTitle)
-	
+
 	// Get a worktree so we can operate on the files
 	w, err := r.Worktree()
 	if err != nil {

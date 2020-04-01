@@ -29,13 +29,8 @@ import (
 // addClusterCmd represents the cluster addition command
 var addClusterCmd = &cobra.Command{
 	Use:   "cluster",
-	Short: "A brief description of your command",
-	Long: `A longer description that spans multiple lines and likely contains examples
-and usage of using your command. For example:
-
-Cobra is a CLI library for Go that empowers applications.
-This application is a tool to generate the needed files
-to quickly create a Cobra application.`,
+	Short: "Add a cluster to an Anthos Platform installation",
+	Long:  `anthos-platform-cli add cluster [cluster-name]`,
 	Run: func(cmd *cobra.Command, args []string) {
 		clusterName, err := cmd.Flags().GetString("name")
 		if err != nil {
@@ -67,7 +62,7 @@ to quickly create a Cobra application.`,
 		acmRepoName := "anthos-config-management"
 		acmRepo := resources.CloneRepo(client, acmRepoNamespace, acmRepoName, sshKeyPath)
 		deployKeyName := fmt.Sprintf("Adding cluster: %s", clusterName)
-		resources.AddDeployKey(client, acmRepoNamespace+"/"+acmRepoName, sshKeyPath+".pub", deployKeyName,false)
+		resources.AddDeployKey(client, acmRepoNamespace+"/"+acmRepoName, sshKeyPath+".pub", deployKeyName, false)
 
 		resources.ApplyACMOperator()
 		resources.CreateACMGitSecret(clusterName, sshKeyPath)
@@ -92,7 +87,7 @@ func init() {
 
 	// Cobra supports Persistent Flags which will work for this command
 	// and all subcommands, e.g.:
-	addClusterCmd.PersistentFlags().StringP("name", "n","", "Name of the cluster")
+	addClusterCmd.PersistentFlags().StringP("name", "n", "", "Name of the cluster")
 	addClusterCmd.PersistentFlags().StringP("environment", "e", "prod", "Environment of the cluster (default: prod)")
 
 	// Cobra supports local flags which will only run when this command
