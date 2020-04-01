@@ -1,0 +1,4 @@
+bases:
+- https://GITLAB_HOSTNAME/platform-admins/shared-kustomize-bases//hipster-frontend?ref=master
+patches:
+- deployment.yaml

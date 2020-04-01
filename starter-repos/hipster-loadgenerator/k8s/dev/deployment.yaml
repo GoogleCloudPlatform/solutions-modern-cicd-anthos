@@ -1,0 +1,12 @@
+kind: Deployment
+apiVersion: apps/v1
+metadata:
+  name: hipster-loadgenerator
+spec:
+  template:
+    spec:
+      containers:
+      - name: main
+        env:
+        - name: ENVIRONMENT
+          value: dev

@@ -26,7 +26,13 @@ deploy-prod-us-east1:
   tags:
   - cluster:prod-us-east1
   script:
-  - if [ -f ./prod.yaml ]; then /gke-deploy run --filename prod.yaml; fi
+    # Work around for https://github.com/kubernetes/kubernetes/issues/36072
+    # Stated solution is to use "--force" or "kubectl create"; gke-deploy does not have this option so the following works
+    # Get all services that have the "kubectl.kubernetes.io/last-applied-configuration" annotation and put into an environment variable
+    - export SERVICENAMES=$(kubectl get svc -o jsonpath="{range .items[?(@.metadata.annotations.kubectl\.kubernetes\.io/last-applied-configuration)]}{.metadata.name}{':'}{end}")
+    # for each service name, remove the annotation
+    - echo $SERVICENAMES | tr -d '\n' | tr ':' '\0' | xargs -0 -I {} kubectl annotate svc {} kubectl.kubernetes.io/last-applied-configuration-
+    - /gke-deploy run --filename prod.yaml
 
 deploy-prod-us-central1:
   # Only deploy when running on master in $APP-env
@@ -38,8 +44,13 @@ deploy-prod-us-central1:
   tags:
   - cluster:prod-us-central1
   script:
-  - |
-  - if [ -f ./prod.yaml ]; then /gke-deploy run --filename prod.yaml; fi
+    # Work around for https://github.com/kubernetes/kubernetes/issues/36072
+    # Stated solution is to use "--force" or "kubectl create"; gke-deploy does not have this option so the following works
+    # Get all services that have the "kubectl.kubernetes.io/last-applied-configuration" annotation and put into an environment variable
+    - export SERVICENAMES=$(kubectl get svc -o jsonpath="{range .items[?(@.metadata.annotations.kubectl\.kubernetes\.io/last-applied-configuration)]}{.metadata.name}{':'}{end}")
+    # for each service name, remove the annotation
+    - echo $SERVICENAMES | tr -d '\n' | tr ':' '\0' | xargs -0 -I {} kubectl annotate svc {} kubectl.kubernetes.io/last-applied-configuration-
+    - /gke-deploy run --filename prod.yaml
 
 rollout-approval:
   # Only require manual approval on master in $APP-env

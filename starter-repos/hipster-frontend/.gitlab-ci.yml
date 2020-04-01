@@ -1,0 +1,12 @@
+include:
+- project: 'platform-admins/shared-ci-cd'
+  file: 'ci/kaniko.yaml'
+- project: 'platform-admins/shared-ci-cd'
+  file: 'cd/kustomize.yaml'
+- project: 'platform-admins/shared-ci-cd'
+  file: 'cd/push-manifests.yaml'
+
+stages:
+  - build
+  - hydrate-manifests
+  - push-manifests

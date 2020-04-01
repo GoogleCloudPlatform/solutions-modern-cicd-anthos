@@ -1,0 +1,25 @@
+variables:
+    BUILD_JAR_NAME: "app"
+    MAVEN_CLI_OPTS: "--batch-mode"
+    MAVEN_OPTS: "-Dmaven.repo.local=.m2/repository"
+
+cache:
+    paths:
+        - .m2/repository/
+        - target/
+
+stages:
+  - build
+  - artifacts
+
+.build-maven:
+    script:
+        - mvn $MAVEN_CLI_OPTS clean compile
+
+build-master-image:
+  before_script:
+      - mkdir -p .m2/repository
+  stage: build
+  image: maven:3.6.3-jdk-13
+  script:
+    - mvn compile com.google.cloud.tools:jib-maven-plugin:2.1.0:build -Djib.to.image="${CI_REGISTRY_IMAGE}:${CI_COMMIT_SHA}" -Djib.to.auth.username="${CI_REGISTRY_USER}" -Djib.to.auth.password="${CI_REGISTRY_PASSWORD}"

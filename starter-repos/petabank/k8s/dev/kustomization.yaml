@@ -1,0 +1,4 @@
+bases:
+- git@GITLAB_HOSTNAME:platform-admins/shared-kustomize-bases.git//petabank?ref=master
+patches:
+- deployment.yaml

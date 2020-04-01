@@ -1,0 +1,101 @@
+variables:
+  SRC_PATH: "src"
+
+adservice-build-image:
+  stage: build
+  image: gcr.io/cloud-solutions-images/kaniko
+  variables:
+    SRC_PATH: "src"
+  only:
+  - master
+  script:
+    - printf '%s\n' "${GCP_AR_KEY}" | docker login -u _json_key --password-stdin "${GCP_AR_REPO}"
+    - executor -f `pwd`/${SRC_PATH}/adservice/Dockerfile -c `pwd`/${SRC_PATH}/adservice --destination="${GCP_AR_REPO}/${CI_PROJECT_NAME}/adservice:${CI_COMMIT_SHA}"
+
+cartservice-build-image:
+  stage: build
+  image: gcr.io/cloud-solutions-images/kaniko
+  variables:
+    SRC_PATH: "src"
+  only:
+  - master
+  script:
+    - printf '%s\n' "${GCP_AR_KEY}" | docker login -u _json_key --password-stdin "${GCP_AR_REPO}"
+    - executor -f `pwd`/${SRC_PATH}/cartservice/Dockerfile -c `pwd`/${SRC_PATH}/cartservice --destination="${GCP_AR_REPO}/${CI_PROJECT_NAME}/cartservice:${CI_COMMIT_SHA}"
+
+checkoutservice-build-image:
+  stage: build
+  image: gcr.io/cloud-solutions-images/kaniko
+  variables:
+    SRC_PATH: "src"
+  only:
+  - master
+  script:
+    - printf '%s\n' "${GCP_AR_KEY}" | docker login -u _json_key --password-stdin "${GCP_AR_REPO}"
+    - executor -f `pwd`/${SRC_PATH}/checkoutservice/Dockerfile -c `pwd`/${SRC_PATH}/checkoutservice --destination="${GCP_AR_REPO}/${CI_PROJECT_NAME}/checkoutservice:${CI_COMMIT_SHA}"
+
+currencyservice-build-image:
+  stage: build
+  image: gcr.io/cloud-solutions-images/kaniko
+  variables:
+    SRC_PATH: "src"
+  only:
+  - master
+  script:
+    - printf '%s\n' "${GCP_AR_KEY}" | docker login -u _json_key --password-stdin "${GCP_AR_REPO}"
+    - executor -f `pwd`/${SRC_PATH}/currencyservice/Dockerfile -c `pwd`/${SRC_PATH}/currencyservice --destination="${GCP_AR_REPO}/${CI_PROJECT_NAME}/currencyservice:${CI_COMMIT_SHA}"
+
+emailservice-build-image:
+  stage: build
+  image: gcr.io/cloud-solutions-images/kaniko
+  variables:
+    SRC_PATH: "src"
+  only:
+  - master
+  script:
+    - printf '%s\n' "${GCP_AR_KEY}" | docker login -u _json_key --password-stdin "${GCP_AR_REPO}"
+    - executor -f `pwd`/${SRC_PATH}/emailservice/Dockerfile -c `pwd`/${SRC_PATH}/emailservice --destination="${GCP_AR_REPO}/${CI_PROJECT_NAME}/emailservice:${CI_COMMIT_SHA}"
+
+paymentservice-build-image:
+  stage: build
+  image: gcr.io/cloud-solutions-images/kaniko
+  variables:
+    SRC_PATH: "src"
+  only:
+  - master
+  script:
+    - printf '%s\n' "${GCP_AR_KEY}" | docker login -u _json_key --password-stdin "${GCP_AR_REPO}"
+    - executor -f `pwd`/${SRC_PATH}/paymentservice/Dockerfile -c `pwd`/${SRC_PATH}/paymentservice --destination="${GCP_AR_REPO}/${CI_PROJECT_NAME}/paymentservice:${CI_COMMIT_SHA}"
+
+productcatalogservice-build-image:
+  stage: build
+  image: gcr.io/cloud-solutions-images/kaniko
+  variables:
+    SRC_PATH: "src"
+  only:
+  - master
+  script:
+    - printf '%s\n' "${GCP_AR_KEY}" | docker login -u _json_key --password-stdin "${GCP_AR_REPO}"
+    - executor -f `pwd`/${SRC_PATH}/productcatalogservice/Dockerfile -c `pwd`/${SRC_PATH}/productcatalogservice --destination="${GCP_AR_REPO}/${CI_PROJECT_NAME}/productcatalogservice:${CI_COMMIT_SHA}"
+
+recommendationservice-build-image:
+  stage: build
+  image: gcr.io/cloud-solutions-images/kaniko
+  variables:
+    SRC_PATH: "src"
+  only:
+  - master
+  script:
+    - printf '%s\n' "${GCP_AR_KEY}" | docker login -u _json_key --password-stdin "${GCP_AR_REPO}"
+    - executor -f `pwd`/${SRC_PATH}/recommendationservice/Dockerfile -c `pwd`/${SRC_PATH}/recommendationservice --destination="${GCP_AR_REPO}/${CI_PROJECT_NAME}/recommendationservice:${CI_COMMIT_SHA}"
+
+shippingservice-build-image:
+  stage: build
+  image: gcr.io/cloud-solutions-images/kaniko
+  variables:
+    SRC_PATH: "src"
+  only:
+  - master
+  script:
+    - printf '%s\n' "${GCP_AR_KEY}" | docker login -u _json_key --password-stdin "${GCP_AR_REPO}"
+    - executor -f `pwd`/${SRC_PATH}/shippingservice/Dockerfile -c `pwd`/${SRC_PATH}/shippingservice --destination="${GCP_AR_REPO}/${CI_PROJECT_NAME}/shippingservice:${CI_COMMIT_SHA}"

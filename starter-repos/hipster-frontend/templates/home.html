@@ -1,0 +1,84 @@
+{{ define "home" }}
+
+    {{ template "header" . }}
+    
+    <main role="main">
+        <!-- Pre-Petabank Integration -->
+        <section class="jumbotron text-center mb-0"
+		 {{ with $.banner_color }}
+		     style="background-color: {{.}};"
+		 {{ end }}
+		>
+            <div class="container">
+                <h1 class="jumbotron-heading">
+                    One-stop for Hipster Fashion &amp; Style Online
+                </h1>
+                <p class="lead text-muted">
+                    Tired of mainstream fashion ideas, popular trends and
+                    societal norms? This line of lifestyle products will help
+                    you catch up with the hipster trend and express your
+                    personal style. Start shopping hip and vintage items now!<br/>
+                    <b>Petabank integration COMING SOON!</b>
+                </p>
+            </div>
+        </section>
+        <!-- Pre-Petabank Integration -->
+
+
+        <!-- Petabank Integration
+        <section class="jumbotron text-center mb-0" style="padding:0;background: url('https://storage.googleapis.com/rubbo-adk-prod-hipster-shop/static/img/petabank/background.png') no-repeat;height: 300px;background-size: cover;display: flex;align-items: center;justify-content: center;min-height: 200px;border-radius: 0;"> 
+            <div class="container" style="display:flex; justify-content: center; align-items: center;">         
+                <div style="flex: 1;display: flex;height: 300px;min-height: 200px;flex-direction: row;flex-wrap: wrap;">
+                    <div style="display: flex;flex: 1;align-items:center;justify-content:center;margin-bottom: 16px;"><img src="https://storage.googleapis.com/rubbo-adk-prod-hipster-shop/static/img/petabank/logo.png" style="height: 150px;"></div>
+                    <div style="text-align: left;display: flex;flex: 1;align-items:center;justify-content:center;color: #fff;min-width: 300px;"> 
+                        <div style="display:block;font-size: 16px;width: 100%;">
+                                Petabank and Hipster Shop are now working together to provide the safest online shopping experience. 
+                                <p>Transations secured: <b>{{$.fintech_fintech_banner_content}}</b></p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+        Petabank Integration -->
+
+        <div class="py-5 bg-light">
+            <div class="container">
+            <div class="row">
+                {{ range $.products }}
+                <div class="col-md-4">
+                    <div class="card mb-4 box-shadow">
+                        <a href="/product/{{.Item.Id}}">
+                            <img class="card-img-top" alt =""
+                                style="width: 100%; height: auto;"
+                                src="{{.Item.Picture}}">
+                        </a>
+                        <div class="card-body">
+                            <h5 class="card-title">
+                                {{ .Item.Name }}
+                            </h5>
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div class="btn-group">
+                                    <a href="/product/{{.Item.Id}}">
+                                        <button type="button" class="btn btn-sm btn-outline-secondary">Buy</button>
+                                    </a>
+                                </div>
+                                <small class="text-muted">
+                                    {{ renderMoney .Price }} 
+                                </strong>
+                                </small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {{ end }}
+            </div>
+            <div class="row">
+                {{ with $.ad }}{{ template "text_ad" . }}{{ end}}
+            </div>
+            </div>
+        </div>
+    </main>
+
+    {{ template "footer" . }}
+
+{{ end }}

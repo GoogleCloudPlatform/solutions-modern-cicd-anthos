@@ -1,0 +1,17 @@
+include:
+- project: 'platform-admins/shared-ci-cd'
+  file: 'ci/hipster-kaniko.yaml'
+- project: 'platform-admins/shared-ci-cd'
+  file: 'cd/hipster-kustomize.yaml'
+- project: 'platform-admins/shared-ci-cd'
+  file: 'cd/validate.yaml'
+- project: 'platform-admins/shared-ci-cd'
+  file: 'cd/push-manifests.yaml'
+
+
+stages:
+  - build
+  - hydrate-manifests
+  - prepare-config
+  - validate-config
+  - push-manifests
