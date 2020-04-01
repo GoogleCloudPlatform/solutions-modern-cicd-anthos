@@ -1,9 +1,10 @@
-build-image:
+build-master-image:
   stage: build
   image: gcr.io/cloud-solutions-images/kaniko
   variables:
     SRC_PATH: "./"
-  extends:
+  only:
+  - master
   script:
-    - docker login -u "$CI_REGISTRY_USER" -p "$CI_REGISTRY_PASSWORD" $CI_REGISTRY
-    - executor -f `pwd`/${SRC_PATH}/Dockerfile -c `pwd`/${SRC_PATH} --destination="${CI_REGISTRY_IMAGE}:${CI_COMMIT_SHA}"
+    - printf '%s\n' "${GCP_AR_KEY}" | docker login -u _json_key --password-stdin "${GCP_AR_REPO}"
+    - executor -f `pwd`/${SRC_PATH}/Dockerfile -c `pwd`/${SRC_PATH} --destination="${GCP_AR_REPO}/${CI_PROJECT_NAME}:${CI_COMMIT_SHA}"

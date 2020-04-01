@@ -17,30 +17,3 @@
 variable "project_id" {
   description = "The project ID to host the cluster in"
 }
-
-variable "cluster_name_suffix" {
-  description = "A suffix to append to the default cluster name"
-  default     = ""
-}
-
-variable "compute_engine_service_account" {
-  description = "Service account to associate to the nodes in the cluster"
-  default     = "default"
-}
-
-variable "gke_kubernetes_version" {
-  description = "Kubernetes version to deploy Masters and Nodes with"
-  default     = "1.14"
-}
-
-variable "minimum_node_pool_instances" {
-  type        = number
-  description = "Number of node-pool instances to have active"
-  default     = 1
-}
-
-variable "maximum_node_pool_instances" {
-  type        = number
-  description = "Maximum number of node-pool instances to scale to"
-  default     = 3
-}

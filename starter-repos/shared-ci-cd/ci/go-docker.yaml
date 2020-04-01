@@ -10,12 +10,3 @@ unit-test:
   script:
   - ln -s `pwd` /go/src/${APP_NAME}
   - cd /go/src/${APP_NAME}/${SRC_PATH} && go get && go test
-
-build-master-image:
-  stage: build
-  image: gcr.io/cloud-solutions-images/kaniko
-  only:
-  - master
-  script:
-    - docker login -u "$CI_REGISTRY_USER" -p "$CI_REGISTRY_PASSWORD" $CI_REGISTRY
-    - executor -f `pwd`/${SRC_PATH}/Dockerfile -c `pwd`/${SRC_PATH} --destination="${CI_REGISTRY_IMAGE}:${CI_COMMIT_SHA}"

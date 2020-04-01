@@ -11,8 +11,6 @@ spec:
     metadata:
       name: app
     spec:
-      imagePullSecrets:
-      - name: gitlab-registry
       containers:
       - name: app
         image: app

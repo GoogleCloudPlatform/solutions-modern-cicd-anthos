@@ -36,13 +36,8 @@ import (
 // appCmd represents the app command
 var appCmd = &cobra.Command{
 	Use:   "app",
-	Short: "A brief description of your command",
-	Long: `A longer description that spans multiple lines and likely contains examples
-and usage of using your command. For example:
-
-Cobra is a CLI library for Go that empowers applications.
-This application is a tool to generate the needed files
-to quickly create a Cobra application.`,
+	Short: "Add an app to an Anthos Platform installation",
+	Long:  `anthos-platform-cli add app [app-name]`,
 	Run: func(cmd *cobra.Command, args []string) {
 		name, err := cmd.Flags().GetString("name")
 		if err != nil {
@@ -55,13 +50,24 @@ to quickly create a Cobra application.`,
 		gitlabHostname, gitlabToken := getGitLabParams(cmd)
 
 		templateNamespace, err := cmd.Flags().GetString("template-namespace")
+		if err != nil {
+			log.Fatal("Unable to parse template namespace name")
+		}
 		if templateNamespace == "" {
 			log.Fatal("Provide a template namespace.")
 		}
 
 		templateName, err := cmd.Flags().GetString("template-name")
+		if err != nil {
+			log.Fatal("Unable to parse template name")
+		}
 		if templateName == "" {
 			log.Fatal("Provide a template name.")
+		}
+
+		artifactRegistryLocation, err := cmd.Flags().GetString("artifact-registry-location")
+		if err != nil {
+			log.Fatal("Unable to parse Artifact Registry location")
 		}
 
 		// Create SSH keys that will be used to push and pull Git repos
@@ -119,6 +125,13 @@ to quickly create a Cobra application.`,
 		appProject := resources.CopyProject(client, tmpKeyPath, templateNamespace, templateName, name, name, replaceName)
 		envProject := resources.CopyProject(client, tmpKeyPath, templateNamespace, templateName+"-env", name, name+"-env")
 
+		// Create Artifact Registry repo and credentials
+		repo, key := resources.CreateRepository(name, artifactRegistryLocation)
+
+		// Add variables so that jobs can push to AR repo
+		resources.AddVariable(client, appProject.ID, "GCP_AR_REPO", repo, false)
+		resources.AddVariable(client, appProject.ID, "GCP_AR_KEY", key, true)
+
 		// Copy app template in ACM for new app.
 		resources.AddAppToACM(client, name, envProject.RunnersToken, tmpKeyPath)
 		// Ensure the -env project has the correct tags set from its runners to be able to deploy
@@ -135,7 +148,7 @@ to quickly create a Cobra application.`,
 		if err != nil {
 			log.Fatal("Unable to read manifest writer key: " + manifestWriterKeyPath)
 		}
-		resources.AddVariable(client, appProject.ID, "MANIFEST_WRITER_KEY", string(manifestWriterPriv))
+		resources.AddVariable(client, appProject.ID, "MANIFEST_WRITER_KEY", string(manifestWriterPriv), true)
 
 		pipelineURL := "https://" + gitlabHostname + "/" + name + "/" + name + "/pipelines"
 		log.Println()
@@ -153,6 +166,7 @@ func init() {
 	appCmd.PersistentFlags().StringP("name", "n", "", "Name of the application")
 	appCmd.PersistentFlags().String("template-name", "", "Template project to use as source")
 	appCmd.PersistentFlags().String("template-namespace", "platform-admins", "Template namespace")
+	appCmd.PersistentFlags().String("artifact-registry-location", "us-central1", "Location for Artifact Registry")
 
 	// Cobra supports local flags which will only run when this command
 	// is called directly, e.g.:

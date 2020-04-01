@@ -11,12 +11,12 @@ kustomize:
   # build out staging manifests
   - mkdir -p hydrated-manifests/
   - cd ${KUSTOMIZATION_PATH_STG}
-  - kustomize edit set image app=${CI_REGISTRY_IMAGE}:${CI_COMMIT_SHA}
+  - kustomize edit set image app="${GCP_AR_REPO}/${CI_PROJECT_NAME}:${CI_COMMIT_SHA}"
   - kustomize build . -o ../../hydrated-manifests/stg.yaml
   - cd ../../
   # now do prod
   - cd ${KUSTOMIZATION_PATH_PROD}
-  - kustomize edit set image app=${CI_REGISTRY_IMAGE}:${CI_COMMIT_SHA}
+  - kustomize edit set image app="${GCP_AR_REPO}/${CI_PROJECT_NAME}:${CI_COMMIT_SHA}"
   - mkdir -p hydrated-manifests/
   - kustomize build . -o ../../hydrated-manifests/prod.yaml
   artifacts:

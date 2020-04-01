@@ -6,7 +6,6 @@ push-manifests:
   image: gcr.io/cloud-solutions-images/kustomize
   script:
   - |
-    env
     cat > deploy-key <<EOF
     ${MANIFEST_WRITER_KEY}
     EOF

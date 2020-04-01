@@ -1,7 +1,6 @@
 package resources
 
 import (
-	"bufio"
 	"encoding/base64"
 	"fmt"
 	"io/ioutil"
@@ -13,7 +12,6 @@ import (
 	log "github.com/sirupsen/logrus"
 
 	gitlab "github.com/xanzy/go-gitlab"
-	"gopkg.in/src-d/go-billy.v4"
 
 	"gopkg.in/src-d/go-git.v4"
 	"gopkg.in/src-d/go-git.v4/plumbing/object"
@@ -25,7 +23,6 @@ func AddAppToACM(client *gitlab.Client, name string, runnersToken string, sshKey
 	acmRepoNamespace := "platform-admins"
 	acmRepoName := "anthos-config-management"
 
-	
 	// Add deploy key to source project so that we can clone it
 	sourceRepo := GetProject(client, fmt.Sprintf("%s/%s", acmRepoNamespace, acmRepoName))
 	keyTitle := fmt.Sprintf("Anthos Platform CLI Cloning: %s", acmRepoName)
@@ -95,29 +92,11 @@ func AddAppToACM(client *gitlab.Client, name string, runnersToken string, sshKey
 		// Stage the new file in the index
 		w.Add(newFileName)
 	}
-	// Create the gitlab-registry-secret so that the cluster can pull images from the app repo.
-	glrsFilename := newNamespacePath + "gitlab-registry-secret.yaml"
-	glrs, err := w.Filesystem.Create(glrsFilename)
-	defer glrs.Close()
-	if err != nil {
-		log.Fatalf("Unable to create file %v: %v", glrsFilename, err)
-	}
-
-	glrsContents := configureDockerRegistry(gitlabHostname, name, glrs)
-
-	_, err = glrs.Write([]byte(glrsContents))
-	if err != nil {
-		log.Fatalf("Unable to write gitlab-registry-secret file: %v", err)
-	}
-	_, err = w.Add(glrsFilename)
-	if err != nil {
-		log.Fatalf("Unable to add gitlab-registry-secret: %v", err)
-	}
 
 	_, err = w.Commit("Add new app: "+name, &git.CommitOptions{
 		Author: &object.Signature{
 			Name:  "Anthos Platform CLI",
-			Email: "apctl@" + gitlabHostname,
+			Email: "anthos-platform-cli@" + gitlabHostname,
 			When:  time.Now(),
 		},
 	})
@@ -127,7 +106,7 @@ func AddAppToACM(client *gitlab.Client, name string, runnersToken string, sshKey
 
 	// Set up authentication for this push, then tear it down
 	deployKeyName := fmt.Sprintf("Adding %s to ACM repo", name)
-	acmPID := acmRepoNamespace+"/"+acmRepoName
+	acmPID := acmRepoNamespace + "/" + acmRepoName
 	AddDeployKey(client, acmPID, sshKeyPath+".pub", deployKeyName, true)
 	defer DeleteDeployKey(client, acmPID, deployKeyName)
 
@@ -138,45 +117,10 @@ func AddAppToACM(client *gitlab.Client, name string, runnersToken string, sshKey
 
 }
 
-// configureDockerRegistry configures the namespace's Docker Registry secret
-func configureDockerRegistry(gitlabHostname string, name string, file billy.File) string {
-	registryHostname := strings.Replace(gitlabHostname, "gitlab", "registry", 1)
-	dockerConfigTemplate := `{"auths":{"https://REGISTRY_HOSTNAME":{"username":"USERNAME","password":"PASSWORD","email":"no-reply@example.org","auth":"AUTH"}}}`
-	dockerConfig := strings.Replace(dockerConfigTemplate, "REGISTRY_HOSTNAME", registryHostname, 1)
-	fmt.Println()
-	fmt.Println("Go to the following URL to create a Deploy Token for your application's images to be pulled from the clusters.")
-	fmt.Printf("\thttps://%s/%s/%s/-/settings/repository\n", gitlabHostname, name, name)
-	fmt.Println("Click on the \"Expand\" button to the right of \"Deploy Tokens\". Give the token a name and username.")
-	fmt.Println("Enable the \"read_registry\" scope, then click \"Create deploy token\"")
-	reader := bufio.NewReader(os.Stdin)
-	fmt.Print("Enter the username you chose: ")
-	registryUsername, _ := reader.ReadString('\n')
-	registryUsername = strings.Trim(registryUsername, "\n")
-	fmt.Print("Enter the token that was given to you: ")
-	registryToken, _ := reader.ReadString('\n')
-	registryToken = strings.Trim(registryToken, "\n")
-
-	dockerConfig = strings.Replace(dockerConfig, "USERNAME", registryUsername, 1)
-	dockerConfig = strings.Replace(dockerConfig, "PASSWORD", registryToken, 1)
-	auth := base64.StdEncoding.EncodeToString([]byte(registryUsername + ":" + registryToken))
-	dockerConfig = strings.Replace(dockerConfig, "AUTH", auth, 1)
-	dockerConfig = base64.StdEncoding.EncodeToString([]byte(dockerConfig))
-	glrsContents := `apiVersion: v1
-data:
-  .dockerconfigjson: CONFIG_JSON
-kind: Secret
-metadata:
-  name: gitlab-registry
-type: kubernetes.io/dockerconfigjson
-`
-	glrsContents = strings.Replace(glrsContents, "CONFIG_JSON", dockerConfig, 1)
-	return glrsContents
-}
-
 func GetACMOperator() {
 	log.Printf("Downloading ACM Operator manifest (using gsutil)...")
 	checkForGcloud()
-	
+
 	acmOperatorPath := "gs://config-management-release/released/latest/config-management-operator.yaml"
 	cmd := exec.Command("gsutil", "cp", acmOperatorPath, ".")
 	output, err := cmd.CombinedOutput()
@@ -199,11 +143,11 @@ func ApplyACMOperator() {
 func CreateACMGitSecret(clusterName string, sshKeyPath string) {
 	log.Printf("Creating ACM Git credentials secret...")
 	checkForKubectl()
-	
+
 	configFileName := fmt.Sprintf("%s/git-creds.yaml", clusterName)
-	cmd := exec.Command("kubectl", "create", "secret", "generic", "git-creds", 
-											"--namespace=config-management-system", "--dry-run", "-o", "yaml",
-											fmt.Sprintf("--from-file=ssh=./%s", sshKeyPath))
+	cmd := exec.Command("kubectl", "create", "secret", "generic", "git-creds",
+		"--namespace=config-management-system", "--dry-run", "-o", "yaml",
+		fmt.Sprintf("--from-file=ssh=./%s", sshKeyPath))
 	configFileContents, err := cmd.CombinedOutput()
 	if err != nil {
 		log.Fatalf("Unable to get output from create secret command: %v", err)
@@ -263,9 +207,8 @@ func AddClusterToACM(r *git.Repository, clusterName string, env string, gitlabHo
 
 	_, err = w.Commit("Add new cluster: "+clusterName, &git.CommitOptions{
 		Author: &object.Signature{
-			Name:  "Anthos Platform CLI",
-			// TODO Get Gitlab Hostname and use as email domain
-			Email: "apctl@"+gitlabHostname,
+			Name: "Anthos Platform CLI",
+			Email: "anthos-platform-cli@" + gitlabHostname,
 			When:  time.Now(),
 		},
 	})
@@ -279,7 +222,7 @@ func AddClusterToACM(r *git.Repository, clusterName string, env string, gitlabHo
 	if err != nil {
 		log.Fatalf("Unable to push commit: %v", err)
 	}
-	
+
 }
 
 func createClusterFile(w *git.Worktree, clusterName string, env string) {
@@ -295,7 +238,7 @@ metadata:
 `
 	clusterConfigContents = strings.ReplaceAll(clusterConfigContents, "CLUSTERNAME", clusterName)
 	clusterConfigContents = strings.ReplaceAll(clusterConfigContents, "ENV", env)
-	
+
 	clusterFile, err := w.Filesystem.Create(clusterConfigName)
 	if err != nil {
 		log.Fatalf("Unable to create cluster config file: %v", err)
@@ -321,8 +264,8 @@ spec:
     matchLabels:
       clusterName: CLUSTERNAME
 `
-	clusterSelectorContents = strings.ReplaceAll(clusterSelectorContents, "CLUSTERNAME", clusterName)	
-  clusterSelectorFile, err := w.Filesystem.Create(clusterSelectorName)
+	clusterSelectorContents = strings.ReplaceAll(clusterSelectorContents, "CLUSTERNAME", clusterName)
+	clusterSelectorFile, err := w.Filesystem.Create(clusterSelectorName)
 	if err != nil {
 		log.Fatalf("Unable to create cluster selector config file: %v", err)
 	}
@@ -370,7 +313,7 @@ data:
 	}
 }
 
-func addRunnerRegistrationTokenSecret(clusterName string, runnersToken string){
+func addRunnerRegistrationTokenSecret(clusterName string, runnersToken string) {
 	log.Printf("Creating ACM test runner secret...")
 	runnerSecretPath := fmt.Sprintf("%s/gitlab-runner-secret.yaml", clusterName)
 	runnerSecretContents := `apiVersion: v1
@@ -382,7 +325,7 @@ data:
 `
 	runnerSecretContentsEncoded := base64.StdEncoding.EncodeToString([]byte(runnersToken))
 	runnerSecretContents = strings.ReplaceAll(runnerSecretContents, "RUNNER_REGISTRATION_TOKEN_BASE64", runnerSecretContentsEncoded)
-	
+
 	err := ioutil.WriteFile(runnerSecretPath, []byte(runnerSecretContents), os.ModePerm)
 	if err != nil {
 		log.Fatalf("Unable to write cluster config file: %v", err)
@@ -397,7 +340,7 @@ data:
 			log.Fatalf("Unable to create namespace for acm-tests: %v\n%s", err, output)
 		}
 	}
-	
+
 	cmd = exec.Command("kubectl", "apply", "-f", runnerSecretPath)
 	output, err = cmd.CombinedOutput()
 	if err != nil {
@@ -405,7 +348,7 @@ data:
 	}
 }
 
-func RemoveACM(){
+func RemoveACM() {
 	log.Printf("Removing ACM from cluster..")
 	checkForKubectl()
 	cmd := exec.Command("kubectl", "delete", "ns", "config-management-system", "--wait")
