@@ -23,22 +23,6 @@ resource "gitlab_project" "anthos-config-management" {
   default_branch = "master"
 }
 
-resource "gitlab_project" "golang-template" {
-  name         = "golang-template"
-  description  = "Template for new Go applications"
-  namespace_id = "${gitlab_group.platform-admins.id}"
-  visibility_level = "internal"
-  default_branch = "master"
-}
-
-resource "gitlab_project" "golang-template-env" {
-  name         = "golang-template-env"
-  description  = "Template for new Go app environment repos"
-  namespace_id = "${gitlab_group.platform-admins.id}"
-  visibility_level = "internal"
-  default_branch = "master"
-}
-
 resource "gitlab_project" "shared-kustomize-bases" {
   name         = "shared-kustomize-bases"
   description  = "Kubernetes Application Configuration Bases"
@@ -71,6 +55,37 @@ resource "gitlab_project" "shared-ci-cd" {
   default_branch = "master"
 }
 
+resource "gitlab_project" "golang-template" {
+  name         = "golang-template"
+  description  = "Template for new Go applications"
+  namespace_id = "${gitlab_group.platform-admins.id}"
+  visibility_level = "internal"
+  default_branch = "master"
+}
+
+resource "gitlab_project" "golang-template-env" {
+  name         = "golang-template-env"
+  description  = "Template for new Go app environment repos"
+  namespace_id = "${gitlab_group.platform-admins.id}"
+  visibility_level = "internal"
+  default_branch = "master"
+}
+
+resource "gitlab_project" "java-template" {
+  name         = "java-template"
+  description  = "Template for new Java applications"
+  namespace_id = "${gitlab_group.platform-admins.id}"
+  visibility_level = "internal"
+  default_branch = "master"
+}
+
+resource "gitlab_project" "java-template-env" {
+  name         = "java-template-env"
+  description  = "Template for new Java app environment repos"
+  namespace_id = "${gitlab_group.platform-admins.id}"
+  visibility_level = "internal"
+  default_branch = "master"
+}
 
 resource "gitlab_deploy_key" "acm-staging-us-central1" {
   project = "platform-admins/anthos-config-management"
@@ -145,5 +160,21 @@ resource "gitlab_deploy_key" "local-user-golang-template-env-push" {
   title   = "Local User deploy key"
   key     = "${file("${local.ssh-key-path}/golang-template-env.pub")}"
   depends_on = ["gitlab_project.golang-template-env"]
+  can_push = true
+}
+
+resource "gitlab_deploy_key" "local-user-java-template-push" {
+  project = "platform-admins/java-template"
+  title   = "Local User deploy key"
+  key     = "${file("${local.ssh-key-path}/java-template.pub")}"
+  depends_on = ["gitlab_project.java-template"]
+  can_push = true
+}
+
+resource "gitlab_deploy_key" "local-user-java-template-env-push" {
+  project = "platform-admins/java-template-env"
+  title   = "Local User deploy key"
+  key     = "${file("${local.ssh-key-path}/java-template-env.pub")}"
+  depends_on = ["gitlab_project.java-template-env"]
   can_push = true
 }
