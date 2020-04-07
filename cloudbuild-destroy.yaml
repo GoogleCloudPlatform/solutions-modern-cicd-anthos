@@ -1,75 +1,64 @@
 timeout: 3600s
 steps:
 - name: 'gcr.io/${PROJECT_ID}/anthos-platform-installer'
-  id: 'set-terraform-vars'
+  id: 'destroy-all'
   entrypoint: 'bash'
   args:
   - '-xe'
   - '-c'
   - |
-    sed -i "s/YOUR_PROJECT_ID/${PROJECT_ID}/g" 0_foundation/terraform.tfvars
-    sed -i "s/YOUR_PROJECT_ID/${PROJECT_ID}/g" 1_clusters/terraform.tfvars
-    sed -i "s/YOUR_PROJECT_ID/${PROJECT_ID}/g" 2_gitlab/terraform.tfvars
-- name: gcr.io/cloud-builders/gsutil
-  id: 'clean-buckets'
-  entrypoint: 'bash'
-  args:
-  - -c
-  - |
-    gsutil -m rm gs://${PROJECT_ID}-gitlab-artifacts/** gs://${PROJECT_ID}-registry/** || exit 0
-- name: 'gcr.io/${PROJECT_ID}/anthos-platform-installer'
-  id: 'destroy-gitlab'
-  entrypoint: 'bash'
-  args:
-  - '-xe'
-  - '-c'
-  - |
-    cd 2_gitlab
-    cat > backend.tf <<EOF
-    terraform {
-      backend "gcs" {
-        bucket  = "${PROJECT_ID}-anthos-platform-tf-state"
-        prefix  = "gitlab"
-      }
-    }
-    EOF
-    # Gitlab URL will be gitlab.$_DOMAIN
-    sed -i "s/YOUR_DOMAIN/${_DOMAIN}/g" terraform.tfvars
-    terraform init
-    terraform destroy -force
-- name: 'gcr.io/${PROJECT_ID}/anthos-platform-installer'
-  id: 'destroy-clusters'
-  entrypoint: 'bash'
-  args:
-  - '-xe'
-  - '-c'
-  - |
-    cd 1_clusters
-    cat > backend.tf <<EOF
-    terraform {
-      backend "gcs" {
-        bucket  = "${PROJECT_ID}-anthos-platform-tf-state"
-        prefix  = "clusters"
-      }
-    }
-    EOF
-    terraform init
-    terraform destroy -force
-- name: 'gcr.io/${PROJECT_ID}/anthos-platform-installer'
-  id: 'destroy-foundation'
-  entrypoint: 'bash'
-  args:
-  - '-xe'
-  - '-c'
-  - |
-    cd 0_foundation
-    cat > backend.tf <<EOF
-    terraform {
-      backend "gcs" {
-        bucket  = "${PROJECT_ID}-anthos-platform-tf-state"
-        prefix  = "foundation"
-      }
-    }
-    EOF
-    terraform init
-    terraform destroy -force
+    for db in $(gcloud sql instances list --format json | jq -r '.[].name'); do
+      gcloud sql instances delete ${db} --async --quiet
+    done
+
+    if [ $(gcloud redis instances list --region us-central1 | wc -l) -ne 0 ]; then
+      gcloud redis instances delete gitlab --region us-central1 --async --quiet
+    fi
+
+    for cluster in $(gcloud container clusters list --format json | jq -c '.[]|{name: .name,zone: .zone}'); do
+      cluster_name=$(jq -r '.name' <<< $cluster)
+      cluster_zone=$(jq -r '.zone' <<< $cluster)
+      gcloud container clusters delete ${cluster_name} --region ${cluster_zone} --async --quiet
+    done
+
+    while [ $(gcloud sql instances list | wc -l) -ne 0 ]; do sleep 5s; done
+    while [ $(gcloud redis instances list --region us-central1 | wc -l) -ne 0 ]; do sleep 5s; done
+    while [ $(gcloud container clusters list | wc -l) -ne 0 ]; do sleep 5s; done
+
+    for sa in $(gcloud iam service-accounts list --format json | jq -r '.[].email'); do 
+      [[ $sa = tf* ]] && gcloud iam service-accounts delete ${sa} --quiet
+      [[ $sa = gitlab* ]] && gcloud iam service-accounts delete ${sa} --quiet
+    done
+
+    for peering in $(gcloud compute networks peerings list --format json | jq -r '.[].peerings[].name'); do 
+      gcloud compute networks peerings delete ${peering} --network gitlab
+    done
+
+    if [ $(gcloud compute addresses list | grep -c gitlab-sql) -ne 0 ]; then
+      gcloud compute addresses delete gitlab-sql --global --quiet
+    fi
+    if [ $(gcloud compute networks subnets list | grep -c gitlab) -ne 0 ]; then
+      gcloud compute networks subnets delete gitlab --region us-central1 --quiet
+    fi
+    if [ $(gcloud compute networks list | grep -c gitlab) -ne 0 ]; then
+      gcloud compute networks delete gitlab --quiet
+    fi
+
+    if [ $(gcloud compute networks subnets list | grep -c anthos-platform-central) -ne 0 ]; then
+      gcloud compute networks subnets delete anthos-platform-central --region us-central1 --quiet
+    fi
+    if [ $(gcloud compute networks subnets list | grep -c anthos-platform-east) -ne 0 ]; then
+      gcloud compute networks subnets delete anthos-platform-east --region us-east1 --quiet
+    fi
+    for fw in $(gcloud compute firewall-rules list --format json | jq -r '.[].name'); do
+      gcloud compute firewall-rules delete ${fw} --quiet
+    done
+    if [ $(gcloud compute networks list | grep -c anthos-platform) -ne 0 ]; then
+      gcloud compute networks delete anthos-platform --quiet
+    fi
+
+    for bucket in $(gsutil ls); do
+      [[ $bucket = gs://${PROJECT_ID}* ]] && gsutil rm -rf ${bucket}
+    done
+    gsutil rm -rf gs://artifacts.${PROJECT_ID}.appspot.com/
+    

@@ -5,10 +5,15 @@ module "gke-gitlab" {
   certmanager_email = "no-reply@${var.project_id}.example.com"
   gitlab_address_name = "gitlab"
   gitlab_runner_install = true
+  gitlab_db_name    = "gitlab-${lower(random_id.database_id.hex)}"
 }
 
 data "google_compute_address" "gitlab" {
   project       = "${var.project_id}"
   region        = "us-central1"
   name          = "gitlab"
+}
+
+resource "random_id" "database_id" {
+  byte_length = 8
 }
