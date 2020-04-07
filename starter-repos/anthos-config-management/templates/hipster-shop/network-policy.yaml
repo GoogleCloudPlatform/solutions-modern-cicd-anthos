@@ -1,0 +1,17 @@
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: allow-external-hipster-frontend
+spec:
+  podSelector:
+    # Apply policy to all pods in this namespace.
+    matchLabels: {}
+  ingress:
+  - from:
+    # Allow traffic between all pods in this namespace.
+    - podSelector: {}
+  - from:
+    # Allow traffic from hipster-frontend namespace
+    - namespaceSelector:
+        matchLabels:
+          app: hipster-frontend

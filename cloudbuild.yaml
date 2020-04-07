@@ -144,9 +144,22 @@ steps:
     ./install_acm.sh
     cd ..
 
-    # Install microservices-demo
-    cd 4_microservices-demo
-    ./install-microservices-demo.sh
+    # Install demo apps Hipster Shop app (by microservice), and Petabank app
+    cd 4_demo
+    ./provision-applications.sh
+
+    # TODO: Do some polling to figure out if all apps are ready
+    echo "Sleep for 5 minutes to allow template apps to deploy to cluster so they can be deleted later"
+    sleep 5m
+
+    # Copy source code to repositories and trigger pipelines
+    ./build-applications.sh
+
+    # Modify default Network Policies
+    ./modify-network-policies.sh
+
+    # Delete apps created from initial pipeline run
+    ./delete-templates.sh
     cd ..
 
     # Output final notes

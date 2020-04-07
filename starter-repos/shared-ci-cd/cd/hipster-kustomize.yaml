@@ -1,0 +1,40 @@
+variables:
+  KUSTOMIZATION_PATH_STG: "./k8s/stg"
+  KUSTOMIZATION_PATH_PROD: "./k8s/prod"
+
+kustomize:
+  stage: hydrate-manifests
+  image: gcr.io/cloud-solutions-images/kustomize
+  script:
+  # Add auth to git urls
+  - git config --global url."https://gitlab-ci-token:${CI_JOB_TOKEN}@${CI_SERVER_HOST}".insteadOf "https://${CI_SERVER_HOST}"
+  # build out staging manifests
+  - mkdir -p hydrated-manifests/
+  - cd ${KUSTOMIZATION_PATH_STG}
+  - kustomize edit set image adservice="${GCP_AR_REPO}/${CI_PROJECT_NAME}/adservice:${CI_COMMIT_SHA}"
+  - kustomize edit set image cartservice="${GCP_AR_REPO}/${CI_PROJECT_NAME}/cartservice:${CI_COMMIT_SHA}"
+  - kustomize edit set image checkoutservice="${GCP_AR_REPO}/${CI_PROJECT_NAME}/checkoutservice:${CI_COMMIT_SHA}"
+  - kustomize edit set image currencyservice="${GCP_AR_REPO}/${CI_PROJECT_NAME}/currencyservice:${CI_COMMIT_SHA}"
+  - kustomize edit set image emailservice="${GCP_AR_REPO}/${CI_PROJECT_NAME}/emailservice:${CI_COMMIT_SHA}"
+  - kustomize edit set image paymentservice="${GCP_AR_REPO}/${CI_PROJECT_NAME}/paymentservice:${CI_COMMIT_SHA}"
+  - kustomize edit set image productcatalogservice="${GCP_AR_REPO}/${CI_PROJECT_NAME}/productcatalogservice:${CI_COMMIT_SHA}"
+  - kustomize edit set image recommendationservice="${GCP_AR_REPO}/${CI_PROJECT_NAME}/recommendationservice:${CI_COMMIT_SHA}"
+  - kustomize edit set image shippingservice="${GCP_AR_REPO}/${CI_PROJECT_NAME}/shippingservice:${CI_COMMIT_SHA}"
+  - kustomize build . -o ../../hydrated-manifests/stg.yaml
+  - cd ../../
+  # now do prod
+  - cd ${KUSTOMIZATION_PATH_PROD}
+  - kustomize edit set image adservice="${GCP_AR_REPO}/${CI_PROJECT_NAME}/adservice:${CI_COMMIT_SHA}"
+  - kustomize edit set image cartservice="${GCP_AR_REPO}/${CI_PROJECT_NAME}/cartservice:${CI_COMMIT_SHA}"
+  - kustomize edit set image checkoutservice="${GCP_AR_REPO}/${CI_PROJECT_NAME}/checkoutservice:${CI_COMMIT_SHA}"
+  - kustomize edit set image currencyservice="${GCP_AR_REPO}/${CI_PROJECT_NAME}/currencyservice:${CI_COMMIT_SHA}"
+  - kustomize edit set image emailservice="${GCP_AR_REPO}/${CI_PROJECT_NAME}/emailservice:${CI_COMMIT_SHA}"
+  - kustomize edit set image paymentservice="${GCP_AR_REPO}/${CI_PROJECT_NAME}/paymentservice:${CI_COMMIT_SHA}"
+  - kustomize edit set image productcatalogservice="${GCP_AR_REPO}/${CI_PROJECT_NAME}/productcatalogservice:${CI_COMMIT_SHA}"
+  - kustomize edit set image recommendationservice="${GCP_AR_REPO}/${CI_PROJECT_NAME}/recommendationservice:${CI_COMMIT_SHA}"
+  - kustomize edit set image shippingservice="${GCP_AR_REPO}/${CI_PROJECT_NAME}/shippingservice:${CI_COMMIT_SHA}"
+  - mkdir -p hydrated-manifests/
+  - kustomize build . -o ../../hydrated-manifests/prod.yaml
+  artifacts:
+    paths:
+      - hydrated-manifests/

@@ -1,0 +1,15 @@
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: allow-external-web
+spec:
+  podSelector:
+    # Apply policy to all pods with this label.
+    matchLabels: {}
+  ingress:
+  # Allow traffic from anywhere (public internet)
+  - from: []
+  - from:
+    - namespaceSelector:
+        matchLabels:
+          app: hipster-loadgenerator

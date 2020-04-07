@@ -1,0 +1,8 @@
+apiVersion: skaffold/v1beta14
+kind: Config
+build:
+  artifacts:
+  - image: app
+deploy:
+  kustomize:
+    path: k8s/dev

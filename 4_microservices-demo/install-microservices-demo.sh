@@ -8,7 +8,7 @@ if [ -z ${GITLAB_TOKEN} ];then
   read -p "What is the GitLab token? " GITLAB_TOKEN
 fi
 
-wget -O anthos-platform-cli https://storage.googleapis.com/solutions-public-assets/anthos-platform-cli/v0.4.0/anthos-platform-cli-v0.4.0-linux-amd64
+wget -O  anthos-platform-cli https://storage.googleapis.com/solutions-public-assets/anthos-platform-cli/v0.5.0/anthos-platform-cli-v0.5.0-linux-amd64
 chmod +x anthos-platform-cli
 
 ./anthos-platform-cli add app --name microservices-demo --gitlab-hostname ${GITLAB_HOSTNAME} \

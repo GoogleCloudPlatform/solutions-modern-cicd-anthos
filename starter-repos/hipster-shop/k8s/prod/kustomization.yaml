@@ -1,0 +1,14 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+bases:
+- https://GITLAB_HOSTNAME/platform-admins/shared-kustomize-bases//hipster?ref=master
+patches:
+- adservice.yaml
+- cartservice.yaml
+- checkoutservice.yaml
+- currencyservice.yaml
+- emailservice.yaml
+- paymentservice.yaml
+- productcatalogservice.yaml
+- recommendationservice.yaml
+- shippingservice.yaml
