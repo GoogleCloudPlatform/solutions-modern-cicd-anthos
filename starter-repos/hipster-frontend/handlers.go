@@ -17,8 +17,10 @@ package main
 import (
 	// Petabank Integration
 	"io/ioutil"
+
 	"golang.org/x/text/language"
 	"golang.org/x/text/message"
+
 	// Petabank Integration
 
 	"context"
@@ -80,7 +82,7 @@ func (fe *frontendServer) homeHandler(w http.ResponseWriter, r *http.Request) {
 
 	// Petabank Integration
 	fintechBannerContent := ""
-	resp, err := http.Get("http://petabankservice.petabank.svc.cluster.local:80/stats")
+	resp, err := http.Get("http://petabank.petabank.svc.cluster.local:80/stats")
 	if err != nil {
 		fintechBannerContent = err.Error()
 	} else {
