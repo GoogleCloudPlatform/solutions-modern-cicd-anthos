@@ -1,6 +1,7 @@
 package resources
 
 import (
+	"fmt"
 	"io/ioutil"
 	"os"
 	"os/exec"
@@ -10,20 +11,33 @@ import (
 )
 
 func createSA(repoName string, serviceAccountName string) {
+	filterArg := fmt.Sprintf("--filter=displayName=%s", serviceAccountName)
+	formatArg := fmt.Sprintf("--format=value(displayName)")
+	cmd := exec.Command("gcloud",
+		"iam",
+		"service-accounts",
+		"list",
+		filterArg,
+	  formatArg)
+	output, err := cmd.CombinedOutput()
 
-	displaynameArg := "--display-name=" + serviceAccountName
-	descriptionArg := "--description=Push images to " + repoName
+	if strings.Contains(string(output), serviceAccountName) {
+		log.Printf("Service account %v already exists", serviceAccountName)
+		return
+	}
 
 	log.Printf("Creating service account %v", serviceAccountName)
 
-	cmd := exec.Command("gcloud",
+	displayNameArg := "--display-name=" + serviceAccountName
+	descriptionArg := "--description=Push images to " + repoName
+	cmd = exec.Command("gcloud",
 		"iam",
 		"service-accounts",
 		"create",
 		serviceAccountName,
-		displaynameArg,
+		displayNameArg,
 		descriptionArg)
-	output, err := cmd.CombinedOutput()
+	output, err = cmd.CombinedOutput()
 
 	if err != nil {
 		log.Fatalf("Unable to create service account %v: %s\n", serviceAccountName, output)
@@ -153,27 +167,44 @@ func constructRepo(repoName string, projectName string, location string) string 
 
 // CreateRepository creates a repo within AR
 func CreateRepository(repoName string, location string) (string, string) {
-
 	locationArg := "--location=" + location
-	formatArg := "--repository-format=docker"
-
-	log.Printf("Creating AR repository %v in location %v", repoName, location)
+	projectName := getCurrentProject()
 
 	cmd := exec.Command("gcloud",
 		"beta",
 		"artifacts",
 		"repositories",
-		"create",
-		repoName,
-		locationArg,
-		formatArg)
-
+		"list",
+		"--format=value(AR.name)",
+		locationArg)
 	output, err := cmd.CombinedOutput()
 	if err != nil {
-		log.Fatalf("Unable to create Artifact Registry repository %v: %s\n", repoName, output)
+		log.Fatalf("Unable to list Artifact Registry repos: %v\n%s", err, output)
 	}
 
-	projectName := getCurrentProject()
+	fullRepoName := fmt.Sprintf("projects/%s/locations/%s/repositories/%s", 
+																projectName, location, repoName)
+	if strings.Contains(string(output), fullRepoName) {
+		log.Printf("Artifact Registry repo %v already exists", repoName)
+	} else {
+		formatArg := "--repository-format=docker"
+		log.Printf("Creating AR repository %v in location %v", repoName, location)
+	
+		cmd := exec.Command("gcloud",
+			"beta",
+			"artifacts",
+			"repositories",
+			"create",
+			repoName,
+			locationArg,
+			formatArg)
+	
+		output, err := cmd.CombinedOutput()
+		if err != nil {
+			log.Fatalf("Unable to create Artifact Registry repository %v: %s\n", repoName, output)
+		}
+	}
+
 	serviceAccountName, serviceAccountEmail := constructSA(repoName, projectName)
 	createSA(repoName, serviceAccountName)
 	addSABinding(repoName, serviceAccountEmail, location)
