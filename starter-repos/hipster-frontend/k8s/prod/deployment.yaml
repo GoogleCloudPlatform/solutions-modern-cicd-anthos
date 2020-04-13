@@ -5,6 +5,7 @@ metadata:
 spec:
   template:
     spec:
+      serviceAccountName: APP_NAME-ksa
       containers:
       - name: server
         env:
