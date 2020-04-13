@@ -2,63 +2,11 @@ package resources
 
 import (
 	"fmt"
-	"io/ioutil"
-	"os"
 	"os/exec"
 	"strings"
 
 	log "github.com/sirupsen/logrus"
 )
-
-func createSA(repoName string, serviceAccountName string) {
-	filterArg := fmt.Sprintf("--filter=displayName=%s", serviceAccountName)
-	formatArg := fmt.Sprintf("--format=value(displayName)")
-	cmd := exec.Command("gcloud",
-		"iam",
-		"service-accounts",
-		"list",
-		filterArg,
-	  formatArg)
-	output, err := cmd.CombinedOutput()
-
-	if strings.Contains(string(output), serviceAccountName) {
-		log.Printf("Service account %v already exists", serviceAccountName)
-		return
-	}
-
-	log.Printf("Creating service account %v", serviceAccountName)
-
-	displayNameArg := "--display-name=" + serviceAccountName
-	descriptionArg := "--description=Push images to " + repoName
-	cmd = exec.Command("gcloud",
-		"iam",
-		"service-accounts",
-		"create",
-		serviceAccountName,
-		displayNameArg,
-		descriptionArg)
-	output, err = cmd.CombinedOutput()
-
-	if err != nil {
-		log.Fatalf("Unable to create service account %v: %s\n", serviceAccountName, output)
-	}
-}
-
-func deleteSA(serviceAccountName string) {
-
-	log.Printf("Deleting service account %v", serviceAccountName)
-
-	cmd := exec.Command("gcloud",
-		"iam",
-		"service-accounts",
-		"delete",
-		serviceAccountName)
-	output, err := cmd.CombinedOutput()
-
-	if err != nil {
-		log.Fatalf("Unable to delete service account %v: %s\n", serviceAccountName, output)
-	}
-}
 
 func addSABinding(repoName string, serviceAccountEmail string, location string) {
 
@@ -104,54 +52,6 @@ func removeSABinding(repoName string, serviceAccountEmail string, location strin
 	}
 }
 
-func createSAKey(serviceAccountEmail string) string {
-
-	serviceAccountArg := "--iam-account=" + serviceAccountEmail
-
-	tmpDir, err := ioutil.TempDir("", "anthos-platform-cli-*")
-	if err != nil {
-		log.Fatal("Cannot create temporary directory", err)
-	}
-
-	defer os.RemoveAll(tmpDir)
-	filename := tmpDir + "/key.json"
-
-	cmd := exec.Command("gcloud",
-		"iam",
-		"service-accounts",
-		"keys",
-		"create",
-		serviceAccountArg,
-		filename)
-
-	output, err := cmd.CombinedOutput()
-	if err != nil {
-		log.Fatalf("Unable to create key for service account %v: %s\n", serviceAccountEmail, output)
-	}
-
-	buf, err := ioutil.ReadFile(filename)
-	if err != nil {
-		log.Fatalf("Unable to read keyfile %v: %v\n", filename, output)
-	}
-
-	return string(buf)
-}
-
-func getCurrentProject() string {
-
-	cmd := exec.Command("gcloud",
-		"config",
-		"get-value",
-		"project")
-
-	output, err := cmd.CombinedOutput()
-	if err != nil {
-		log.Fatalf("Unable to retrieve current project ID: %s\n", output)
-	}
-
-	return strings.TrimSuffix(string(output), "\n")
-}
-
 func constructSA(repoName string, projectName string) (string, string) {
 
 	serviceAccountName := repoName + "-push"
@@ -168,7 +68,7 @@ func constructRepo(repoName string, projectName string, location string) string 
 // CreateRepository creates a repo within AR
 func CreateRepository(repoName string, location string) (string, string) {
 	locationArg := "--location=" + location
-	projectName := getCurrentProject()
+	projectName := GetCurrentProject()
 
 	cmd := exec.Command("gcloud",
 		"beta",
@@ -206,11 +106,11 @@ func CreateRepository(repoName string, location string) (string, string) {
 	}
 
 	serviceAccountName, serviceAccountEmail := constructSA(repoName, projectName)
-	createSA(repoName, serviceAccountName)
+	CreateSA(serviceAccountName, repoName)
 	addSABinding(repoName, serviceAccountEmail, location)
 
 	repo := constructRepo(repoName, projectName, location)
-	key := createSAKey(serviceAccountEmail)
+	key := CreateSAKey(serviceAccountEmail)
 
 	return repo, key
 
@@ -223,11 +123,11 @@ func DeleteRepository(repoName string, location string) {
 
 	log.Printf("Deleting AR repository %v in location %v", repoName, location)
 
-	projectName := getCurrentProject()
+	projectName := GetCurrentProject()
 	serviceAccountName, serviceAccountEmail := constructSA(repoName, projectName)
 
 	removeSABinding(repoName, serviceAccountEmail, location)
-	deleteSA(serviceAccountName)
+	DeleteSA(serviceAccountName)
 
 	cmd := exec.Command("gcloud",
 		"beta",

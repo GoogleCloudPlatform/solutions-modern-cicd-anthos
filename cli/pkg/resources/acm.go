@@ -82,6 +82,8 @@ func AddAppToACM(client *gitlab.Client, name string, runnersToken string, sshKey
 		// Replace GitLab Runner registration token
 		encodedRT := base64.StdEncoding.EncodeToString([]byte(runnersToken))
 		outString = strings.ReplaceAll(string(outString), "RUNNER_REGISTRATION_TOKEN_BASE64", encodedRT)
+		// Replace PROJECT_ID with current project
+		outString = strings.ReplaceAll(string(outString), "PROJECT_ID", GetCurrentProject())
 
 		_, err = out.Write([]byte(outString))
 		defer out.Close()
