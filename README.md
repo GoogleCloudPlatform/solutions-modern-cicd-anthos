@@ -1,29 +1,48 @@
-# Anthos Platform Demo Setup Instructions
+# Modern CI/CD with Anthos
 
-Feedback and questions: cloud-sa-anthos-platform@google.com, or
-open an issue: [New issue in Buganizer](https://b.corp.google.com/issues/new?component=759009&template=1357580)
+## Introduction
 
-For more information please visit:
+Kubernetes has given us wonderful abstraction that we can use to optimize the way we
+develop, deploy, and maintain software projects across multiple environments.
+In many cases though, Kubernetes is too complex for end users to learn and feel empowered with.
+To alleviate this learning curve, many teams
+are looking to build platform abstractions on top of Kubernetes to streamline onboarding and
+reduce maintainenance for software projects.
 
-* [go/anthos-platform](http://go/anthos-platform)
-* [go/anthos-platform-tech-pitch](http://go/anthos-platform-tech-pitch)
+In this repository we lay out a prescriptive way to create a multi-team software delivery platfrom
+using Anthos. The platform has the following capabilities:
 
-For a user guide on what to do after the install, please go to:
-[go/anthos-platform-demo](http://go/anthos-platform-demo)
+* Allow platform administrators to create and update best practices for provisioning apps
+* Ensure App Developers can iterate independently in their own "landing zones" without interfereing with each other
+* Allow security teams to seamlessly implement and propagate policy across the platform
+* Use GitOps for deployment
 
-![Anthos Platform High Level Architecture](images/anthos-platform-arch.png)
+For more details, please watch [this talk on Youtube](https://www.youtube.com/watch?v=MOALiliVoeg).
+
+## Architecture Overview
+
+After the [Quick Start](#quick-start) you will have the following infra:
+
+![Anthos Platform Infrastructure](images/anthos-platform-infra.png)
+
+* [GitLab deployed on GKE](https://cloud.google.com/solutions/deploying-production-ready-gitlab-on-gke) to host your source code repostitories
+* 1 Dev cluster that can be used for iterative development with tools like [Skaffold](skaffold.dev)
+* 1 Staging cluster
+* 2 Production clusters in different GCP regions
+
+Within GitLab you will have the following repo structure:
+![Anthos Platform Repos](images/anthos-platform-repos.png)
+
+[Starter repos](starter-repos/) have examples for:
+
+* [CI stages/steps](starter-repos/shared-ci-cd/ci/)
+* [CD methodologies](starter-repos/shared-ci-cd/cd/)
+* [Kubernetes configs](starter-repos/shared-kustomize-bases/) (via Kustomize)
+* An example [applcation repo](starter-repos/golang-template/) for a Go app
 
 ## Pre-requisites
 
-1. [Download](https://cloudsolutionsarchitects.git.corp.google.com/anthos-platform-setup/+archive/refs/heads/master.tar.gz) this repo to your local machine.
-
-1. Untar the repo and go into the directory.
-
-    ```shell
-    mkdir -p anthos-platform-setup
-    tar zxfv anthos-platform-setup-refs_heads_master.tar.gz -C anthos-platform-setup/
-    cd anthos-platform-setup
-    ```
+1. Clone this repo to your local machine.
 
 1. [Install gcloud SDK](https://cloud.google.com/sdk/install).
 
@@ -78,7 +97,7 @@ For a user guide on what to do after the install, please go to:
 
 1. Log in to your GitLab instance with the URL, username and password printed at the end of the build. Hang on to this password, you will need it for later steps.
 
-1. Follow the steps in [go/anthos-platform-demo](http://go/anthos-platform-demo) to go through a user journey (add, deploy, and change applications).
+1. Follow the steps in the [docs](docs/index.md) to go through a user journey (add, deploy, and change applications).
 
 ## Securing the ACM repository
 
@@ -88,53 +107,3 @@ demos. If you want to follow production best practices, read
 
 Always leave at least one namespace defined in `namespaces/managed-apps`, otherwise ACM will
 stop syncing.
-
-## Contributing
-
-To contribute follows these instrcutions for the development flow:
-
-1. [Setup Local Repo](https://docs.google.com/document/d/1DMIAlcSmh6LaqkGLNxDunP6O_zpwPSchA0ywcSWdlXQ/edit#heading=h.w7ieayamciyz)
-
-    ```shell
-    git clone sso://cloudsolutionsarchitects/anthos-platform-setup
-    cd anthos-platform-setup
-    ```
-
-1. [Configure the Gerrit Commit Hook Script](https://docs.google.com/document/d/1DMIAlcSmh6LaqkGLNxDunP6O_zpwPSchA0ywcSWdlXQ/edit#heading=h.csxq7bbwjeox)
-
-    ```shell
-    hookfile=`git rev-parse --git-dir`/hooks/commit-msg
-    mkdir -p $(dirname $hookfile)
-    curl -Lo $hookfile \
-      https://gerrit-review.googlesource.com/tools/hooks/commit-msg
-    chmod +x $hookfile
-    unset hookfile
-    ```
-
-1. Make your changes and commit them. Make sure your commit includes the auto-populated `Change-Id:` line in the message.
-
-1. [Push the commit to Gerrit for review](https://docs.google.com/document/d/1DMIAlcSmh6LaqkGLNxDunP6O_zpwPSchA0ywcSWdlXQ/edit#heading=h.e4h88uajgibc)
-
-    ```shell
-    git push origin HEAD:refs/for/devel
-    ```
-
-  A link to your review request will be printed.
-
-## TODOs
-
-### Demo
-
-* Instructions on how to add a cluster (on-prem or GKE) (smchgee@)
-
-### Starter repos
-
-* Add more [kustomize bases](starter-repos/shared-kustomize-bases) (Java, Python, Ruby, etc), currently only have Go
-* Add more [CI/CD patterns](starter-repos/shared-ci-cd) (Java, Ruby, Python, etc)
-
-### Alternative tools
-
-* Jenkins for CI/CD
-* GitHub Enterprise for SCM
-* Artifactory as the registry
-* App Delivery for CD/rollout
