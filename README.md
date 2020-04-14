@@ -1,41 +1,31 @@
-# Anthos Platform Demo Setup Instructions
+# Modern CI/CD with Anthos
 
-Feedback and questions: cloud-sa-anthos-platform@google.com, or
-open an issue: [New issue in Buganizer](https://b.corp.google.com/issues/new?component=759009&template=1357580)
+Table of contents
 
-For more information please visit:
-
-* [go/anthos-platform](http://go/anthos-platform)
-* [go/anthos-platform-tech-pitch](http://go/anthos-platform-tech-pitch)
-
-For a user guide on what to do after the install, please go to:
-[go/anthos-platform-demo](http://go/anthos-platform-demo)
-
-![Anthos Platform High Level Architecture](images/anthos-platform-arch.png)
-
-## Pre-requisites
-
-1. [Download](https://cloudsolutionsarchitects.git.corp.google.com/anthos-platform-setup/+archive/refs/heads/master.tar.gz) this repo to your local machine.
-
-1. Untar the repo and go into the directory.
-
-    ```shell
-    mkdir -p anthos-platform-setup
-    tar zxfv anthos-platform-setup-refs_heads_master.tar.gz -C anthos-platform-setup/
-    cd anthos-platform-setup
-    ```
+1. Clone this repo to your local machine.
 
 1. [Install gcloud SDK](https://cloud.google.com/sdk/install).
 
 1. [Create a new GCP project.](https://cloud.google.com/resource-manager/docs/creating-managing-projects#creating_a_project)
 
-## Quick Start
+    <!-- TODO Find URL-->
+1. Enable billing for GCP project
+
+    <!-- TODO Link for regions -->
+1. Set a region to deploy infrastructure
+
+    ```shell
+    export REGION="<INSERT_YOUR_REGION>"
+    gcloud config set compute/region ${REGION}
+    ```
+
+### Build Infrastructure
 
 1. Run the following commands to setup Cloud Build
 
     ```shell
     export PROJECT_ID=<INSERT_YOUR_PROJECT_ID>
-    gcloud config set project ${PROJECT_ID}
+    gcloud config set core/project ${PROJECT_ID}
     export PROJECT_NUMBER=$(gcloud projects describe ${PROJECT_ID} --format 'value(projectNumber)')
     gcloud services enable cloudbuild.googleapis.com
     gcloud services enable serviceusage.googleapis.com
@@ -46,10 +36,10 @@ For a user guide on what to do after the install, please go to:
 
     ```shell
     gcloud services enable compute.googleapis.com
-    gcloud compute addresses create --region us-central1 gitlab
+    gcloud compute addresses create --region ${REGION} gitlab
     ```
 
-1. Create a DNS sub-domain using cloud-tutorial.dev
+1. Create a DNS sub-domain using anthos-platform.dev
 
     ```shell
     # Set this to a custom subdomain if youd like it to be more memorable
@@ -65,20 +55,52 @@ For a user guide on what to do after the install, please go to:
     ```shell
     export GITLAB_ADDRESS=$(gcloud compute addresses list --filter="name=('gitlab')" --format "value(address)")
     gcloud dns record-sets transaction start --zone ${SUBDOMAIN}-zone
-    gcloud dns record-sets transaction add ${GITLAB_ADDRESS} --name "*.${SUBDOMAIN}.demo.anthos-platform.dev" --type A --zone ${SUBDOMAIN}-zone --ttl 300
+    gcloud dns record-sets transaction add ${GITLAB_ADDRESS} \
+        --name "*.${SUBDOMAIN}.demo.anthos-platform.dev" \
+        --type A \
+        --zone ${SUBDOMAIN}-zone \
+        --ttl 300
     gcloud dns record-sets transaction execute --zone ${SUBDOMAIN}-zone
     ```
 
-1. Run Cloud Build to create the necessary resources. This takes around 30 minutes.
+1. Run Cloud Build to create the necessary resources.
 
     ```shell
     export DOMAIN=${SUBDOMAIN}.demo.anthos-platform.dev
     gcloud builds submit --substitutions=_DOMAIN=${DOMAIN}
     ```
 
+    > :warning: This operation may take up to 30 minutes depending on region. Do not close the console or connection as the operation is NOT idempotent. If a failure occurs, [clean up](#clean-up) the environment and attempt again.
+
 1. Log in to your GitLab instance with the URL, username and password printed at the end of the build. Hang on to this password, you will need it for later steps.
 
-1. Follow the steps in [go/anthos-platform-demo](http://go/anthos-platform-demo) to go through a user journey (add, deploy, and change applications).
+1. Follow the steps in the [docs](docs/index.md) to go through a user journey (add, deploy, and change applications).
+
+### Important Variables
+
+1. Take note and record the Password for your Gitlab account.
+1. URL for Gitlab
+
+    ```shell
+    echo "https://gitlab.${DOMAIN}"
+    ```
+
+### Clean Up
+<!-- TODO: Domain name deletion will be added later  -->
+1. Remove infrastructure
+
+    ```shell
+    gcloud builds submit --config cloudbuild-destroy.yaml
+    ```
+
+1. Unset variables (optional)
+
+    ```shell
+    unset PROJECT_ID
+    unset DOMAIN
+    unset SUBDOMAIN
+    unset REGION
+    ```
 
 ## Securing the ACM repository
 
@@ -88,53 +110,3 @@ demos. If you want to follow production best practices, read
 
 Always leave at least one namespace defined in `namespaces/managed-apps`, otherwise ACM will
 stop syncing.
-
-## Contributing
-
-To contribute follows these instrcutions for the development flow:
-
-1. [Setup Local Repo](https://docs.google.com/document/d/1DMIAlcSmh6LaqkGLNxDunP6O_zpwPSchA0ywcSWdlXQ/edit#heading=h.w7ieayamciyz)
-
-    ```shell
-    git clone sso://cloudsolutionsarchitects/anthos-platform-setup
-    cd anthos-platform-setup
-    ```
-
-1. [Configure the Gerrit Commit Hook Script](https://docs.google.com/document/d/1DMIAlcSmh6LaqkGLNxDunP6O_zpwPSchA0ywcSWdlXQ/edit#heading=h.csxq7bbwjeox)
-
-    ```shell
-    hookfile=`git rev-parse --git-dir`/hooks/commit-msg
-    mkdir -p $(dirname $hookfile)
-    curl -Lo $hookfile \
-      https://gerrit-review.googlesource.com/tools/hooks/commit-msg
-    chmod +x $hookfile
-    unset hookfile
-    ```
-
-1. Make your changes and commit them. Make sure your commit includes the auto-populated `Change-Id:` line in the message.
-
-1. [Push the commit to Gerrit for review](https://docs.google.com/document/d/1DMIAlcSmh6LaqkGLNxDunP6O_zpwPSchA0ywcSWdlXQ/edit#heading=h.e4h88uajgibc)
-
-    ```shell
-    git push origin HEAD:refs/for/devel
-    ```
-
-  A link to your review request will be printed.
-
-## TODOs
-
-### Demo
-
-* Instructions on how to add a cluster (on-prem or GKE) (smchgee@)
-
-### Starter repos
-
-* Add more [kustomize bases](starter-repos/shared-kustomize-bases) (Java, Python, Ruby, etc), currently only have Go
-* Add more [CI/CD patterns](starter-repos/shared-ci-cd) (Java, Ruby, Python, etc)
-
-### Alternative tools
-
-* Jenkins for CI/CD
-* GitHub Enterprise for SCM
-* Artifactory as the registry
-* App Delivery for CD/rollout
