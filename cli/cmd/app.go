@@ -153,6 +153,15 @@ var appCmd = &cobra.Command{
 		pipelineURL := "https://" + gitlabHostname + "/" + name + "/" + name + "/pipelines"
 		log.Println()
 		log.Printf("Your first pipeline run has started. Check on it here: %s", pipelineURL)
+
+		// Add Service Accounts for Workload Identity
+		// https://cloud.google.com/kubernetes-engine/docs/how-to/workload-identity#creating_a_relationship_between_ksas_and_gsas
+		gsaName := name + "-gsa"
+		resources.CreateSA(gsaName, "Map KSA to GSA for " + name)
+		projectID := resources.GetCurrentProject()
+		bindingName := fmt.Sprintf("%s@%s.iam.gserviceaccount.com", gsaName, projectID)
+		wiName := fmt.Sprintf("%s.svc.id.goog[%s/%s-ksa]", projectID, name, name)
+		resources.AddSAIAMPolicyBinding(bindingName, "roles/iam.workloadIdentityUser", wiName)
 	},
 }
 
