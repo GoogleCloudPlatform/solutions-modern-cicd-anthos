@@ -54,7 +54,7 @@ For a user guide on what to do after the install, please go to:
     ```shell
     # Set this to a custom subdomain if youd like it to be more memorable
     export SUBDOMAIN=ap-$(date +%s)
-    curl -o claim.sh https://cloud-tutorial.dev/claim.sh
+    curl -sL -o claim.sh https://claim.anthos-platform.dev/claim.sh
     chmod +x claim.sh
     ./claim.sh ${SUBDOMAIN}
     rm claim.sh
@@ -65,14 +65,14 @@ For a user guide on what to do after the install, please go to:
     ```shell
     export GITLAB_ADDRESS=$(gcloud compute addresses list --filter="name=('gitlab')" --format "value(address)")
     gcloud dns record-sets transaction start --zone ${SUBDOMAIN}-zone
-    gcloud dns record-sets transaction add ${GITLAB_ADDRESS} --name "*.${SUBDOMAIN}.cloud-tutorial.dev" --type A --zone ${SUBDOMAIN}-zone --ttl 300
+    gcloud dns record-sets transaction add ${GITLAB_ADDRESS} --name "*.${SUBDOMAIN}.demo.anthos-platform.dev" --type A --zone ${SUBDOMAIN}-zone --ttl 300
     gcloud dns record-sets transaction execute --zone ${SUBDOMAIN}-zone
     ```
 
 1. Run Cloud Build to create the necessary resources. This takes around 30 minutes.
 
     ```shell
-    export DOMAIN=${SUBDOMAIN}.cloud-tutorial.dev
+    export DOMAIN=${SUBDOMAIN}.demo.anthos-platform.dev
     gcloud builds submit --substitutions=_DOMAIN=${DOMAIN}
     ```
 
