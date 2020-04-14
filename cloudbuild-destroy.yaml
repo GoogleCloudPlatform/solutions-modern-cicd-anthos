@@ -7,6 +7,11 @@ steps:
   - '-xe'
   - '-c'
   - |
+    for ar in $(gcloud beta artifacts repositories list --format json | jq '.AR[].name'); do
+      gcloud config set artifacts/location us-central1
+      gcloud beta artifacts repositories delete ${ar//\"} --quiet
+    done
+
     for db in $(gcloud sql instances list --format json | jq -r '.[].name'); do
       gcloud sql instances delete ${db} --async --quiet
     done
@@ -25,12 +30,14 @@ steps:
     while [ $(gcloud redis instances list --region us-central1 | wc -l) -ne 0 ]; do sleep 5s; done
     while [ $(gcloud container clusters list | wc -l) -ne 0 ]; do sleep 5s; done
 
-    for sa in $(gcloud iam service-accounts list --format json | jq -r '.[].email'); do 
+    for sa in $(gcloud iam service-accounts list --format json | jq -r '.[].email'); do
+      [[ $sa = hipster* ]] && gcloud iam service-accounts delete ${sa} --quiet
+      [[ $sa = petabank* ]] && gcloud iam service-accounts delete ${sa} --quiet
       [[ $sa = tf* ]] && gcloud iam service-accounts delete ${sa} --quiet
       [[ $sa = gitlab* ]] && gcloud iam service-accounts delete ${sa} --quiet
     done
 
-    for peering in $(gcloud compute networks peerings list --format json | jq -r '.[].peerings[].name'); do 
+    for peering in $(gcloud compute networks peerings list --format json | jq -r '.[].peerings[].name'); do
       gcloud compute networks peerings delete ${peering} --network gitlab
     done
 
