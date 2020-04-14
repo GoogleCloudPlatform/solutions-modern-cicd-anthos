@@ -4,8 +4,7 @@ steps:
   id: 'build-installer-image'
   args:
   - --destination=gcr.io/${PROJECT_ID}/anthos-platform-installer
-  - --cache=true
-  - --cache-ttl=12h
+  - --cache=false
 - name: 'gcr.io/${PROJECT_ID}/anthos-platform-installer'
   id: 'destroy-all'
   entrypoint: 'bash'
