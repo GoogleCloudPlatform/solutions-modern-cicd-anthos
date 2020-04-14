@@ -8,7 +8,7 @@ project_id=anthos-platform-ci-env
 domain=ap-anthos-platform-ci-env.cloud-tutorial.dev
 
 # Activate the service account
-#gcloud auth activate-service-account --key-file="${KOKORO_KEYSTORE_DIR}/${sa_creds}"
+gcloud auth activate-service-account --key-file="${KOKORO_KEYSTORE_DIR}/${sa_creds}"
 
 # Display commands, now that creds are set.
 set -x
