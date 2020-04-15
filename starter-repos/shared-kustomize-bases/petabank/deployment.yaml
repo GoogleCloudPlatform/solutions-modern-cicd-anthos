@@ -26,6 +26,7 @@ spec:
       labels:
         app: petabank
     spec:
+      serviceAccountName: petabank-ksa
       containers:
       - name: server
         image: app
