@@ -1,6 +1,46 @@
 # Modern CI/CD with Anthos
 
-Table of contents
+## Introduction
+
+Kubernetes has given us wonderful abstraction that we can use to optimize the way we
+develop, deploy, and maintain software projects across multiple environments.
+In many cases though, Kubernetes is too complex for end users to learn and feel empowered with.
+To alleviate this learning curve, many teams
+are looking to build platform abstractions on top of Kubernetes to streamline onboarding and
+reduce maintenenance for software projects.
+
+In this repository we lay out a prescriptive way to create a multi-team software delivery platform
+using Anthos. The platform has the following capabilities:
+
+* Allow platform administrators to create and update best practices for provisioning apps
+* Ensure App Developers can iterate independently in their own "landing zones" without interfereing with each other
+* Allow security teams to seamlessly implement and propagate policy across the platform
+* Use GitOps for deployment
+
+For more details, please watch [this talk on Youtube](https://www.youtube.com/watch?v=MOALiliVoeg).
+
+## Architecture Overview
+
+After the [Quick Start](#quick-start) you will have the following infra:
+
+![Anthos Platform Infrastructure](images/anthos-platform-infra.png)
+
+* [GitLab deployed on GKE](https://cloud.google.com/solutions/deploying-production-ready-gitlab-on-gke) to host your source code repostitories
+* 1 Dev cluster that can be used for iterative development with tools like [Skaffold](skaffold.dev)
+* 1 Staging cluster
+* 2 Production clusters in different GCP regions
+
+Within GitLab you will have the following repo structure:
+![Anthos Platform Repos](images/anthos-platform-repos.png)
+
+[Starter repos](starter-repos/) have examples for:
+
+* [CI stages/steps](starter-repos/shared-ci-cd/ci/)
+* [CD methodologies](starter-repos/shared-ci-cd/cd/)
+* [Kubernetes configs](starter-repos/shared-kustomize-bases/) (via Kustomize)
+* An example [applcation repo](starter-repos/golang-template/) for a Go app
+
+## Pre-requisites
 
 1. Clone this repo to your local machine.
 
