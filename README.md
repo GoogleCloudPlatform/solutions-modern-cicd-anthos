@@ -1,5 +1,13 @@
 # Modern CI/CD with Anthos
 
+* [Introduction](#introduction)
+* [Architecture Overview](#architecture-overview)
+* [Quick Start](#quick-start)
+  * [Pre-requisites](#pre-requisites)
+  * [Build Infrastructure](#build-infrastructure)
+  * [Clean up](#clean-up)
+* [Securing the ACM repository](#securing-the-acm-repository)
+
 ## Introduction
 
 Kubernetes has given us wonderful abstraction that we can use to optimize the way we
