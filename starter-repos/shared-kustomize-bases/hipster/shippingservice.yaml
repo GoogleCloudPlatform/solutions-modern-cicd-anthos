@@ -25,6 +25,7 @@ spec:
       labels:
         app: shippingservice
     spec:
+      serviceAccountName: hipster-shop-ksa
       containers:
       - name: server
         image: shippingservice

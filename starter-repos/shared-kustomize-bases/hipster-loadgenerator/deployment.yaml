@@ -27,6 +27,7 @@ spec:
       annotations:
         sidecar.istio.io/rewriteAppHTTPProbers: "true"
     spec:
+      serviceAccountName: hipster-loadgenerator-ksa
       terminationGracePeriodSeconds: 5
       restartPolicy: Always
       containers:

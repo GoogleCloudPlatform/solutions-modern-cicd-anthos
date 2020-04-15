@@ -27,6 +27,7 @@ spec:
       annotations:
         sidecar.istio.io/rewriteAppHTTPProbers: "true"
     spec:
+      serviceAccountName: hipster-frontend-ksa
       containers:
         - name: server
           image: app
