@@ -60,10 +60,10 @@ Within GitLab you will have the following repo structure:
 1. Enable billing for GCP project
 
     <!-- TODO Link for regions -->
-1. Set a region to deploy infrastructure
+1. Set the `us-central1` region to deploy infrastructure
 
     ```shell
-    export REGION="<INSERT_YOUR_REGION>"
+    export REGION="us-central1"
     gcloud config set compute/region ${REGION}
     ```
 
