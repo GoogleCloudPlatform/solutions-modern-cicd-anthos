@@ -145,13 +145,13 @@ steps:
     cat > auth.txt <<EOF
     grant_type=password&username=root&password=$${GITLAB_PASSWORD}
     EOF
-    export GITLAB_OAUTH_TOKEN=$(curl --data "@auth.txt" --request POST https://gitlab.${_DOMAIN}/oauth/token | jq -r .access_token)
+    export GITLAB_OAUTH_TOKEN=$(curl -k --data "@auth.txt" --request POST https://gitlab.${_DOMAIN}/oauth/token | jq -r .access_token)
 
     # Get ACM repo project ID
-    export ACM_PROJECT_ID=$(curl -s "https://gitlab.${_DOMAIN}/api/v4/projects?search=anthos-config-management&access_token=$${GITLAB_OAUTH_TOKEN}" | jq -r .[0].id)
+    export ACM_PROJECT_ID=$(curl -k -s "https://gitlab.${_DOMAIN}/api/v4/projects?search=anthos-config-management&access_token=$${GITLAB_OAUTH_TOKEN}" | jq -r .[0].id)
 
     # Get runner registration token from GitLab
-    export ACM_RUNNER_TOKEN=$(curl -s "https://gitlab.${_DOMAIN}/api/v4/projects/$${ACM_PROJECT_ID}?access_token=$${GITLAB_OAUTH_TOKEN}" | jq -r .runners_token)
+    export ACM_RUNNER_TOKEN=$(curl -k -s "https://gitlab.${_DOMAIN}/api/v4/projects/$${ACM_PROJECT_ID}?access_token=$${GITLAB_OAUTH_TOKEN}" | jq -r .runners_token)
 
     # Install ACM
     cd 3_acm
