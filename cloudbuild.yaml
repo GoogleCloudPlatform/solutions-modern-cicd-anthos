@@ -181,4 +181,4 @@ steps:
     echo -e "\e[32mUsername: root"
     echo -e "\e[32mPassword: $${GITLAB_PASSWORD}"
     echo
-    echo -e "\e[32mVisit the user guide at go/anthos-platform-demo"
+    echo -e "\e[32mVisit the user guide in the docs (docs/index.md) to go through a user journey (add, deploy, and change applications)."
