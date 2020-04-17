@@ -43,9 +43,11 @@ pushd gitlab-repos
   fi
 popd
 
-# TODO: Don't hardcode the number of repos, list them all first
-for i in `seq 1 9`; do
-  curl --header "PRIVATE-TOKEN: ${GITLAB_TOKEN}" -X PUT --form 'shared_runners_enabled=true' https://${GITLAB_HOSTNAME}/api/v4/projects/$i
+# Enable shared runners on all repos so that the can build from the CI cluster
+for i in `seq 1 $(echo ${REPOS} | wc -w)`; do
+  # There are times during setup that the cert has not yet been received
+  # Temporarily ignore the SSL validation check
+  curl -k --header "PRIVATE-TOKEN: ${GITLAB_TOKEN}" -X PUT --form 'shared_runners_enabled=true' https://${GITLAB_HOSTNAME}/api/v4/projects/$i
 done
 
 pushd ../starter-repos
