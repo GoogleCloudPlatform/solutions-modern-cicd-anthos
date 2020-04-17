@@ -31,15 +31,15 @@ gcloud services enable compute.googleapis.com
 gcloud compute addresses create --region us-central1 gitlab
 
 # Get a DNS Domain
-curl -fsSL https://cloud-tutorial.dev/claim.sh | bash -s -- ap-${TIMESTAMP}
+curl -fsSL https://claim.anthos-platform.dev/claim.sh | bash -s -- ap-${TIMESTAMP}
 export SUBDOMAIN=ap-${TIMESTAMP}
 
 # Configure DNS
 export GITLAB_ADDRESS=$(gcloud compute addresses list --filter="name=('gitlab')" --format "value(address)")
 gcloud dns record-sets transaction start --zone ${SUBDOMAIN}-zone
-gcloud dns record-sets transaction add ${GITLAB_ADDRESS} --name "*.${SUBDOMAIN}.cloud-tutorial.dev" --type A --zone ${SUBDOMAIN}-zone --ttl 300
+gcloud dns record-sets transaction add ${GITLAB_ADDRESS} --name "*.${SUBDOMAIN}.demo.anthos-platform.dev" --type A --zone ${SUBDOMAIN}-zone --ttl 300
 gcloud dns record-sets transaction execute --zone ${SUBDOMAIN}-zone
 
 # Run Cloud Build
-export DOMAIN=${SUBDOMAIN}.cloud-tutorial.dev
+export DOMAIN=${SUBDOMAIN}.demo.anthos-platform.dev
 gcloud builds submit --substitutions=_DOMAIN=${DOMAIN}
