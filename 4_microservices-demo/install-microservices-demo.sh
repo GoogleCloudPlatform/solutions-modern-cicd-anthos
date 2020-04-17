@@ -22,7 +22,7 @@ if [ -z ${GITLAB_TOKEN} ];then
   read -p "What is the GitLab token? " GITLAB_TOKEN
 fi
 
-anthos-platform-cli add app --name microservices-demo --gitlab-hostname ${GITLAB_HOSTNAME} \
+anthos-platform-cli add app --gitlab-insecure --name microservices-demo --gitlab-hostname ${GITLAB_HOSTNAME} \
     --gitlab-token ${GITLAB_TOKEN} --template-name golang-template
 
 git clone https://root:${GITLAB_TOKEN}@${GITLAB_HOSTNAME}/microservices-demo/microservices-demo.git microservices-demo-clone

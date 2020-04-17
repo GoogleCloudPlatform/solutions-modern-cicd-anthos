@@ -16,6 +16,8 @@ package cmd
 
 import (
 	"anthos-platform/anthos-platform-cli/pkg/resources"
+	"crypto/tls"
+	"net/http"
 	"os"
 	"strings"
 	"time"
@@ -78,7 +80,13 @@ var appCmd = &cobra.Command{
 		resources.CreateSSHKey(manifestWriterKeyName, name)
 
 		// Configure GitLab client
-		client := gitlab.NewClient(nil, gitlabToken)
+		gitlabInsecure, err := cmd.Flags().GetBool("gitlab-insecure")
+		tr := &http.Transport{}
+		if gitlabInsecure {
+			tr.TLSClientConfig = &tls.Config{InsecureSkipVerify: true}
+		}
+		httpClient := &http.Client{Transport: tr}
+		client := gitlab.NewClient(httpClient, gitlabToken)
 		client.SetBaseURL(fmt.Sprintf("https://%s/", gitlabHostname))
 
 		// Create a group namespace to put the projects in
