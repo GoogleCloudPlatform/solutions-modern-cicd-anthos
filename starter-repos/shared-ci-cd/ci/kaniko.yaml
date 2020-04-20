@@ -20,5 +20,9 @@ build-master-image:
   only:
   - master
   script:
+    - "[ -z ${GCP_AR_KEY} ] && echo 'Artifact Registry credentials not available' && exit 1"
+    - "[ -z ${GCP_AR_REPO} ] && echo 'Artifact Registry location not available' && exit 1"
     - printf '%s\n' "${GCP_AR_KEY}" | docker login -u _json_key --password-stdin "${GCP_AR_REPO}"
+    - export DOCKER_CONFIG=/kaniko/.docker/
+    - "mkdir -p ${DOCKER_CONFIG} && cp /root/.docker/config.json ${DOCKER_CONFIG}"
     - executor -f `pwd`/${SRC_PATH}/Dockerfile -c `pwd`/${SRC_PATH} --destination="${GCP_AR_REPO}/${CI_PROJECT_NAME}:${CI_COMMIT_SHA}"

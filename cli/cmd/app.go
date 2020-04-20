@@ -69,6 +69,9 @@ var appCmd = &cobra.Command{
 			log.Fatal("Unable to parse Artifact Registry location")
 		}
 
+		// Create Artifact Registry repo and credentials
+		repo, key := resources.CreateRepository(name, artifactRegistryLocation)
+
 		// Create SSH keys that will be used to push and pull Git repos
 		tmpKeyName := "tmp-key"
 		tmpKeyPath := name + "/" + tmpKeyName
@@ -121,20 +124,23 @@ var appCmd = &cobra.Command{
 			}
 			return w
 		}
-		appProject := resources.CopyProject(client, tmpKeyPath, templateNamespace, templateName, name, name, replaceName)
-		envProject := resources.CopyProject(client, tmpKeyPath, templateNamespace, templateName+"-env", name, name+"-env")
 
-		// Create Artifact Registry repo and credentials
-		repo, key := resources.CreateRepository(name, artifactRegistryLocation)
+		// Create the main app project from the template
+		appProject := resources.CopyProject(client, tmpKeyPath, templateNamespace, templateName, name, name, replaceName)
 
 		// Add variables so that jobs can push to AR repo
 		resources.AddVariable(client, appProject.ID, "GCP_AR_REPO", repo, false)
 		resources.AddVariable(client, appProject.ID, "GCP_AR_KEY", key, true)
 
+		// Create the associated -env project for the pre-environment configuration
+		envProject := resources.CopyProject(client, tmpKeyPath, templateNamespace, templateName+"-env", name, name+"-env")
+
 		// Copy app template in ACM for new app.
 		resources.AddAppToACM(client, name, envProject.RunnersToken, tmpKeyPath)
+
 		// Ensure the -env project has the correct tags set from its runners to be able to deploy
 		resources.FixRunnerTagsInEnvTemplate(client, name, tmpKeyPath)
+
 		// Create staging branch in the -env project
 		resources.CreateBranch(client, envProject.ID, "staging", "master")
 
