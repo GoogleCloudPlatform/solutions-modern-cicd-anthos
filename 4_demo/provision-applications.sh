@@ -30,4 +30,6 @@ for service in ${SERVICES}; do
   if [ -z ${APP_EXISTS} ]; then
     anthos-platform-cli add app --gitlab-insecure --name ${service} --gitlab-hostname ${GITLAB_HOSTNAME} --gitlab-token ${GITLAB_TOKEN} --template-name golang-template
   fi
+  echo "Sleep for 1 minute to allow template app to deploy to cluster so it can be deleted later"
+  sleep 1m
 done

@@ -162,9 +162,9 @@ steps:
     cd 4_demo
     ./provision-applications.sh
 
-    # TODO: Do some polling to figure out if all apps are ready
-    echo "Sleep for 5 minutes to allow template apps to deploy to cluster so they can be deleted later"
-    sleep 5m
+    # Add IAM policies to GSA service accounts
+    export PROJECT_ID=${PROJECT_ID}
+    ./add-gsa-iam-policies.sh
 
     # Copy source code to repositories and trigger pipelines
     ./build-applications.sh

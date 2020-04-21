@@ -23,7 +23,11 @@ adservice-build-image:
   only:
   - master
   script:
+    - "[ -z ${GCP_AR_KEY} ] && echo 'Artifact Registry credentials not available' && exit 1"
+    - "[ -z ${GCP_AR_REPO} ] && echo 'Artifact Registry location not available' && exit 1"
     - printf '%s\n' "${GCP_AR_KEY}" | docker login -u _json_key --password-stdin "${GCP_AR_REPO}"
+    - export DOCKER_CONFIG=/kaniko/.docker/
+    - "mkdir -p ${DOCKER_CONFIG} && cp /root/.docker/config.json ${DOCKER_CONFIG}"
     - executor -f `pwd`/${SRC_PATH}/adservice/Dockerfile -c `pwd`/${SRC_PATH}/adservice --destination="${GCP_AR_REPO}/${CI_PROJECT_NAME}/adservice:${CI_COMMIT_SHA}"
 
 cartservice-build-image:
@@ -34,7 +38,11 @@ cartservice-build-image:
   only:
   - master
   script:
+    - "[ -z ${GCP_AR_KEY} ] && echo 'Artifact Registry credentials not available' && exit 1"
+    - "[ -z ${GCP_AR_REPO} ] && echo 'Artifact Registry location not available' && exit 1"
     - printf '%s\n' "${GCP_AR_KEY}" | docker login -u _json_key --password-stdin "${GCP_AR_REPO}"
+    - export DOCKER_CONFIG=/kaniko/.docker/
+    - "mkdir -p ${DOCKER_CONFIG} && cp /root/.docker/config.json ${DOCKER_CONFIG}"
     - executor -f `pwd`/${SRC_PATH}/cartservice/Dockerfile -c `pwd`/${SRC_PATH}/cartservice --destination="${GCP_AR_REPO}/${CI_PROJECT_NAME}/cartservice:${CI_COMMIT_SHA}"
 
 checkoutservice-build-image:
@@ -45,7 +53,11 @@ checkoutservice-build-image:
   only:
   - master
   script:
+    - "[ -z ${GCP_AR_KEY} ] && echo 'Artifact Registry credentials not available' && exit 1"
+    - "[ -z ${GCP_AR_REPO} ] && echo 'Artifact Registry location not available' && exit 1"
     - printf '%s\n' "${GCP_AR_KEY}" | docker login -u _json_key --password-stdin "${GCP_AR_REPO}"
+    - export DOCKER_CONFIG=/kaniko/.docker/
+    - "mkdir -p ${DOCKER_CONFIG} && cp /root/.docker/config.json ${DOCKER_CONFIG}"
     - executor -f `pwd`/${SRC_PATH}/checkoutservice/Dockerfile -c `pwd`/${SRC_PATH}/checkoutservice --destination="${GCP_AR_REPO}/${CI_PROJECT_NAME}/checkoutservice:${CI_COMMIT_SHA}"
 
 currencyservice-build-image:
@@ -56,7 +68,11 @@ currencyservice-build-image:
   only:
   - master
   script:
+    - "[ -z ${GCP_AR_KEY} ] && echo 'Artifact Registry credentials not available' && exit 1"
+    - "[ -z ${GCP_AR_REPO} ] && echo 'Artifact Registry location not available' && exit 1"
     - printf '%s\n' "${GCP_AR_KEY}" | docker login -u _json_key --password-stdin "${GCP_AR_REPO}"
+    - export DOCKER_CONFIG=/kaniko/.docker/
+    - "mkdir -p ${DOCKER_CONFIG} && cp /root/.docker/config.json ${DOCKER_CONFIG}"
     - executor -f `pwd`/${SRC_PATH}/currencyservice/Dockerfile -c `pwd`/${SRC_PATH}/currencyservice --destination="${GCP_AR_REPO}/${CI_PROJECT_NAME}/currencyservice:${CI_COMMIT_SHA}"
 
 emailservice-build-image:
@@ -67,7 +83,11 @@ emailservice-build-image:
   only:
   - master
   script:
+    - "[ -z ${GCP_AR_KEY} ] && echo 'Artifact Registry credentials not available' && exit 1"
+    - "[ -z ${GCP_AR_REPO} ] && echo 'Artifact Registry location not available' && exit 1"
     - printf '%s\n' "${GCP_AR_KEY}" | docker login -u _json_key --password-stdin "${GCP_AR_REPO}"
+    - export DOCKER_CONFIG=/kaniko/.docker/
+    - "mkdir -p ${DOCKER_CONFIG} && cp /root/.docker/config.json ${DOCKER_CONFIG}"
     - executor -f `pwd`/${SRC_PATH}/emailservice/Dockerfile -c `pwd`/${SRC_PATH}/emailservice --destination="${GCP_AR_REPO}/${CI_PROJECT_NAME}/emailservice:${CI_COMMIT_SHA}"
 
 paymentservice-build-image:
@@ -78,7 +98,11 @@ paymentservice-build-image:
   only:
   - master
   script:
+    - "[ -z ${GCP_AR_KEY} ] && echo 'Artifact Registry credentials not available' && exit 1"
+    - "[ -z ${GCP_AR_REPO} ] && echo 'Artifact Registry location not available' && exit 1"
     - printf '%s\n' "${GCP_AR_KEY}" | docker login -u _json_key --password-stdin "${GCP_AR_REPO}"
+    - export DOCKER_CONFIG=/kaniko/.docker/
+    - "mkdir -p ${DOCKER_CONFIG} && cp /root/.docker/config.json ${DOCKER_CONFIG}"
     - executor -f `pwd`/${SRC_PATH}/paymentservice/Dockerfile -c `pwd`/${SRC_PATH}/paymentservice --destination="${GCP_AR_REPO}/${CI_PROJECT_NAME}/paymentservice:${CI_COMMIT_SHA}"
 
 productcatalogservice-build-image:
@@ -89,7 +113,11 @@ productcatalogservice-build-image:
   only:
   - master
   script:
+    - "[ -z ${GCP_AR_KEY} ] && echo 'Artifact Registry credentials not available' && exit 1"
+    - "[ -z ${GCP_AR_REPO} ] && echo 'Artifact Registry location not available' && exit 1"
     - printf '%s\n' "${GCP_AR_KEY}" | docker login -u _json_key --password-stdin "${GCP_AR_REPO}"
+    - export DOCKER_CONFIG=/kaniko/.docker/
+    - "mkdir -p ${DOCKER_CONFIG} && cp /root/.docker/config.json ${DOCKER_CONFIG}"
     - executor -f `pwd`/${SRC_PATH}/productcatalogservice/Dockerfile -c `pwd`/${SRC_PATH}/productcatalogservice --destination="${GCP_AR_REPO}/${CI_PROJECT_NAME}/productcatalogservice:${CI_COMMIT_SHA}"
 
 recommendationservice-build-image:
@@ -100,7 +128,11 @@ recommendationservice-build-image:
   only:
   - master
   script:
+    - "[ -z ${GCP_AR_KEY} ] && echo 'Artifact Registry credentials not available' && exit 1"
+    - "[ -z ${GCP_AR_REPO} ] && echo 'Artifact Registry location not available' && exit 1"
     - printf '%s\n' "${GCP_AR_KEY}" | docker login -u _json_key --password-stdin "${GCP_AR_REPO}"
+    - export DOCKER_CONFIG=/kaniko/.docker/
+    - "mkdir -p ${DOCKER_CONFIG} && cp /root/.docker/config.json ${DOCKER_CONFIG}"
     - executor -f `pwd`/${SRC_PATH}/recommendationservice/Dockerfile -c `pwd`/${SRC_PATH}/recommendationservice --destination="${GCP_AR_REPO}/${CI_PROJECT_NAME}/recommendationservice:${CI_COMMIT_SHA}"
 
 shippingservice-build-image:
@@ -111,5 +143,9 @@ shippingservice-build-image:
   only:
   - master
   script:
+    - "[ -z ${GCP_AR_KEY} ] && echo 'Artifact Registry credentials not available' && exit 1"
+    - "[ -z ${GCP_AR_REPO} ] && echo 'Artifact Registry location not available' && exit 1"
     - printf '%s\n' "${GCP_AR_KEY}" | docker login -u _json_key --password-stdin "${GCP_AR_REPO}"
+    - export DOCKER_CONFIG=/kaniko/.docker/
+    - "mkdir -p ${DOCKER_CONFIG} && cp /root/.docker/config.json ${DOCKER_CONFIG}"
     - executor -f `pwd`/${SRC_PATH}/shippingservice/Dockerfile -c `pwd`/${SRC_PATH}/shippingservice --destination="${GCP_AR_REPO}/${CI_PROJECT_NAME}/shippingservice:${CI_COMMIT_SHA}"
