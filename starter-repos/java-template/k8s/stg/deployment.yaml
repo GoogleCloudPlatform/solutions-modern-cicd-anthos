@@ -20,7 +20,7 @@ spec:
   replicas: 1
   template:
     spec:
-      serviceAccountName: APP_NAME-ksa
+      serviceAccountName: java-template-ksa
       containers:
       - name: app
         env:

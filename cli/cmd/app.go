@@ -89,7 +89,13 @@ var appCmd = &cobra.Command{
 
 		// Copy template projects for the app and environment repos
 		replaceName := func(w *git.Worktree) *git.Worktree {
-			files := []string{"k8s/dev/kustomization.yaml", "k8s/stg/kustomization.yaml", "k8s/prod/kustomization.yaml"}
+			// TODO: Iterate over all files in the repo
+			files := []string{"k8s/dev/kustomization.yaml",
+												"k8s/dev/deployment.yaml",
+												"k8s/stg/kustomization.yaml",
+												"k8s/stg/deployment.yaml",
+												"k8s/prod/kustomization.yaml",
+												"k8s/prod/deployment.yaml"}
 
 			for _, filename := range files {
 				file, err := w.Filesystem.OpenFile(filename, os.O_RDWR, os.ModePerm)
