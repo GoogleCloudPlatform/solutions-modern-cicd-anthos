@@ -62,7 +62,7 @@ popd
 if [ -z "${HS_ALLOW_EXTERNAL_FRONTEND}" ] || [ -z "${PB_ALLOW_EXTERNAL_FRONTEND}" ] || [ -z "${FE_ALLOW_EXTERNAL_WEB}" ]; then
   git add .
   git commit -m "Setup Network Policies for Hipster Shop and Petabank"
-  git push -u origin master
+  git -c http.sslVerify=false push -u origin master
 else
   echo "No configuration changes needeed."
 fi

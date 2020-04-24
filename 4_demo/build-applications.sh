@@ -43,7 +43,7 @@ for service in ${SERVICES}; do
 
         git add .
         git commit -m "Initial commit"
-        git push -u origin master
+        git -c http.sslVerify=false push -u origin master
       else
         echo "Hipster Shop source code is already pushed to remote master!"
       fi
@@ -66,7 +66,7 @@ for service in ${SERVICES}; do
         # Commit & push the code back to Gitlab
         git add .
         git commit -m "Initial commit"
-        git push -u origin master
+        git -c http.sslVerify=false push -u origin master
       else
         echo "${SERVICE_NAME} source code is already pushed to remote master!"
       fi
