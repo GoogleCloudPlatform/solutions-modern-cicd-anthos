@@ -28,6 +28,6 @@ for service in ${SERVICES}; do
   APP_DEPLOYMENT="${service}-app"
   APP_EXISTS="$(kubectl get deployment ${APP_DEPLOYMENT} -n ${service})"
   if [ -z ${APP_EXISTS} ]; then
-    anthos-platform-cli add app --name ${service} --gitlab-hostname ${GITLAB_HOSTNAME} --gitlab-token ${GITLAB_TOKEN} --template-name golang-template
+    anthos-platform-cli add app --gitlab-insecure --name ${service} --gitlab-hostname ${GITLAB_HOSTNAME} --gitlab-token ${GITLAB_TOKEN} --template-name golang-template
   fi
 done

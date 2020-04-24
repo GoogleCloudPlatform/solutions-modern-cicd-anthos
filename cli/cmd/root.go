@@ -75,7 +75,7 @@ func init() {
 
 	rootCmd.PersistentFlags().String("gitlab-hostname", "", "Hostname for your gitlab instance")
 	rootCmd.PersistentFlags().String("gitlab-token", "", "Access Token from GitLab for admin actions")
-
+	rootCmd.PersistentFlags().Bool("gitlab-insecure", false, "Skip SSL validation for GitLab requests")
 	rootCmd.PersistentFlags().StringVar(&cfgFile, "config", ".apctl.yaml", "config file (default is .apctl.yaml)")
 
 	// Cobra also supports local flags, which will only run
