@@ -22,7 +22,7 @@ if [ -z ${GITLAB_TOKEN} ];then
 fi
 
 rm -rf anthos-config-management
-git clone https://root:${GITLAB_TOKEN}@${GITLAB_HOSTNAME}/platform-admins/anthos-config-management.git
+git -c http.sslVerify=false clone https://root:${GITLAB_TOKEN}@${GITLAB_HOSTNAME}/platform-admins/anthos-config-management.git
 cd anthos-config-management
 
 HIPSTER_NAMESPACE=namespaces/managed-apps/hipster-shop

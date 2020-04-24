@@ -25,7 +25,7 @@ fi
 anthos-platform-cli add app --gitlab-insecure --name microservices-demo --gitlab-hostname ${GITLAB_HOSTNAME} \
     --gitlab-token ${GITLAB_TOKEN} --template-name golang-template
 
-git clone https://root:${GITLAB_TOKEN}@${GITLAB_HOSTNAME}/microservices-demo/microservices-demo.git microservices-demo-clone
+git -c http.sslVerify=false clone https://root:${GITLAB_TOKEN}@${GITLAB_HOSTNAME}/microservices-demo/microservices-demo.git microservices-demo-clone
 cd microservices-demo-clone
 git rm -r Dockerfile main.go skaffold.yaml k8s
 mkdir hydrated-manifests

@@ -26,7 +26,7 @@ SERVICES="hipster-loadgenerator hipster-shop hipster-frontend petabank"
 for service in ${SERVICES}; do
   SERVICE_DIRECTORY="${service}-clone"
   rm -rf ${SERVICE_DIRECTORY}
-  git clone https://root:${GITLAB_TOKEN}@${GITLAB_HOSTNAME}/${service}/${service}.git ${SERVICE_DIRECTORY}
+  git -c http.sslVerify=false clone https://root:${GITLAB_TOKEN}@${GITLAB_HOSTNAME}/${service}/${service}.git ${SERVICE_DIRECTORY}
   pushd ${SERVICE_DIRECTORY}
     # TODO: Remove when each microservice has it's own Gitlab project
     if [ "${service}" == "hipster-shop" ]; then
