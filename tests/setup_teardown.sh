@@ -25,8 +25,17 @@ domain=${subdomain}.demo.anthos-platform.dev
 # Set the project ID for CI
 gcloud config set project ${project_id}
 
+if [ -n ${GITHUB_ACTIONS} ]; then
+  # Running in GitHub Actions
+  KEY_FILE=/tmp/service-account.json
+  echo "${GCP_SERVICE_ACCOUNT_JSON}" > ${KEY_FILE}
+else
+  # Running in Kokoro
+  KEY_FILE="${KOKORO_KEYSTORE_DIR}/${sa_creds}"
+fi
+
 # Activate the service account
-gcloud auth activate-service-account --key-file="${KOKORO_KEYSTORE_DIR}/${sa_creds}"
+gcloud auth activate-service-account --key-file=${KEY_FILE}
 
 # Display commands, now that creds are set.
 set -x
