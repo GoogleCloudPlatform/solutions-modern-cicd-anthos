@@ -56,13 +56,40 @@ cd go-test-app-1`
 1. Get credentials for the shared dev cluster
 
   ```shell
-  gcloud container clusters get-credentials --region us-central1 dev
+  kubectx development
   ```
 
-1. Set your default repository for skaffold to use. This repo needs to be accessible from the dev cluster.
+1. Create an Artifact Registry repository for your user.
 
   ```shell
-  /vic-gke-on-prem-0/viglesias
+  gcloud beta artifacts repositories create $USER --repository-format=Docker --location=us-central1
+  gcloud beta artifacts repositories add-iam-policy-binding --member serviceAccount:tf-sa-dev-us-central1@anthos-platform- 1588530541.iam.gserviceaccount.com --role roles/artifactregistry.reader --location us-central1 $USER
+  ```
+
+1. Set up Docker authentication to the registry.
+
+  ```shell
+  gcloud beta auth configure-docker us-central1-docker.pkg.dev
+  ```
+
+1. Currently the dev cluster is not managed by ACM so it's likely necessary to create the Dev’s namespace.
+
+  ```shell
+  kubectl create namespace $USER
+  kubens $USER
+  ```
+
+1. Create the Kubernetes Service Account used by the app.
+
+  ```shell
+  kubectl create serviceaccount <app-name>-ksa
+  ```
+  
+1. Set your default repository for skaffold to use.
+
+  ```shell
+  export PROJECT_ID=$(gcloud config get-value project)
+  skaffold config set default-repo us-central1-docker.pkg.dev/$PROJECT_ID/$USER
   ```
 
 1. Run Skaffold in developer mode so that it rebuilds your application as it changes:
