@@ -88,5 +88,5 @@ steps:
     for bucket in $(gsutil ls); do
       [[ $bucket = gs://${PROJECT_ID}* ]] && gsutil rm -rf ${bucket}
     done
-    gsutil rm -rf gs://artifacts.${PROJECT_ID}.appspot.com/
+    gsutil rm -rf gs://artifacts.${PROJECT_ID}.appspot.com/ || true
     
