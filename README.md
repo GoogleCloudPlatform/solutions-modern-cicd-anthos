@@ -50,6 +50,8 @@ Within GitLab you will have the following repo structure:
 
 ## Pre-requisites
 
+1. You must have control of a DNS domain where you can add a wildcard A record.
+
 1. Clone this repo to your local machine.
 
 1. [Install gcloud SDK](https://cloud.google.com/sdk/install).
@@ -87,34 +89,27 @@ Within GitLab you will have the following repo structure:
     gcloud compute addresses create --region ${REGION} gitlab
     ```
 
-1. Create a DNS sub-domain using anthos-platform.dev
+1. Map your GitLab address above to your DNS by creating a wildcard DNS record.
 
     ```shell
-    # Set this to a custom subdomain if youd like it to be more memorable
-    export SUBDOMAIN=ap-$(date +%s)
-    curl -sL -o claim.sh https://claim.anthos-platform.dev/claim.sh
-    chmod +x claim.sh
-    ./claim.sh ${SUBDOMAIN}
-    rm claim.sh
+    gcloud compute addresses list --filter="name=('gitlab')" --format "value(address)"
     ```
 
-1. Map your gitlab address above to your domain.
+    For example if your domain is `example.org` and you want to use the
+    `platform` subdomain. You would need to create an A record that points
+    `*.platform.example.org` to the address printed in the command above.
+
+    To test that DNS is working as expected, make sure that the following command
+    returns your GitLab address:
 
     ```shell
-    export GITLAB_ADDRESS=$(gcloud compute addresses list --filter="name=('gitlab')" --format "value(address)")
-    gcloud dns record-sets transaction start --zone ${SUBDOMAIN}-zone
-    gcloud dns record-sets transaction add ${GITLAB_ADDRESS} \
-        --name "*.${SUBDOMAIN}.demo.anthos-platform.dev" \
-        --type A \
-        --zone ${SUBDOMAIN}-zone \
-        --ttl 300
-    gcloud dns record-sets transaction execute --zone ${SUBDOMAIN}-zone
+    nslookup gitlab.platform.example.org
     ```
 
 1. Run Cloud Build to create the necessary resources.
 
     ```shell
-    export DOMAIN=${SUBDOMAIN}.demo.anthos-platform.dev
+    export DOMAIN=platform.example.org
     gcloud builds submit --substitutions=_DOMAIN=${DOMAIN}
     ```
 
