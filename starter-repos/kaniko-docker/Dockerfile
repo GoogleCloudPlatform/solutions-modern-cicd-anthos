@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-FROM gcr.io/kaniko-project/executor:latest as kaniko
+FROM gcr.io/kaniko-project/executor:edge as kaniko
 
 FROM docker:19-git
 COPY --from=kaniko /kaniko/executor /usr/local/bin
