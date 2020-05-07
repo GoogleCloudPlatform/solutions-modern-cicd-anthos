@@ -37,12 +37,14 @@ func checkForGcloud() {
 	}
 }
 
+// GetCurrentProject returns the current, active project for the authenticated gcloud user
 func GetCurrentProject() string {
 
-	cmd := exec.Command("gcloud",
-		"config",
-		"get-value",
-		"project")
+    // derived from: gcloud config list --format 'value(core.project)' 2>/dev/null
+    cmd := exec.Command("gcloud",
+        "config",
+        "list",
+        "--format=value(core.project)")
 
 	output, err := cmd.CombinedOutput()
 	if err != nil {
