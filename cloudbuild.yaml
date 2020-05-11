@@ -112,12 +112,10 @@ steps:
 
     # Configure GitLab
     gcloud container clusters get-credentials gitlab --region us-central1
-    echo "::add-mask::$$GITLAB_PASSWORD"
     export GITLAB_PASSWORD=$(kubectl get secrets gitlab-gitlab-initial-root-password -o jsonpath="{.data.password}" | base64 -d)
 
     # Create a personal access token with the value of the root password
     export UNICORN_POD=$(kubectl get pods -l=app=unicorn -o jsonpath='{.items[0].metadata.name}')
-    echo "::add-mask::$$GITLAB_TOKEN"
     export GITLAB_TOKEN=$${GITLAB_PASSWORD}
     kubectl exec -it $$UNICORN_POD -c unicorn -- /bin/bash -c "
     cd /srv/gitlab;
@@ -178,7 +176,7 @@ steps:
     ./delete-templates.sh
     cd ..
 
-    # Output final notes if not in CI
+    # Output final notes
     echo -e "\e[32mLog in to your GitLab instance at: https://gitlab.${_DOMAIN}"
     echo -e "\e[32mUsername: root"
     echo -e "\e[32mPassword: $${GITLAB_PASSWORD}"
