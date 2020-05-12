@@ -62,8 +62,9 @@ cd go-test-app-1`
 1. Create an Artifact Registry repository for your user.
 
   ```shell
+  export PROJECT_ID=$(gcloud config get-value project)
   gcloud beta artifacts repositories create $USER --repository-format=Docker --location=us-central1
-  gcloud beta artifacts repositories add-iam-policy-binding --member serviceAccount:tf-sa-dev-us-central1@anthos-platform- 1588530541.iam.gserviceaccount.com --role roles/artifactregistry.reader --location us-central1 $USER
+  gcloud beta artifacts repositories add-iam-policy-binding --member serviceAccount:tf-sa-dev-us-central1@${PROJECT_ID}.iam.gserviceaccount.com --role roles/artifactregistry.reader --location us-central1 $USER
   ```
 
 1. Set up Docker authentication to the registry.
