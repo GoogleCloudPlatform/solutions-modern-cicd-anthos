@@ -113,7 +113,6 @@ steps:
     # Configure GitLab
     gcloud container clusters get-credentials gitlab --region us-central1
     export GITLAB_PASSWORD=$(kubectl get secrets gitlab-gitlab-initial-root-password -o jsonpath="{.data.password}" | base64 -d)
-    echo "::add-mask::$$GITLAB_PASSWORD"
     
     # Create a personal access token with the value of the root password
     export UNICORN_POD=$(kubectl get pods -l=app=unicorn -o jsonpath='{.items[0].metadata.name}')
