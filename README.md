@@ -2,7 +2,7 @@
 
 * [Introduction](#introduction)
 * [Architecture Overview](#architecture-overview)
-* [Quick Start](#quick-start)
+* Quick Start
   * [Pre-requisites](#pre-requisites)
   * [Build Infrastructure](#build-infrastructure)
   * [Clean up](#clean-up)
@@ -29,7 +29,7 @@ For more details, please watch [this talk on Youtube](https://www.youtube.com/wa
 
 ## Architecture Overview
 
-After the [Quick Start](#quick-start) you will have the following infra:
+After the [Quick Start](#pre-requisites) you will have the following infra:
 
 ![Anthos Platform Infrastructure](images/anthos-platform-infra.png)
 
