@@ -4,7 +4,7 @@ This doc acts as a user guide for onboarding apps to the platform and then updat
 
 The following Critical User Journeys (CUJs) are covered:
 
-* [Installation](README.md#quick-start)
+* [Installation](../README.md#pre-requisites)
 * [Adding a new application (using CLI)](#adding-a-new-application-using-cli)
 * [Adding a new feature/version of the application](#adding-a-new-featureversion-of-the-application)
   * [Testing the change locally with Skaffold](#testing-the-change-locally-with-skaffold)
@@ -34,10 +34,10 @@ The following instructions use a command line utility ([anthos-platform-cli](cli
   chmod +x anthos-platform-cli
   ```
 
-1. Run the app creation command, providing your GitLab root user password as the --gitlab-token parameter and providing an application name. Parameters that you need to alter are in red below:
+1. Run the app creation command, provide an application name with the parameter `--name`, your configured GitLab hostname (i.e. gitlab.your.domain.com) with the parameter `--gitlab-hostname` and GitLab root user password with the parameter `--gitlab-token`:
 
   ```shell
-  ./anthos-platform-cli add app --name my-app-name --gitlab-hostname gitlab.your.domain.com --gitlab-token GITLAB_ROOT_PASSWORD --template-name golang-template
+  ./anthos-platform-cli add app --name $APP_NAME --gitlab-hostname $GITLAB_HOSTNAME --gitlab-token $GITLAB_ROOT_PASSWORD --template-name golang-template
   ```
 
 ## Adding a new feature/version of the application
