@@ -9,10 +9,8 @@ The following Critical User Journeys (CUJs) are covered:
 * [Adding a new feature/version of the application](#adding-a-new-featureversion-of-the-application)
   * [Testing the change locally with Skaffold](#testing-the-change-locally-with-skaffold)
   * [Setting up your change for production](#setting-up-your-change-for-production)
-* [Deploying application to production clusters](#deploying-application-to-production-clusters)
-* [Accessing the application](#accessing-the-application)
 * [Promoting changes from Staging to Production](#promoting-changes-from-staging-to-production)
-* [Adding a cluster to the platform](#adding-a-cluster-to-the-platform)
+* WIP [Adding a cluster to the platform](#adding-a-cluster-to-the-platform)
 * [Deleting an application](#deleting-an-application)
 
 ## Adding a new application (using CLI)
@@ -180,66 +178,67 @@ If you want to add another cluster (like asia-east1 in the above screenshots), r
 
 1. Create a new GKE cluster:
 
-   ```shell
-   gcloud compute regions list  # pick anywhere!`
-   ```
+    ```shell
+    gcloud compute regions list  # pick anywhere!`
+    ```
 
-   ```shell
-   # set to the domain used during install
-   export DOMAIN="ap-123412.cloud-tutorial.dev"
-   export NEW_REGION="asia-east1"
-   export SHORT_CLUSTERNAME="prod-${NEW_REGION}"
-   gcloud beta container clusters create ${SHORT_CLUSTERNAME} \
-   --region=${NEW_REGION} \
-   --release-channel=stable
-   ```
+    ```shell
+    # set to the domain used during install
+    export DOMAIN="ap-123412.cloud-tutorial.dev"
+    export NEW_REGION="asia-east1"
+    export SHORT_CLUSTERNAME="prod-$NEW_REGION"
+    gcloud beta container clusters create $SHORT_CLUSTERNAME \
+    --region=$NEW_REGION \
+    --release-channel=stable
+    ```
 
 1. You should now be in the context of your new cluster:
 
-   ```shell
-   kubectl config current-context
-   ```
+    ```shell
+    kubectl config current-context
+    ```
 
-   This should return a line like:
-   `gke_smcghee-anthos-platform-demo-0_**asia-east1**_anthos-platform-**prod-asia-east1`**
+    This should return a line like:
+    `gke_smcghee-anthos-platform-demo-0_**asia-east1**_anthos-platform-**prod-asia-east1`**
 
 1. Clone your ACM repo, as hosted in your GitLab instance. You will use this repo in later steps.
 
-   ```shell
-   git clone git@gitlab.${DOMAIN}:platform-admins/anthos-config-management.git
-   ```
+    ```shell
+    git clone git@gitlab.$DOMAIN:platform-admins/anthos-config-management.git
+    ```
 
 1. Clone the `shared-ci-cd` and any `${APP}` and `${APP}-env` repos on your local machine, for any apps you want deployed in this new cluster.
 
-   ```shell
-   export APP_NAME=go-app
-   git clone git@gitlab.${DOMAIN}:platform-admins/shared-ci-cd.git
-   git clone git@gitlab.${DOMAIN}:${APP_NAME}/${APP_NAME}.git
-   git clone git@gitlab.${DOMAIN}:${APP_NAME}/${APP_NAME}-env.git
-   ```
+    ```shell
+    export APP_NAME=go-app
+    git clone git@gitlab.$DOMAIN:platform-admins/shared-ci-cd.git
+    git clone git@gitlab.$DOMAIN:$APP_NAME/$APP_NAME.git
+    git clone git@gitlab.$DOMAIN:$APP_NAME/$APP_NAME-env.git
+    ```
 
 1. Setup ACM on the new cluster by applying the config management operator manifest into your newly created cluster:
 
-   ```shell
-   gsutil cp gs://config-management-release/released/latest/config-management-operator.yaml config-management-operator.yaml
-   kubectl apply -f config-management-operator.yaml
-   ```
+    ```shell
+    gsutil cp gs://config-management-release/released/latest/config-management-operator.yaml config-management-operator.yaml
+    kubectl apply -f config-management-operator.yaml
+    ```
 
 1. [Install](https://cloud.google.com/anthos-config-management/downloads) the `nomos` CLI locally:
 
-   MacOS - gsutil cp gs://config-management-release/released/latest/darwin_amd64/nomos nomos
-   Linux - gsutil cp gs://config-management-release/released/latest/linux_amd64/nomos nomos
+   MacOS - `gsutil cp gs://config-management-release/released/latest/darwin_amd64/nomos nomos`
+   
+   Linux - `gsutil cp gs://config-management-release/released/latest/linux_amd64/nomos nomos`
 
 1. Create an SSH keypair that nomos can use to authenticate with your ACM Git repository.`
 
-   ```shell
-   export NEW_REGION="asia-east1"
-   export SHORT_CLUSTERNAME="prod-${NEW_REGION}"
-   ssh-keygen -t rsa -b 4096 \
-      -C "**$SHORT_CLUSTERNAME**" \
-      -N '' \
-      -f **$SHORT_CLUSTERNAME
-   ```
+    ```shell
+    export NEW_REGION="asia-east1"
+    export SHORT_CLUSTERNAME="prod-$NEW_REGION"
+    ssh-keygen -t rsa -b 4096 \
+       -C "$SHORT_CLUSTERNAME" \
+       -N '' \
+       -f $SHORT_CLUSTERNAME
+    ```
 
 1. Go to the ACM Git repository in GitLab. https://GITLAB_HOSTNAME/platform-admins/anthos-config-management
 
@@ -256,38 +255,40 @@ If you want to add another cluster (like asia-east1 in the above screenshots), r
 
 1. Create a secret in your cluster that contains the private key of the SSH key pair.
 
-  ```shell
-  export NEW_REGION="asia-east1"
-  export SHORT_CLUSTERNAME="prod-${NEW_REGION}"
-  kubectl create secret generic git-creds --namespace=config-management-system --from-file=ssh=./$SHORT_CLUSTERNAME
-  ```
+   ```shell
+   export NEW_REGION="asia-east1"
+   export SHORT_CLUSTERNAME="prod-$NEW_REGION"
+   kubectl create secret generic git-creds --namespace=config-management-system --from-file=ssh=./$SHORT_CLUSTERNAME
+   ```
 
 1. Create a Anthos Config Management configuration for your cluster:
 
-  ```shell
-  export NEW_REGION="asia-east1"
-  export SHORT_CLUSTERNAME="prod-${NEW_REGION}"
-  cat > config-management.yaml <<EOF
-  apiVersion: configmanagement.gke.io/v1
-  kind: ConfigManagement
-  metadata:
-    name: config-management
-  spec:
-    # clusterName is required and must be unique among all managed clusters
-    clusterName: ${SHORT_CLUSTERNAME}
-    git:
-      syncRepo: git@gitlab.${DOMAIN}:platform-admins/anthos-config-management.git
-      syncBranch: master
-      secretType: ssh
-  EOF
-  ```
-
+   ```shell
+   export NEW_REGION="asia-east1"
+   export SHORT_CLUSTERNAME="prod-${NEW_REGION}"
+   cat > config-management.yaml <<EOF
+   apiVersion: configmanagement.gke.io/v1
+   kind: ConfigManagement
+   metadata:
+     name: config-management
+   spec:
+     # clusterName is required and must be unique among all managed clusters
+     clusterName: $SHORT_CLUSTERNAME
+     git:
+       syncRepo: git@gitlab.$DOMAIN:platform-admins/anthos-config-management.git
+       syncBranch: master
+       secretType: ssh
+     policyController:
+       enabled: true
+   EOF
+   ```
+  
 1. Apply the configuration to your cluster
 
-  ```shell
-  kubectl apply -f config-management.yaml
-  ```
-
+    ```shell
+    kubectl apply -f config-management.yaml
+    ```
+  
 1. Check the status of the installation with the following command. Your cluster should now be synced.
 
     ```shell
@@ -309,157 +310,162 @@ If you want to add another cluster (like asia-east1 in the above screenshots), r
 
 1. Now we need to add our new cluster to be usable in ACM:
 
-  ```shell
-  export NEW_REGION="asia-east1"
-  export SHORT_CLUSTERNAME="prod-${NEW_REGION}"
-  cd anthos-config-management
-  cat > clusterrgistry/${SHORT_CLUSTERNAME}.yaml <<EOF
-  kind: Cluster
-  apiVersion: clusterregistry.k8s.io/v1alpha1
-  metadata:
-    name: ${SHORT_CLUSTERNAME}
-    labels:
-      environment: prod
-      clusterName: ${SHORT_CLUSTERNAME}
-  EOF
+    ```shell
+    export NEW_REGION="asia-east1"
+    export SHORT_CLUSTERNAME="prod-${NEW_REGION}"
+    cd anthos-config-management
+    cat > clusterregistry/$SHORT_CLUSTERNAME.yaml <<EOF
+    kind: Cluster
+    apiVersion: clusterregistry.k8s.io/v1alpha1
+    metadata:
+      name: $SHORT_CLUSTERNAME
+      labels:
+        environment: prod
+        clusterName: $SHORT_CLUSTERNAME
+    EOF
 
-  cat > selector-${SHORT_CLUSTERNAME}.yaml <<EOF
-  kind: ClusterSelector
-  apiVersion: configmanagement.gke.io/v1
-  metadata:
-    name: ${SHORT_CLUSTERNAME}
-  spec:
-    selector:
-      matchLabels:
-        clusterName: ${SHORT_CLUSTERNAME}
-  EOF
-  ```
+    cat > clusterregistry/selector-$SHORT_CLUSTERNAME.yaml <<EOF
+    kind: ClusterSelector
+    apiVersion: configmanagement.gke.io/v1
+    metadata:
+      name: $SHORT_CLUSTERNAME
+    spec:
+      selector:
+        matchLabels:
+          clusterName: $SHORT_CLUSTERNAME
+    EOF
+    ```
 
 1. For the ACM unit tests to be useful in our new cluster, first add a cluster entry for gitlab runner configmaps and add the configuration of the Gitlab runner for running ACM tests.`
 
-  ```shell
-  export NEW_REGION="asia-east1"
-  export SHORT_CLUSTERNAME="prod-${NEW_REGION}"
-  cat >> namespaces/acm-tests/gitlab-runner-configmap-per-cluster.yaml <<EOF
-  apiVersion: v1
-  kind: ConfigMap
-  metadata:
-    name: gitlab-runner-config-acm
-    annotations:
-      configmanagement.gke.io/cluster-selector: ${SHORT_CLUSTERNAME}
-  data:
-    CI_SERVER_URL: https://gitlab.${DOMAIN}
-    KUBERNETES_IMAGE: ubuntu:16.04
-    KUBERNETES_NAMESPACE: acm-tests
-    REGISTER_LOCKED: "true"
-    RUNNER_EXECUTOR: kubernetes
-    RUNNER_REQUEST_CONCURRENCY: "1"
-    RUNNER_TAG_LIST: app:acm-tests, cluster:${SHORT_CLUSTERNAME}
-  EOF
-  ```
+    ```shell
+    export NEW_REGION="asia-east1"
+    export SHORT_CLUSTERNAME="prod-$NEW_REGION"
+    cat >> namespaces/acm-tests/gitlab-runner-configmap-per-cluster.yaml <<EOF
+    apiVersion: v1
+    kind: ConfigMap
+    metadata:
+      name: gitlab-runner-config-acm
+      annotations:
+        configmanagement.gke.io/cluster-selector: $SHORT_CLUSTERNAME
+    data:
+      CI_SERVER_URL: https://gitlab.$DOMAIN
+      KUBERNETES_IMAGE: ubuntu:16.04
+      KUBERNETES_NAMESPACE: acm-tests
+      REGISTER_LOCKED: "true"
+      RUNNER_EXECUTOR: kubernetes
+      RUNNER_REQUEST_CONCURRENCY: "1"
+      RUNNER_TAG_LIST: app:acm-tests, cluster:$SHORT_CLUSTERNAME
+    EOF
+    ```
 
 1. Commit the change and push it to your ACM repo
 
-  ```shell
-  export NEW_REGION="asia-east1"
-  export SHORT_CLUSTERNAME="prod-${NEW_REGION}"
-  git add namespaces/acm-tests/gitlab-runner-configmap-per-cluster.yaml
-  git commit -m "add new cluster: ${SHORT_CLUSTERNAME}"
-  git push origin master
-  ```
+    ```shell
+    export NEW_REGION="asia-east1"
+    export SHORT_CLUSTERNAME="prod-$NEW_REGION"
+    git add namespaces/acm-tests/gitlab-runner-configmap-per-cluster.yaml
+    git commit -m "add new cluster: $SHORT_CLUSTERNAME"
+    git push origin master
+    ```
 
 1. Now, for each app that needs to run in this new cluster, add a file:
 
-  ```shell
-  export NEW_REGION="asia-east1"
-  export APPNAME="go-app"
+    ```shell
+    export NEW_REGION="asia-east1"
+    export APP_NAME="go-app"
 
-  cd namespaces/managed-apps/$APPNAME/`
-  cat >> gitlab-runner-configmap-prod-${NEWREGION}.yaml <<EOF
-  apiVersion: v1
-  kind: ConfigMap
-  metadata:
-    name: gitlab-runner-config
-    annotations:
-      configmanagement.gke.io/cluster-selector: ${SHORT_CLUSTERNAME}
-  data:
-    CI_SERVER_URL: "https://gitlab.${DOMAIN}/"
-    CLONE_URL: ""
-    RUNNER_REQUEST_CONCURRENCY: "1"
-    RUNNER_EXECUTOR: "kubernetes"
-    REGISTER_LOCKED: "true"
-    RUNNER_TAG_LIST: "app:go-test-app-1, cluster:${SHORT_CLUSTERNAME}"
-    KUBERNETES_IMAGE: "ubuntu:16.04"
-    KUBERNETES_NAMESPACE: "go-test-app-1"
-    KUBERNETES_PULL_POLICY: "always"
-  EOF
-  ```
+    cd namespaces/managed-apps/$APP_NAME/
+    cat >> gitlab-runner-configmap-prod-$NEW_REGION.yaml <<EOF
+    apiVersion: v1
+    kind: ConfigMap
+    metadata:
+      name: gitlab-runner-config
+      annotations:
+        configmanagement.gke.io/cluster-selector: $SHORT_CLUSTERNAME
+    data:
+      CI_SERVER_URL: "https://gitlab.$DOMAIN/"
+      CLONE_URL: ""
+      RUNNER_REQUEST_CONCURRENCY: "1"
+      RUNNER_EXECUTOR: "kubernetes"
+      REGISTER_LOCKED: "true"
+      RUNNER_TAG_LIST: "app:$APP_NAME, cluster:$SHORT_CLUSTERNAME"
+      KUBERNETES_IMAGE: "ubuntu:16.04"
+      KUBERNETES_NAMESPACE: "$APP_NAME"
+      KUBERNETES_PULL_POLICY: "always"
+    EOF
+    ```
 
 1. For each repo, push changes:
 
-   ```shell
-   git add .
-   git commit -m "adding $NEWREGION"
-   git push origin master
-   ```
+    ```shell
+    git add .
+    git commit -m "adding $NEW_REGION"
+    git push origin master
+    ```
 
-1. Now make similar changes in your `${APPNAME}-env` repo. This time we're going to make our changes in the `staging` branch, which already was created when we made our app above.
+1. Add the new cluster to the Shared CI/CD configuration repo:
 
-      ```shell
-      export APPNAME="go-app"
-      cd ${APPNAME}-env
-      git checkout staging
-      git pull
-      cat >> .gitlab-ci.yml <<EOF
-      deploy-prod-asia-east1:
-        tags:
-        - cluster:${SHORT_CLUSTERNAME}, app:go-test-app-1
-      stages:
-      - deploy-${SHORT_CLUSTERNAME}
-      EOF
-      ```
+    ```shell
+    cd platform-admins/shared-ci-cd
+    export NEW_REGION="asia-east1"
+    cat >> cd/gke-deploy.yaml <<EOF
+    deploy-prod-$NEW_REGION:
+      # Only deploy when running on master in $APP-env
+      only:
+        refs:
+          - master
+      stage: deploy-prod-$NEW_REGION
+      image: gcr.io/cloud-builders/gke-deploy:stable
+      tags:
+      - cluster:prod-$NEW_REGION
+      script:
+        # Work around for https://github.com/kubernetes/kubernetes/issues/36072
+        # Stated solution is to use "--force" or "kubectl create"; gke-deploy does not have this option so the following works
+        # Get all services that have the "kubectl.kubernetes.io/last-applied-configuration" annotation and put into an environment variable
+        - export SERVICENAMES=$(kubectl get svc -o jsonpath="{range .items[?(@.metadata.annotations.kubectl\.kubernetes\.io/last-applied-configuration)]}{.metadata.name}{':'}{end}")
+        # for each service name, remove the annotation
+        - echo $SERVICENAMES | tr -d '\n' | tr ':' '\0' | xargs -0 -I {} kubectl annotate svc {} kubectl.kubernetes.io/last-applied-configuration-
+        - /gke-deploy run --filename prod.yaml
+    EOF
+    ```
+
+1. Now make similar changes in your `$APP_NAME-env` repo. This time we're going to make our changes in the `staging` branch, which already was created when we made our app above.
+
+    ```shell
+    export APP_NAME="go-app"
+    cd $APP_NAME-env
+    git checkout staging
+    git pull
+    cat >> .gitlab-ci.yml <<EOF
+    deploy-prod-$NEW_REGION:
+      tags:
+      - cluster:$SHORT_CLUSTERNAME, app:$APP_NAME
+    stages:
+    - deploy-$SHORT_CLUSTERNAME
+    EOF
+    ```
 
 1. Commit the changes:
 
-      ```shell
-      git add .gitlab-ci.
-      git commit -m "adding new cluster to CD"
-      git push
-      ```
+    ```shell
+    git add .gitlab-ci.yml
+    git commit -m "adding new cluster to CD"
+    git push
+    ```
 
 1. Now in the Gitlab web UI, navigate to the link shown in the output of your last git command, which should look like:
 
-      ```console
-      remote: To create a merge request for staging, visit:
-      remote:   https://GITLAB_HOSTNAME/go-app/go-app-env/merge_requests/new?merge_request%5Bsource_branch%5D=staging`
-      ```
+    ```console
+    remote: To create a merge request for staging, visit:
+    remote:   https://$GITLAB_HOSTNAME/$APP_NAME/$APP_NAME-env/merge_requests/new?merge_request%5Bsource_branch%5D=staging`
+    ```
 
 1. Choose "Submit merge request".
 
 1. Click "Merge" (don't choose to delete the source branch).
 
    Note that for $app-env, you will have to push to staging branch first, then perform an MR.
-
-1. Add the new cluster to the Shared CI/CD configuration repo:
-
-      ```shell
-      cd platform-admins/shared-ci-cd
-      export NEW_REGION="asia-east1"
-      cat >> cd/gke-deploy.yaml <<EOF
-      deploy-prod-${NEWREGION}:
-        # Only deploy when running on master in $APP-env
-        only:
-          refs:
-            - master
-        stage: deploy-prod-${NEWREGION}
-        image: gcr.io/cloud-builders/gke-deploy:stable
-        tags:
-        - cluster:prod-${NEWREGION}
-        script:
-        - |
-        - /gke-deploy run --filename kustomize-prod.yaml
-      EOF
-      ```
 
 1. Now your deploys will go to your new region too!
 
