@@ -29,16 +29,20 @@ The following instructions use a command line utility ([anthos-platform-cli](cli
 
 1. After downloading the binary, rename it and make it executable:
 
-  ```shell
-  mv anthos-platform-cli-* anthos-platform-cli
-  chmod +x anthos-platform-cli
-  ```
+    ```shell
+    mv anthos-platform-cli-* anthos-platform-cli
+    chmod +x anthos-platform-cli
+    ```
+1. Run the app creation command:
 
-1. Run the app creation command, provide an application name with the parameter `--name`, your configured GitLab hostname (i.e. gitlab.your.domain.com) with the parameter `--gitlab-hostname` and GitLab root user password with the parameter `--gitlab-token`:
+    ```shell
+    ./anthos-platform-cli add app --name $APP_NAME --gitlab-hostname $GITLAB_HOSTNAME --gitlab-token $GITLAB_ROOT_PASSWORD --template-name golang-template
+    ```
 
-  ```shell
-  ./anthos-platform-cli add app --name $APP_NAME --gitlab-hostname $GITLAB_HOSTNAME --gitlab-token $GITLAB_ROOT_PASSWORD --template-name golang-template
-  ```
+    * `--name` Application name (i.e. `go-app`)
+    * `--gitlab-hostname` Your configured GitLab hostname (i.e. gitlab.your.domain.com)
+    * `--gitlab-token` GitLab root user password with the parameter
+
 
 ## Adding a new feature/version of the application
 
@@ -48,56 +52,75 @@ The following steps are performed by a **developer**, and can be performed local
 
 1. [Install skaffold](https://skaffold.dev/docs/install/)
 1. [Install kustomize](https://github.com/kubernetes-sigs/kustomize/blob/master/docs/INSTALL.md#quickly-curl-the-latest)
-1. Clone your app repository
+1. [Install kubectx/kubens](https://github.com/ahmetb/kubectx/releases)
+1. Clone your app repository (example uses the `$APP_NAME` go-app)
 
-`git clone git@gitlab.platform.1.vic.dev:go-app-1/go-test-app-1.git
-cd go-test-app-1`
+    ```shell
+    git clone git@$GITLAB_HOSTNAME:$APP_NAME/$APP_NAME.git
+    cd $APP_NAME
+    ```
 
-1. Get credentials for the shared dev cluster
+1. Get your shared dev cluster kube context
 
-  ```shell
-  kubectx development
-  ```
+    ```shell
+    gcloud container clusters get-credentials dev-central1
+    ```
+
+    Lists your context(s)
+    ```shell
+    kubectx
+    ```
+
+    Rename your context
+    ```shell
+    kubectx development=$DEV_KUBE_CONTEXT
+    ```
+
+1. Switch to the shared dev cluster context
+
+    ```shell
+    kubectx development
+    ```
 
 1. Create an Artifact Registry repository for your user.
 
-  ```shell
-  export PROJECT_ID=$(gcloud config get-value project)
-  gcloud beta artifacts repositories create $USER --repository-format=Docker --location=us-central1
-  gcloud beta artifacts repositories add-iam-policy-binding --member serviceAccount:tf-sa-dev-us-central1@${PROJECT_ID}.iam.gserviceaccount.com --role roles/artifactregistry.reader --location us-central1 $USER
-  ```
+    ```shell
+    export PROJECT_ID=$(gcloud config get-value project)
+    gcloud beta artifacts repositories create $USER --repository-format=Docker --location=us-central1
+    gcloud beta artifacts repositories add-iam-policy-binding --member serviceAccount:tf-sa-dev-us-central1@${PROJECT_ID}.iam.gserviceaccount.com --role roles/artifactregistry.reader --location us-central1 $USER
+    ```
 
 1. Set up Docker authentication to the registry.
 
-  ```shell
-  gcloud beta auth configure-docker us-central1-docker.pkg.dev
-  ```
+    ```shell
+    gcloud beta auth configure-docker us-central1-docker.pkg.dev
+    ```
 
 1. Currently the dev cluster is not managed by ACM so it's likely necessary to create the Dev’s namespace.
 
-  ```shell
-  kubectl create namespace $USER
-  kubens $USER
-  ```
+    ```shell
+    kubectl create namespace $USER
+    kubens $USER
+    ```
 
 1. Create the Kubernetes Service Account used by the app.
 
-  ```shell
-  kubectl create serviceaccount <app-name>-ksa
-  ```
-  
+    ```shell
+    kubectl create serviceaccount $APP_NAME-ksa
+    ```
+
 1. Set your default repository for skaffold to use.
 
-  ```shell
-  export PROJECT_ID=$(gcloud config get-value project)
-  skaffold config set default-repo us-central1-docker.pkg.dev/$PROJECT_ID/$USER
-  ```
+    ```shell
+    export PROJECT_ID=$(gcloud config get-value project)
+    skaffold config set default-repo us-central1-docker.pkg.dev/$PROJECT_ID/$USER
+    ```
 
 1. Run Skaffold in developer mode so that it rebuilds your application as it changes:
 
-  ```shell
-  skaffold dev --port-forward
-  ```
+    ```shell
+    skaffold dev --port-forward
+    ```
 
 1. Change code and look at the logs in your console to ensure the expected results. If you are running skaffold on your local machine, point your browser to `http://localhost:8080`, if in Cloud Shell hit the "Web Preview" button.
 
@@ -107,28 +130,28 @@ cd go-test-app-1`
 
 ### Setting up your change for production
 
-1. After your MR into your app succeeds, the CI pipeline will perform a few actions:  unit-test, build, kustomize, push-manifests.
+1. After your MR into your app succeeds, the CI pipeline will perform a few actions: unit-test, build, kustomize, push-manifests.
 
 1. The last step, push-manifests actually pushes a file into the app-env repo's staging branch, go check it out and you'll see the output:
 
-   ```console
-   remote: To create a merge request for staging, visit:
-   remote:   https://gitlab.smcghee.dev/go-team-go/go-app-env/merge_requests/new?merge_request%5Bsource_branch%5D=staging
-   ```
+    ```console
+    remote: To create a merge request for staging, visit:
+    remote:   https://gitlab.smcghee.dev/go-team-go/go-app-env/merge_requests/new?merge_request%5Bsource_branch%5D=staging
+    ```
 
 1. You can now find your app running in the staging cluster:
 
-   ```shell
-   kubectx staging
-   kubectl get po -n go-test-app-1
-   kubectl get svc -n go-test-app-1
-   ```
+     ```shell
+     kubectx staging
+     kubectl get po -n $APP_NAME
+     kubectl get svc -n $APP_NAME
+     ```
 
 1. You can port-forward the staging build as well:
 
-   ```shell
-   kubectl port-forward svc/go-test-app-1-app -n go-test-app-1 8080:8080
-   ```
+     ```shell
+     kubectl port-forward svc/$APP_NAME-app -n $APP_NAME 8080:8080
+     ```
 
 1. At this point your feature is ready to be deployed to production.  An Operator will perform this.
 
@@ -140,7 +163,7 @@ The following steps are performed by an **Operator**.
 1. In Gitlab UI, navigate to the ${APP}-env repo (not the ${APP} repo).
 ![env repo branch](../images/env-repo-branch.png)
 
-1. Create a new MR (ie [https://GITLAB_HOSTNAME/go-team-go/go-app-env/merge_requests](https://gitlab.smcghee.dev/go-team-go/go-app-env/merge_requests))
+1. Create a new MR (ie `https://$GITLAB_HOSTNAME/$APP_NAME/$APP_NAME-env/merge_requests`)
 
 1. Get a peer to approve this MR (or approve it yourself if you are feeling lucky)
 
