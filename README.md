@@ -34,7 +34,7 @@ After the [Quick Start](#pre-requisites) you will have the following infra:
 ![Anthos Platform Infrastructure](images/anthos-platform-infra.png)
 
 * [GitLab deployed on GKE](https://cloud.google.com/solutions/deploying-production-ready-gitlab-on-gke) to host your source code repostitories
-* 1 Dev cluster that can be used for iterative development with tools like [Skaffold](skaffold.dev)
+* 1 Dev cluster that can be used for iterative development with tools like [Skaffold](https://skaffold.dev/)
 * 1 Staging cluster
 * 2 Production clusters in different GCP regions
 
