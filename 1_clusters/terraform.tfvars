@@ -1,1 +1,1 @@
-project_id = "binary-authorization"
+project_id = "YOUR_PROJECT_ID"

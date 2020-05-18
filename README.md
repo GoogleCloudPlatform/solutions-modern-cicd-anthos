@@ -80,6 +80,7 @@ Within GitLab you will have the following repo structure:
     gcloud services enable cloudbuild.googleapis.com
     gcloud services enable serviceusage.googleapis.com
     gcloud projects add-iam-policy-binding ${PROJECT_ID} --member serviceAccount:${PROJECT_NUMBER}@cloudbuild.gserviceaccount.com   --role roles/owner
+    gcloud projects add-iam-policy-binding ${PROJECT_ID} --member serviceAccount:${PROJECT_NUMBER}@cloudbuild.gserviceaccount.com --role roles/containeranalysis.admin
     ```
 
 1. Provision the address that GitLab will use.
