@@ -1,5 +1,7 @@
 # Modern CI/CD with Anthos
 
+![CI](https://github.com/GoogleCloudPlatform/solutions-modern-cicd-anthos/workflows/CI/badge.svg)
+
 * [Introduction](#introduction)
 * [Architecture Overview](#architecture-overview)
 * Quick Start
