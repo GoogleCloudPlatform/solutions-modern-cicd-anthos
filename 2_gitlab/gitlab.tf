@@ -16,7 +16,7 @@
 
 module "gke-gitlab" {
   source  = "terraform-google-modules/gke-gitlab/google"
-  version = "~> 0.1.0"
+  version = "~> 0.1.1"
 
   project_id            = var.project_id
   domain                = var.domain
