@@ -76,30 +76,16 @@ steps:
   - '-c'
   - |
     sed -i "s/YOUR_PROJECT_ID/${PROJECT_ID}/g" 2_gitlab/terraform.tfvars
+    sed -i "s/YOUR_PROJECT_ID/${PROJECT_ID}/g" 2_gitlab/backend.tf
+    sed -i "s/YOUR_PROJECT_ID/${PROJECT_ID}/g" 2_gitlab/gitlab-repos/backend.tf
 
-    cd 2_gitlab
-    cat > backend.tf <<EOF
-    terraform {
-      backend "gcs" {
-        bucket  = "${PROJECT_ID}-anthos-platform-tf-state"
-        prefix  = "gitlab"
-      }
-    }
-    EOF
-    cd gitlab-repos
-    cat > backend.tf <<EOF
-    terraform {
-      backend "gcs" {
-        bucket  = "${PROJECT_ID}-anthos-platform-tf-state"
-        prefix  = "gitlab-repos"
-      }
-    }
-    EOF
-    cd ..
+    cd 2_gitlab/
     # Gitlab URL will be gitlab.$_DOMAIN
     sed -i "s/YOUR_DOMAIN/${_DOMAIN}/g" terraform.tfvars
+    cat backend.tf
     terraform init
-    terraform apply -auto-approve
+    terraform plan -out=terraform.tfplan
+    terraform apply -auto-approve terraform.tfplan
 
     export GITLAB_ADDRESS=$(terraform output gitlab_address)
 

@@ -15,7 +15,9 @@
  */
 
 module "gke-gitlab" {
-  source                = "github.com/terraform-google-modules/terraform-google-gke-gitlab?ref=master"
+  source  = "terraform-google-modules/gke-gitlab/google"
+  version = "~> 0.1.0"
+
   project_id            = var.project_id
   domain                = var.domain
   certmanager_email     = "no-reply@${var.project_id}.example.com"
