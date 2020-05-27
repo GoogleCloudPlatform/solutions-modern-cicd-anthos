@@ -10,7 +10,7 @@ The following Critical User Journeys (CUJs) are covered:
   * [Testing the change locally with Skaffold](#testing-the-change-locally-with-skaffold)
   * [Setting up your change for production](#setting-up-your-change-for-production)
 * [Promoting changes from Staging to Production](#promoting-changes-from-staging-to-production)
-* WIP [Adding a cluster to the platform](#adding-a-cluster-to-the-platform)
+* [Adding a cluster to the platform](#adding-a-cluster-to-the-platform)
 * [Deleting an application](#deleting-an-application)
 
 ## Adding a new application (using CLI)
@@ -473,49 +473,52 @@ If you want to add another cluster (like asia-east1 in the above screenshots), r
 
 The following steps are performed by an operator.
 
-1. In Cloud Shell, clone the `anthos-config-management` repo.
+1. Clone the `anthos-config-management` repo.
 
-  ```shell
-  git clone git@gitlab.ap-3.vic.dev:platform-admins/anthos-config-management.git
-  ```
+    ```shell
+    git clone git@$GITLAB_HOSTNAME:platform-admins/anthos-config-management.git
+    ```
 
 1. Create a new branch in the local repo for deleting the app.
 
-  ```shell
-  cd anthos-config-management
-  git checkout -b delete-go-app-1
-  ```
+    ```shell
+    cd anthos-config-management
+    git checkout -b delete-$APP_NAME
+    ```
 
 1. Delete the app folder under the `namespaces/managed-apps` folder.
 
-  ```shell
-  rm -rf namespaces/managed-apps/go-app-1
-  ```
+    ```shell
+    rm -rf namespaces/managed-apps/$APP_NAME
+    ```
 
 1. Commit and push the changes back to the repo in the new branch.
 
-  ```shell
-  git add .
-  git commit -am "deleted app go-app-1"
-  git push -u origin delete-go-app-1
-  ```
+    ```shell
+    git add .
+    git commit -am "deleted app $APP_NAME"
+    git push -u origin delete-$APP_NAME
+    ```
+    
+1. Your changes created in a branch need to be merged into the master branch for Anthos Config Management operator to delete > the resources and policies on the GKE clusters.  
+    * Create a Merge Request.  
+    * The Merge Request is then reviewed and merged into the master branch by a peer Operator.
 
-1. Your changes created in a branch need to be merged into the master branch for Anthos Config Management operator to delete the resources and policies on the GKE clusters.  Create a Merge Request.  The Merge Request is then reviewed and merged into the master branch by a peer Operator.
-
-1. Click on the **Create Merge Request** button.
-
-1. Add a suitable title for the Merge request.
-
-1. Click **Submit merge request** at the bottom.
-
-1. Check **Delete source branch** and click **Merge**.
+1. Navigate to the Gitlab web UI, git repository `platform-admins/anthos-config-management`
+    * Click on the **Create Merge Request** button on the top banner.
+    * Add a suitable title for the Merge request.
+    * Click **Submit merge request** at the bottom.
+    * Check **Delete source branch** and click **Merge**.
 
 1. Once merged into the master branch, the application and its associated resources i.e. namespace, any deployments and the Gitlab CI runners are deleted by the ACM operator.
 
-1. Navigate to the Google Cloud Console and confirm resources are deleted in the GKE clusters by going to the **Kubernetes engine > workloads** page and filtering by **Namespace: go-test-app-1**.
+1. Navigate to the Google Cloud Console and confirm resources are deleted in the GKE clusters by going to the **Kubernetes Engine > Workloads** page and filtering by **Namespace: go-app**.
 
-1. Delete the Group.  Navigate to the `go-app-demo-1` group in the Gitlab UI.  Click on **Settings > General** from the lefthand navbar and the expand the **Advanced** section at the bottom.
-1. Scroll to the bottom and click on **Remove group**. Note that deleting the Group also deletes any projects in the group.
-
-1. Enter the Group name again when prompted and click **Confirm**.
-Note: This is an irreversible process.  You cannot recover any removed Groups/Projects.  Proceed with caution!
+1. Delete the Group.  Navigate ot the Gitlab web UI.
+    * Select the created application group **Groups > Your groups > `go-app`**  
+    * Click on **Settings > General** from the lefthand navbar (expand the lefthand navbar **>>** on the bottom left if necessary)
+    * Scroll to the bottom, In the section **Path, transfer, remove**, click **Expand**
+    * Click **Remove group**. 
+      > NOTE: that deleting the Group also deletes any projects in the group.
+    * Enter the Group name again when prompted and click **Confirm**.
+      > NOTE: This is an irreversible process.  You cannot recover any removed Groups/Projects.  Proceed with caution!
