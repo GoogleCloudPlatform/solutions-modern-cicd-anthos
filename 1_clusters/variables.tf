@@ -17,3 +17,9 @@
 variable "project_id" {
   description = "The project ID to host the cluster in"
 }
+
+variable keyring-region {
+  type        = string
+  default     = "us-central1"
+  description = "Region used for key-ring"
+}

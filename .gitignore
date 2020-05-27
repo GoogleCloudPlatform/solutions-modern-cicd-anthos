@@ -4,3 +4,6 @@ terraform.tfstate*
 
 .vscode/
 target/
+
+.envrc
+projects/

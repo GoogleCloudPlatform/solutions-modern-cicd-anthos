@@ -19,3 +19,12 @@ output "service_account" {
   description = "Service account used to create the cluster and node pool(s)"
 }
 
+output "region" {
+  value       = var.region
+  description = "Region for development cluster"
+}
+
+output "cluster-name" {
+  value       = var.name
+  description = "Cluster Name"
+}
