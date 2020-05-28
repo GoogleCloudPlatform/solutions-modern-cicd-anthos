@@ -57,6 +57,8 @@ module "anthos_platform_cluster" {
   kubernetes_version = var.gke_kubernetes_version
   regional           = true
 
+  enable_binary_authorization = true
+
   create_service_account = false
   service_account        = google_service_account.service_account.email
   identity_namespace     = "${var.project_id}.svc.id.goog"

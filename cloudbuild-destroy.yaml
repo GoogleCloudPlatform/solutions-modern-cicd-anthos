@@ -85,8 +85,28 @@ steps:
       gcloud compute networks delete anthos-platform --quiet
     fi
 
+    attestors=$(gcloud container binauthz attestors list --format="value('name')")
+
+    if [ $(echo $attestors | wc -w) -gt 0 ]; then
+        # Remove Attestors
+        for attestor in $attestors; do
+            gcloud container binauthz attestors delete $attestor
+        done
+
+        # Remove notes (because gcloud does not remove them)
+        access=$(gcloud auth print-access-token)
+        notes=$(curl -H "Authorization: Bearer ${access}" "https://containeranalysis.googleapis.com/v1/projects/${PROJECT_ID}/notes/")
+        if [ "$notes" != "{}" ]; then
+            for NOTE_ID in $(echo $notes | jq -r '.notes[].name' ); do
+                curl -vvv -X DELETE \
+                    -H "Authorization: Bearer ${access}" \
+                    "https://containeranalysis.googleapis.com/v1/projects/${PROJECT_ID}/notes/${NOTE_ID##*/}"
+            done
+        fi
+    fi
+
     for bucket in $(gsutil ls); do
       [[ $bucket = gs://${PROJECT_ID}* ]] && gsutil rm -rf ${bucket}
     done
     gsutil rm -rf gs://artifacts.${PROJECT_ID}.appspot.com/ || true
-    
+
