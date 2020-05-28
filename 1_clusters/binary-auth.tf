@@ -11,19 +11,16 @@ resource "null_resource" "resource-to-wait-on" {
 resource "google_kms_key_ring" "keyring" {
   name     = "attestor-key-ring-${random_pet.keyring-name.id}"
   location = var.keyring-region
-  lifecycle {
-    prevent_destroy = false
-  }
   depends_on = [null_resource.resource-to-wait-on]
 }
 
 locals {
-    attestors = [
-        # Note: module for_each support coming soon
-        "quality",
-        "build",
-        "security"
-    ]
+  attestors = [
+    # Note: module for_each support coming soon
+    "quality",
+    "build",
+    "security"
+  ]
   admin_enabled_apis = [
     "containeranalysis.googleapis.com",
     "binaryauthorization.googleapis.com",
@@ -47,7 +44,7 @@ module "project-services" {
 module "quality-attestor" {
   source = "terraform-google-modules/kubernetes-engine/google//modules/binary-authorization"
 
-project_id = var.project_id
+  project_id = var.project_id
 
   attestor-name = local.attestors[0]
   keyring-id    = google_kms_key_ring.keyring.id
@@ -57,7 +54,7 @@ project_id = var.project_id
 module "build-attestor" {
   source = "terraform-google-modules/kubernetes-engine/google//modules/binary-authorization"
 
-project_id = var.project_id
+  project_id = var.project_id
 
   attestor-name = local.attestors[1]
   keyring-id    = google_kms_key_ring.keyring.id
@@ -67,7 +64,7 @@ project_id = var.project_id
 module "security-attestor" {
   source = "terraform-google-modules/kubernetes-engine/google//modules/binary-authorization"
 
-project_id = var.project_id
+  project_id = var.project_id
 
   attestor-name = local.attestors[2]
   keyring-id    = google_kms_key_ring.keyring.id
@@ -75,7 +72,7 @@ project_id = var.project_id
 
 resource "google_binary_authorization_policy" "policy" {
   admission_whitelist_patterns {
-      # TODO: Figure out pattern for Gitlab's repo
+    # TODO: Figure out pattern for Gitlab's repo
     name_pattern = "quay.io/random-containers/*"
   }
 
