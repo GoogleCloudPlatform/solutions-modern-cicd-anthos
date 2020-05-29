@@ -84,14 +84,6 @@ var removeAppCmd = &cobra.Command{
 
 		gitlabHostname, gitlabToken := getGitLabParams(cmd)
 
-		templateNamespace, err := cmd.Flags().GetString("template-namespace")
-		if err != nil {
-			log.Fatal("Unable to parse template namespace name")
-		}
-		if templateNamespace == "" {
-			log.Fatal("Provide a template namespace.")
-		}
-
 		artifactRegistryLocation, err := cmd.Flags().GetString("artifact-registry-location")
 		if err != nil {
 			log.Fatal("Unable to parse Artifact Registry location")
@@ -118,7 +110,7 @@ var removeAppCmd = &cobra.Command{
 		// Remove group (contains both app and -env repos)
 		resources.DeleteGroup(client, name)
 
-		// Remove app from ACM
+		// Remove app from ACM and so from clusters
 		resources.RemoveAppFromACM(client, name, tmpKeyPath)
 
 		// Remove Artifact Registry repo and credentials
