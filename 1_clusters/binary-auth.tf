@@ -21,7 +21,7 @@ resource "null_resource" "resource-to-wait-on" {
   provisioner "local-exec" {
     command = "sleep 60" # one minute to allow eventual consistency of APIs avoiding failures downstream
   }
-  depends_on = [module.project-services]
+  depends_on = [module.project-services.project_id]
 }
 
 resource "google_kms_key_ring" "keyring" {
