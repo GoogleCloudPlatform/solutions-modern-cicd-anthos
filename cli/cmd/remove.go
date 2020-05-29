@@ -21,13 +21,10 @@ import (
 // removeCmd represents the remove command
 var removeCmd = &cobra.Command{
 	Use:   "remove",
-	Short: "A brief description of your command",
-	Long: `A longer description that spans multiple lines and likely contains examples
-and usage of using your command. For example:
+	Short: "Remove resources from an Anthos Platform installation",
+	Long: `Remove resources from an Anthos Platform installation:
 
-Cobra is a CLI library for Go that empowers applications.
-This application is a tool to generate the needed files
-to quickly create a Cobra application.`,
+anthos-platform-cli remove < app | cluster > `,
 	Run: func(cmd *cobra.Command, args []string) {
 		cmd.Help()
 	},

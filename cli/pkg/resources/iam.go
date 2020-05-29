@@ -32,7 +32,7 @@ func CreateSA(name string, description string) {
 		"service-accounts",
 		"list",
 		filterArg,
-	  formatArg)
+		formatArg)
 	output, err := cmd.CombinedOutput()
 
 	if strings.Contains(string(output), name) {
@@ -74,7 +74,6 @@ func DeleteSA(serviceAccountName string) {
 	}
 }
 
-
 func CreateSAKey(serviceAccountEmail string) string {
 
 	serviceAccountArg := "--iam-account=" + serviceAccountEmail
@@ -108,7 +107,6 @@ func CreateSAKey(serviceAccountEmail string) string {
 	return string(buf)
 }
 
-
 func AddSAIAMPolicyBinding(name string, role string, serviceAccountEmail string) {
 
 	memberArg := "--member=serviceAccount:" + serviceAccountEmail
@@ -125,5 +123,24 @@ func AddSAIAMPolicyBinding(name string, role string, serviceAccountEmail string)
 
 	if err != nil {
 		log.Fatalf("Unable to add binding for service account %v: %s\n", serviceAccountEmail, output)
+	}
+}
+
+func RemoveSAIAMPolicyBinding(name string, role string, serviceAccountEmail string) {
+
+	memberArg := "--member=serviceAccount:" + serviceAccountEmail
+	roleArg := "--role=" + role
+
+	cmd := exec.Command("gcloud",
+		"iam",
+		"service-accounts",
+		"remove-iam-policy-binding",
+		name,
+		memberArg,
+		roleArg)
+	output, err := cmd.CombinedOutput()
+
+	if err != nil {
+		log.Fatalf("Unable to remove binding for service account %v: %s\n", serviceAccountEmail, output)
 	}
 }

@@ -34,8 +34,7 @@ import (
 	gitlab "github.com/xanzy/go-gitlab"
 )
 
-// appCmd represents the app command
-var appCmd = &cobra.Command{
+var addAppCmd = &cobra.Command{
 	Use:   "app",
 	Short: "Add an app to an Anthos Platform installation",
 	Long:  `anthos-platform-cli add app [app-name]`,
@@ -99,11 +98,11 @@ var appCmd = &cobra.Command{
 		replaceName := func(w *git.Worktree) *git.Worktree {
 			// TODO: Iterate over all files in the repo
 			files := []string{"k8s/dev/kustomization.yaml",
-												"k8s/dev/deployment.yaml",
-												"k8s/stg/kustomization.yaml",
-												"k8s/stg/deployment.yaml",
-												"k8s/prod/kustomization.yaml",
-												"k8s/prod/deployment.yaml"}
+				"k8s/dev/deployment.yaml",
+				"k8s/stg/kustomization.yaml",
+				"k8s/stg/deployment.yaml",
+				"k8s/prod/kustomization.yaml",
+				"k8s/prod/deployment.yaml"}
 
 			for _, filename := range files {
 				file, err := w.Filesystem.OpenFile(filename, os.O_RDWR, os.ModePerm)
@@ -169,34 +168,28 @@ var appCmd = &cobra.Command{
 		}
 		resources.AddVariable(client, appProject.ID, "MANIFEST_WRITER_KEY", string(manifestWriterPriv), true)
 
+		// Add Service Accounts for Workload Identity
+		resources.CreateWorkloadIdentity(name)
+
 		pipelineURL := "https://" + gitlabHostname + "/" + name + "/" + name + "/pipelines"
 		log.Println()
 		log.Printf("Your first pipeline run has started. Check on it here: %s", pipelineURL)
-
-		// Add Service Accounts for Workload Identity
-		// https://cloud.google.com/kubernetes-engine/docs/how-to/workload-identity#creating_a_relationship_between_ksas_and_gsas
-		gsaName := name + "-gsa"
-		resources.CreateSA(gsaName, "Map KSA to GSA for " + name)
-		projectID := resources.GetCurrentProject()
-		bindingName := fmt.Sprintf("%s@%s.iam.gserviceaccount.com", gsaName, projectID)
-		wiName := fmt.Sprintf("%s.svc.id.goog[%s/%s-ksa]", projectID, name, name)
-		resources.AddSAIAMPolicyBinding(bindingName, "roles/iam.workloadIdentityUser", wiName)
 	},
 }
 
 func init() {
-	addCmd.AddCommand(appCmd)
+	addCmd.AddCommand(addAppCmd)
 
 	// Here you will define your flags and configuration settings.
 
 	// Cobra supports Persistent Flags which will work for this command
 	// and all subcommands, e.g.:
-	appCmd.PersistentFlags().StringP("name", "n", "", "Name of the application")
-	appCmd.PersistentFlags().String("template-name", "", "Template project to use as source")
-	appCmd.PersistentFlags().String("template-namespace", "platform-admins", "Template namespace")
-	appCmd.PersistentFlags().String("artifact-registry-location", "us-central1", "Location for Artifact Registry")
+	addAppCmd.PersistentFlags().StringP("name", "n", "", "Name of the application")
+	addAppCmd.PersistentFlags().String("template-name", "", "Template project to use as source")
+	addAppCmd.PersistentFlags().String("template-namespace", "platform-admins", "Template namespace")
+	addAppCmd.PersistentFlags().String("artifact-registry-location", "us-central1", "Location for Artifact Registry")
 
 	// Cobra supports local flags which will only run when this command
 	// is called directly, e.g.:
-	// appCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
+	// addAppCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
 }

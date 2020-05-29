@@ -96,14 +96,14 @@ func CreateRepository(repoName string, location string) (string, string) {
 		log.Fatalf("Unable to list Artifact Registry repos: %v\n%s", err, output)
 	}
 
-	fullRepoName := fmt.Sprintf("projects/%s/locations/%s/repositories/%s", 
-																projectName, location, repoName)
+	fullRepoName := fmt.Sprintf("projects/%s/locations/%s/repositories/%s",
+		projectName, location, repoName)
 	if strings.Contains(string(output), fullRepoName) {
 		log.Printf("Artifact Registry repo %v already exists", repoName)
 	} else {
 		formatArg := "--repository-format=docker"
 		log.Printf("Creating AR repository %v in location %v", repoName, location)
-	
+
 		cmd := exec.Command("gcloud",
 			"beta",
 			"artifacts",
@@ -112,7 +112,7 @@ func CreateRepository(repoName string, location string) (string, string) {
 			repoName,
 			locationArg,
 			formatArg)
-	
+
 		output, err := cmd.CombinedOutput()
 		if err != nil {
 			log.Fatalf("Unable to create Artifact Registry repository %v: %s\n", repoName, output)
@@ -134,14 +134,15 @@ func CreateRepository(repoName string, location string) (string, string) {
 func DeleteRepository(repoName string, location string) {
 
 	locationArg := "--location=" + location
+	quietArg := "--quiet"
 
 	log.Printf("Deleting AR repository %v in location %v", repoName, location)
 
 	projectName := GetCurrentProject()
-	serviceAccountName, serviceAccountEmail := constructSA(repoName, projectName)
+	_, serviceAccountEmail := constructSA(repoName, projectName)
 
 	removeSABinding(repoName, serviceAccountEmail, location)
-	DeleteSA(serviceAccountName)
+	DeleteSA(serviceAccountEmail)
 
 	cmd := exec.Command("gcloud",
 		"beta",
@@ -149,10 +150,11 @@ func DeleteRepository(repoName string, location string) {
 		"repositories",
 		"delete",
 		repoName,
-		locationArg)
+		locationArg,
+		quietArg)
 
 	output, err := cmd.CombinedOutput()
 	if err != nil {
-		log.Fatalf("Unable to create Artifact Registry repository %v: %s\n", repoName, output)
+		log.Fatalf("Unable to delete Artifact Registry repository %v: %s\n", repoName, output)
 	}
 }
