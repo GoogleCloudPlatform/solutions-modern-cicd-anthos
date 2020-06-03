@@ -133,6 +133,54 @@ func AddAppToACM(client *gitlab.Client, name string, runnersToken string, sshKey
 
 }
 
+func RemoveAppFromACM(client *gitlab.Client, name string, sshKeyPath string) {
+	// Set variables related to ACM repo
+	gitlabHostname := client.BaseURL().Hostname()
+	acmRepoNamespace := "platform-admins"
+	acmRepoName := "anthos-config-management"
+
+	// Add deploy key to source project so that we can clone it
+	sourceRepo := GetProject(client, fmt.Sprintf("%s/%s", acmRepoNamespace, acmRepoName))
+	keyTitle := fmt.Sprintf("Anthos Platform CLI Cloning: %s", acmRepoName)
+	AddDeployKey(client, sourceRepo.ID, sshKeyPath+".pub", keyTitle, false)
+
+	// Clone ACM repo
+	r := CloneRepo(client, acmRepoNamespace, acmRepoName, sshKeyPath)
+	DeleteDeployKey(client, sourceRepo.ID, keyTitle)
+
+	// Get a worktree so we can operate on the files
+	w, err := r.Worktree()
+	if err != nil {
+		log.Fatalf("Unable to read worktree from respository: %v", err)
+	}
+
+	// Construct path and remove from tree
+	removePath := "namespaces/managed-apps/" + name + "/*"
+	w.RemoveGlob(removePath)
+
+	_, err = w.Commit("Remove app: "+name, &git.CommitOptions{
+		Author: &object.Signature{
+			Name:  "Anthos Platform CLI",
+			Email: "anthos-platform-cli@" + gitlabHostname,
+			When:  time.Now(),
+		},
+	})
+	if err != nil {
+		log.Fatalf("Unable to commit: %v", err)
+	}
+
+	// Set up authentication for this push, then tear it down
+	deployKeyName := fmt.Sprintf("Removing %s from ACM repo", name)
+	acmPID := acmRepoNamespace + "/" + acmRepoName
+	AddDeployKey(client, acmPID, sshKeyPath+".pub", deployKeyName, true)
+	defer DeleteDeployKey(client, acmPID, deployKeyName)
+
+	err = r.Push(&git.PushOptions{Auth: GetSSHAuth(sshKeyPath)})
+	if err != nil {
+		log.Fatalf("Unable to push commit: %v", err)
+	}
+}
+
 func GetACMOperator() {
 	log.Printf("Downloading ACM Operator manifest (using gsutil)...")
 	checkForGcloud()
@@ -223,7 +271,7 @@ func AddClusterToACM(r *git.Repository, clusterName string, env string, gitlabHo
 
 	_, err = w.Commit("Add new cluster: "+clusterName, &git.CommitOptions{
 		Author: &object.Signature{
-			Name: "Anthos Platform CLI",
+			Name:  "Anthos Platform CLI",
 			Email: "anthos-platform-cli@" + gitlabHostname,
 			When:  time.Now(),
 		},

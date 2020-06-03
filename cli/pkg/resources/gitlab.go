@@ -54,6 +54,20 @@ func CreateGroup(client *gitlab.Client, name string) *gitlab.Group {
 	return group
 }
 
+func DeleteGroup(client *gitlab.Client, name string) {
+	log.Printf("Deleting group: %s", name)
+	group, err := GetGroup(client, name)
+	if group == nil || err != nil {
+		log.Printf("Error retrieving group %s for deletion. Continuing...", name)
+		return
+	}
+	_, err = client.Groups.DeleteGroup(group.ID)
+	if err != nil {
+		log.Fatal(err)
+	}
+	return
+}
+
 func GetGroup(client *gitlab.Client, gid interface{}) (*gitlab.Group, error) {
 	group, _, err := client.Groups.GetGroup(gid)
 	if err != nil {
