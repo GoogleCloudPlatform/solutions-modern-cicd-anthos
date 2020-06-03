@@ -11,7 +11,8 @@ The following Critical User Journeys (CUJs) are covered:
   * [Setting up your change for production](#setting-up-your-change-for-production)
 * [Promoting changes from Staging to Production](#promoting-changes-from-staging-to-production)
 * [Adding a cluster to the platform](#adding-a-cluster-to-the-platform)
-* [Deleting an application](#deleting-an-application)
+* [Deleting an application (using CLI)](#deleting-an-application-using-cli)
+* [Deleting an application (manually)](#deleting-an-application-manually)
 
 ## Adding a new application (using CLI)
 
@@ -34,7 +35,11 @@ The following instructions use a command line utility ([anthos-platform-cli](cli
 1. Run the app creation command:
 
     ```shell
-    ./anthos-platform-cli add app --name $APP_NAME --gitlab-hostname $GITLAB_HOSTNAME --gitlab-token $GITLAB_ROOT_PASSWORD --template-name golang-template
+    ./anthos-platform-cli add app \
+      --name $APP_NAME \
+      --gitlab-hostname $GITLAB_HOSTNAME \
+      --gitlab-token $GITLAB_ROOT_PASSWORD \
+      --template-name golang-template
     ```
 
     * `--name` Application name (i.e. `go-app`)
@@ -469,7 +474,25 @@ If you want to add another cluster (like asia-east1 in the above screenshots), r
 
 1. Now your deploys will go to your new region too!
 
-## Deleting an application
+## Deleting an application (using CLI)
+
+The following steps are performed by an operator.
+
+1. Run the app removal command:
+
+    ```shell
+    ./anthos-platform-cli remove app \
+      --name $APP_NAME \
+      --gitlab-hostname $GITLAB_HOSTNAME \
+      --gitlab-token $GITLAB_ROOT_PASSWORD \
+    ```
+
+    * `--name` Application name (i.e. `go-app`)
+    * `--gitlab-hostname` Your configured GitLab hostname (i.e. gitlab.your.domain.com)
+    * `--gitlab-token` GitLab root user password with the parameter
+
+
+## Deleting an application (manually)
 
 The following steps are performed by an operator.
 
@@ -522,3 +545,35 @@ The following steps are performed by an operator.
       > NOTE: that deleting the Group also deletes any projects in the group.
     * Enter the Group name again when prompted and click **Confirm**.
       > NOTE: This is an irreversible process.  You cannot recover any removed Groups/Projects.  Proceed with caution!
+    
+1. When the app was created, an artifact repository storing app container images was created for the application.  This repository can be cleaned up as well.  The default location specified was `us-central1`.
+
+    ```shell
+        gcloud beta artifacts repositories delete $APP_NAME --location us-central1
+    ```
+
+1. Clean up created service accounts created
+    * Remove the `roles/iam.workloadIdentityUser` iam policy binding
+
+    ```shell
+    gcloud iam service-accounts remove-iam-policy-binding \
+      $APP_NAME-gsa@$PROJECT_ID.iam.gserviceaccount.com \
+      --member "serviceAccount:$PROJECT_ID.svc.id.goog[$APP_NAME/$APP_NAME-ksa]" \
+      --role roles/iam.workloadIdentityUser
+    ```
+
+    * Remove the app gsa service account
+
+    ```shell
+    gcloud iam service-accounts delete \
+      $APP_NAME-gsa@$PROJECT_ID.iam.gserviceaccount.com \
+      --quiet
+    ```
+
+    * Remove the app push service account
+
+    ```shell
+    gcloud iam service-accounts delete \
+      $APP_NAME-push@$PROJECT_ID.iam.gserviceaccount.com \
+      --quiet
+    ``` 
