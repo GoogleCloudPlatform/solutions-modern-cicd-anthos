@@ -1,3 +1,5 @@
+// Copyright 2020 Google LLC
+
 package resources
 
 // VersionNumber holds the build-number passed at build-time
