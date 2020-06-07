@@ -17,6 +17,7 @@ tags:
   - modern-cicd-anthos
 substitutions:
   _DOMAIN: ""
+  _BUILD_IMAGES: "true"
 options:
     substitution_option: 'ALLOW_LOOSE'
 steps:
@@ -29,13 +30,15 @@ steps:
   - |
     gsutil mb gs://${PROJECT_ID}-anthos-platform-tf-state || true
 
-# TODO: Push this into a separate build to reduce build-time by skipping
-- name: 'gcr.io/kaniko-project/executor:latest'
-  id: 'build-installer-image'
+# Create build-installation-image
+- name: "gcr.io/cloud-builders/gcloud"
+  id: "build-install-image"
+  entrypoint: bash
   args:
-  - --destination=gcr.io/${PROJECT_ID}/anthos-platform-installer
-  - --cache=true
-  - --cache-ttl=12h
+    - -c
+    - |
+      [[ "${_BUILD_IMAGES}" == "false" ]] && exit 0
+      gcloud builds submit --config=build-image/cloudbuild.yaml
 
 # - name: "gcr.io/cloud-builders/gcloud"
 #   id: cleanup-sub-jobs
@@ -55,18 +58,8 @@ steps:
     - -c
     - |
       gcloud builds submit
-  # waitFor:
-  #   - cleanup-sub-jobs
-
-- name: "gcr.io/cloud-builders/gcloud"
-  id: "cleanup-foundation"
-  dir: "0_foundation"
-  entrypoint: bash
-  args:
-    - -c
-    - |
-      gcloud builds submit --config=cloudbuild-destroy.yaml
-  waitFor: ["build-foundation"]
+  waitFor:
+    - build-install-image
 
 
 # Clusters

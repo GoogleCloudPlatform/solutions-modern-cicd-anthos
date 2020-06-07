@@ -13,102 +13,136 @@
 # limitations under the License.
 
 timeout: 3600s
+tags:
+  - modern-cicd-anthos
+substitutions:
+  _DOMAIN: ""
+  _BUILD_IMAGES: "true"
+options:
+    substitution_option: 'ALLOW_LOOSE'
 steps:
-- name: 'gcr.io/kaniko-project/executor:latest'
-  id: 'build-installer-image'
+# Create build-installation-image
+- name: "gcr.io/cloud-builders/gcloud"
+  id: "build-install-image"
+  entrypoint: bash
   args:
-  - --destination=gcr.io/${PROJECT_ID}/anthos-platform-installer
-  - --cache=false
-- name: 'gcr.io/${PROJECT_ID}/anthos-platform-installer'
-  id: 'destroy-all'
-  entrypoint: 'bash'
+    - -c
+    - |
+      [[ "${_BUILD_IMAGES}" == "false" ]] && exit 0
+      gcloud builds submit --config=build-image/cloudbuild.yaml
+
+## Destroy in reverse order
+
+# 4 Apps
+
+# 3 ACM
+
+# 2 CICD
+
+# 1 Clusters
+
+# 0 Foundation (last)
+- name: "gcr.io/cloud-builders/gcloud"
+  id: "cleanup-foundation"
+  dir: "0_foundation"
+  entrypoint: bash
   args:
-  - '-xe'
-  - '-c'
-  - |
-    for ar in $(gcloud beta artifacts repositories list --format json | jq '.AR[].name'); do
-      gcloud config set artifacts/location us-central1
-      gcloud beta artifacts repositories delete ${ar//\"} --quiet
-    done
+    - -c
+    - |
+      gcloud builds submit --config=cloudbuild-destroy.yaml
+  waitFor: ["build-foundation"]
 
-    for db in $(gcloud sql instances list --format json | jq -r '.[].name'); do
-      gcloud sql instances delete ${db} --async --quiet
-    done
 
-    if [ $(gcloud redis instances list --region us-central1 | wc -l) -ne 0 ]; then
-      gcloud redis instances delete gitlab --region us-central1 --async --quiet
-    fi
+# - name: 'gcr.io/${PROJECT_ID}/anthos-platform-installer'
+#   id: 'destroy-all'
+#   entrypoint: 'bash'
+#   args:
+#   - '-xe'
+#   - '-c'
+#   - |
+#     for ar in $(gcloud beta artifacts repositories list --format json | jq '.AR[].name'); do
+#       gcloud config set artifacts/location us-central1
+#       gcloud beta artifacts repositories delete ${ar//\"} --quiet
+#     done
 
-    for cluster in $(gcloud container clusters list --format json | jq -c '.[]|{name: .name,zone: .zone}'); do
-      cluster_name=$(jq -r '.name' <<< $cluster)
-      cluster_zone=$(jq -r '.zone' <<< $cluster)
-      gcloud container clusters delete ${cluster_name} --region ${cluster_zone} --async --quiet
-    done
+#     for db in $(gcloud sql instances list --format json | jq -r '.[].name'); do
+#       gcloud sql instances delete ${db} --async --quiet
+#     done
 
-    while [ $(gcloud sql instances list | wc -l) -ne 0 ]; do sleep 5s; done
-    while [ $(gcloud redis instances list --region us-central1 | wc -l) -ne 0 ]; do sleep 5s; done
-    while [ $(gcloud container clusters list | wc -l) -ne 0 ]; do sleep 5s; done
+#     if [ $(gcloud redis instances list --region us-central1 | wc -l) -ne 0 ]; then
+#       gcloud redis instances delete gitlab --region us-central1 --async --quiet
+#     fi
 
-    for sa in $(gcloud iam service-accounts list --format json | jq -r '.[].email'); do
-      [[ $sa = hipster* ]] && gcloud iam service-accounts delete ${sa} --quiet
-      [[ $sa = petabank* ]] && gcloud iam service-accounts delete ${sa} --quiet
-      [[ $sa = tf* ]] && gcloud iam service-accounts delete ${sa} --quiet
-      [[ $sa = gitlab* ]] && gcloud iam service-accounts delete ${sa} --quiet
-    done
+#     for cluster in $(gcloud container clusters list --format json | jq -c '.[]|{name: .name,zone: .zone}'); do
+#       cluster_name=$(jq -r '.name' <<< $cluster)
+#       cluster_zone=$(jq -r '.zone' <<< $cluster)
+#       gcloud container clusters delete ${cluster_name} --region ${cluster_zone} --async --quiet
+#     done
 
-    for peering in $(gcloud compute networks peerings list --format json | jq -r '.[].peerings[].name'); do
-      gcloud compute networks peerings delete ${peering} --network gitlab
-    done
+#     while [ $(gcloud sql instances list | wc -l) -ne 0 ]; do sleep 5s; done
+#     while [ $(gcloud redis instances list --region us-central1 | wc -l) -ne 0 ]; do sleep 5s; done
+#     while [ $(gcloud container clusters list | wc -l) -ne 0 ]; do sleep 5s; done
 
-    if [ $(gcloud compute addresses list | grep -c gitlab-sql) -ne 0 ]; then
-      gcloud compute addresses delete gitlab-sql --global --quiet
-    fi
-    if [ $(gcloud compute networks subnets list | grep -c gitlab) -ne 0 ]; then
-      gcloud compute networks subnets delete gitlab --region us-central1 --quiet
-    fi
+#     for sa in $(gcloud iam service-accounts list --format json | jq -r '.[].email'); do
+#       [[ $sa = hipster* ]] && gcloud iam service-accounts delete ${sa} --quiet
+#       [[ $sa = petabank* ]] && gcloud iam service-accounts delete ${sa} --quiet
+#       [[ $sa = tf* ]] && gcloud iam service-accounts delete ${sa} --quiet
+#       [[ $sa = gitlab* ]] && gcloud iam service-accounts delete ${sa} --quiet
+#     done
 
-    if [ $(gcloud compute networks subnets list | grep -c anthos-platform-central) -ne 0 ]; then
-      gcloud compute networks subnets delete anthos-platform-central --region us-central1 --quiet
-    fi
-    if [ $(gcloud compute networks subnets list | grep -c anthos-platform-east) -ne 0 ]; then
-      gcloud compute networks subnets delete anthos-platform-east --region us-east1 --quiet
-    fi
+#     for peering in $(gcloud compute networks peerings list --format json | jq -r '.[].peerings[].name'); do
+#       gcloud compute networks peerings delete ${peering} --network gitlab
+#     done
 
-    for fw in $(gcloud compute firewall-rules list --format json | jq -r '.[].name'); do
-      gcloud compute firewall-rules delete ${fw} --quiet
-    done
+#     if [ $(gcloud compute addresses list | grep -c gitlab-sql) -ne 0 ]; then
+#       gcloud compute addresses delete gitlab-sql --global --quiet
+#     fi
+#     if [ $(gcloud compute networks subnets list | grep -c gitlab) -ne 0 ]; then
+#       gcloud compute networks subnets delete gitlab --region us-central1 --quiet
+#     fi
 
-    if [ $(gcloud compute networks list | grep -c gitlab) -ne 0 ]; then
-      gcloud compute networks delete gitlab --quiet
-    fi
-    if [ $(gcloud compute networks list | grep -c anthos-platform) -ne 0 ]; then
-      gcloud compute networks delete anthos-platform --quiet
-    fi
+#     if [ $(gcloud compute networks subnets list | grep -c anthos-platform-central) -ne 0 ]; then
+#       gcloud compute networks subnets delete anthos-platform-central --region us-central1 --quiet
+#     fi
+#     if [ $(gcloud compute networks subnets list | grep -c anthos-platform-east) -ne 0 ]; then
+#       gcloud compute networks subnets delete anthos-platform-east --region us-east1 --quiet
+#     fi
 
-    if [ $(gcloud services list --filter="name~binaryauthorization.googleapis.com" --format="value(name)" | wc -w) -gt 0 ]; then
-      attestors=$(gcloud container binauthz attestors list --format="value('name')")
+#     for fw in $(gcloud compute firewall-rules list --format json | jq -r '.[].name'); do
+#       gcloud compute firewall-rules delete ${fw} --quiet
+#     done
 
-      if [ $(echo $attestors | wc -w) -gt 0 ]; then
-          # Remove Attestors
-          for attestor in $attestors; do
-              gcloud container binauthz attestors delete $attestor
-          done
+#     if [ $(gcloud compute networks list | grep -c gitlab) -ne 0 ]; then
+#       gcloud compute networks delete gitlab --quiet
+#     fi
+#     if [ $(gcloud compute networks list | grep -c anthos-platform) -ne 0 ]; then
+#       gcloud compute networks delete anthos-platform --quiet
+#     fi
 
-          # Remove notes (because gcloud does not remove them)
-          access=$(gcloud auth print-access-token)
-          notes=$(curl -H "Authorization: Bearer ${access}" "https://containeranalysis.googleapis.com/v1/projects/${PROJECT_ID}/notes/")
-          if [ "$notes" != "{}" ]; then
-              for NOTE_ID in $(echo $notes | jq -r '.notes[].name' ); do
-                  curl -vvv -X DELETE \
-                      -H "Authorization: Bearer ${access}" \
-                      "https://containeranalysis.googleapis.com/v1/projects/${PROJECT_ID}/notes/${NOTE_ID##*/}"
-              done
-          fi
-      fi
-    fi # check for binary authorization
+#     if [ $(gcloud services list --filter="name~binaryauthorization.googleapis.com" --format="value(name)" | wc -w) -gt 0 ]; then
+#       attestors=$(gcloud container binauthz attestors list --format="value('name')")
 
-    for bucket in $(gsutil ls); do
-      [[ $bucket = gs://${PROJECT_ID}* ]] && gsutil rm -rf ${bucket}
-    done
-    gsutil rm -rf gs://artifacts.${PROJECT_ID}.appspot.com/ || true
+#       if [ $(echo $attestors | wc -w) -gt 0 ]; then
+#           # Remove Attestors
+#           for attestor in $attestors; do
+#               gcloud container binauthz attestors delete $attestor
+#           done
+
+#           # Remove notes (because gcloud does not remove them)
+#           access=$(gcloud auth print-access-token)
+#           notes=$(curl -H "Authorization: Bearer ${access}" "https://containeranalysis.googleapis.com/v1/projects/${PROJECT_ID}/notes/")
+#           if [ "$notes" != "{}" ]; then
+#               for NOTE_ID in $(echo $notes | jq -r '.notes[].name' ); do
+#                   curl -vvv -X DELETE \
+#                       -H "Authorization: Bearer ${access}" \
+#                       "https://containeranalysis.googleapis.com/v1/projects/${PROJECT_ID}/notes/${NOTE_ID##*/}"
+#               done
+#           fi
+#       fi
+#     fi # check for binary authorization
+
+#     for bucket in $(gsutil ls); do
+#       [[ $bucket = gs://${PROJECT_ID}* ]] && gsutil rm -rf ${bucket}
+#     done
+#     gsutil rm -rf gs://artifacts.${PROJECT_ID}.appspot.com/ || true
 
