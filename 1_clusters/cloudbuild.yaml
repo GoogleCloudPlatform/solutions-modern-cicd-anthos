@@ -15,10 +15,10 @@
 timeout: 3600s # 1-hr
 tags:
   - modern-cicd-anthos
-  - modern-cicd-foundation
+  - modern-cicd-clusters
 steps:
 - name: 'gcr.io/${PROJECT_ID}/anthos-platform-installer'
-  id: 'create-foundation'
+  id: 'create-clusters'
   entrypoint: 'bash'
   args:
   - '-xe'

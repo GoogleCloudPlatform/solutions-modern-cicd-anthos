@@ -12,13 +12,13 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-timeout: 3600s # 1-hr
+timeout: 3600s # 1-hour
 tags:
   - modern-cicd-anthos
-  - modern-cicd-foundation
+  - modern-cicd-clusters
 steps:
 - name: 'gcr.io/${PROJECT_ID}/anthos-platform-installer'
-  id: 'create-foundation'
+  id: 'destroy-clusters'
   entrypoint: 'bash'
   args:
   - '-xe'
@@ -28,4 +28,4 @@ steps:
     sed -i "s/YOUR_PROJECT_ID/${PROJECT_ID}/g" backend.tf
 
     terraform init
-    terraform apply -auto-approve
+    terraform destroy -auto-approve

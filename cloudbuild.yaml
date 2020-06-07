@@ -51,7 +51,7 @@ steps:
 
 # Foundation
 - name: "gcr.io/cloud-builders/gcloud"
-  id: "build-foundation"
+  id: "trigger-foundation"
   dir: "0_foundation"
   entrypoint: bash
   args:
@@ -61,9 +61,17 @@ steps:
   waitFor:
     - build-install-image
 
-
 # Clusters
-
+- name: "gcr.io/cloud-builders/gcloud"
+  id: "trigger-clusters"
+  dir: "1_clusters"
+  entrypoint: bash
+  args:
+    - -c
+    - |
+      gcloud builds submit
+  waitFor:
+    - trigger-foundation
 
 # CICD
 
@@ -75,40 +83,7 @@ steps:
       # [[ "${INSTALL_APPS}" == "false" ]] && exit 0
 
 
-# - name: 'gcr.io/${PROJECT_ID}/anthos-platform-installer'
-#   id: 'create-foundation'
-#   entrypoint: 'bash'
-#   args:
-#   - '-xe'
-#   - '-c'
-#   - |
-#     sed -i "s/YOUR_PROJECT_ID/${PROJECT_ID}/g" 0_foundation/terraform.tfvars
-#     sed -i "s/YOUR_PROJECT_ID/${PROJECT_ID}/g" 0_foundation/backend.tf
 
-#     cd 0_foundation
-
-#     terraform init
-#     terraform apply -auto-approve
-# - name: 'gcr.io/${PROJECT_ID}/anthos-platform-installer'
-#   id: 'create-clusters'
-#   entrypoint: 'bash'
-#   args:
-#   - '-xe'
-#   - '-c'
-#   - |
-#     sed -i "s/YOUR_PROJECT_ID/${PROJECT_ID}/g" 1_clusters/terraform.tfvars
-
-#     cd 1_clusters
-#     cat > backend.tf <<EOF
-#     terraform {
-#       backend "gcs" {
-#         bucket  = "${PROJECT_ID}-anthos-platform-tf-state"
-#         prefix  = "clusters"
-#       }
-#     }
-#     EOF
-#     terraform init
-#     terraform apply -auto-approve
 # - name: 'gcr.io/${PROJECT_ID}/anthos-platform-installer'
 #   id: 'setup-gitlab'
 #   entrypoint: 'bash'

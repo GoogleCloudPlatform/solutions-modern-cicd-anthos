@@ -40,17 +40,26 @@ steps:
 # 2 CICD
 
 # 1 Clusters
+- name: "gcr.io/cloud-builders/gcloud"
+  id: "trigger-destroy-clusters"
+  dir: "1_clusters"
+  entrypoint: bash
+  args:
+    - -c
+    - |
+      gcloud builds submit --config=cloudbuild-destroy.yaml
+  waitFor: ["build-install-image"]
 
 # 0 Foundation (last)
 - name: "gcr.io/cloud-builders/gcloud"
-  id: "cleanup-foundation"
+  id: "trigger-destroy-foundation"
   dir: "0_foundation"
   entrypoint: bash
   args:
     - -c
     - |
       gcloud builds submit --config=cloudbuild-destroy.yaml
-  waitFor: ["build-foundation"]
+  waitFor: ["trigger-destroy-clusters"]
 
 
 # - name: 'gcr.io/${PROJECT_ID}/anthos-platform-installer'
