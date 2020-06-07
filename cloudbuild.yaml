@@ -12,7 +12,13 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-timeout: 3600s
+timeout: 3600s # 1hr
+tags:
+  - modern-cicd-anthos
+substitutions:
+  _DOMAIN: ""
+options:
+    substitution_option: 'ALLOW_LOOSE'
 steps:
 - name: 'gcr.io/cloud-builders/gsutil'
   id: 'create-tf-state-bucket'
@@ -22,148 +28,190 @@ steps:
   - '-c'
   - |
     gsutil mb gs://${PROJECT_ID}-anthos-platform-tf-state || true
+
+# TODO: Push this into a separate build to reduce build-time by skipping
 - name: 'gcr.io/kaniko-project/executor:latest'
   id: 'build-installer-image'
   args:
   - --destination=gcr.io/${PROJECT_ID}/anthos-platform-installer
   - --cache=true
   - --cache-ttl=12h
-- name: 'gcr.io/${PROJECT_ID}/anthos-platform-installer'
-  id: 'create-foundation'
-  entrypoint: 'bash'
+
+# - name: "gcr.io/cloud-builders/gcloud"
+#   id: cleanup-sub-jobs
+#   entrypoint: bash
+#   args:
+#     - -c
+#     - |
+#       gcloud builds list --ongoing --filter='tags[]~modern-cicd-anthos' --format='value(id)' | \
+#         xargs --no-run-if-empty gcloud builds cancel
+
+# Foundation
+- name: "gcr.io/cloud-builders/gcloud"
+  id: "build-foundation"
+  dir: "0_foundation"
+  entrypoint: bash
   args:
-  - '-xe'
-  - '-c'
-  - |
-    sed -i "s/YOUR_PROJECT_ID/${PROJECT_ID}/g" 0_foundation/terraform.tfvars
+    - -c
+    - |
+      gcloud builds submit
+  # waitFor:
+  #   - cleanup-sub-jobs
 
-    cd 0_foundation
-    cat > backend.tf <<EOF
-    terraform {
-      backend "gcs" {
-        bucket  = "${PROJECT_ID}-anthos-platform-tf-state"
-        prefix  = "foundation"
-      }
-    }
-    EOF
-    terraform init
-    terraform apply -auto-approve
-- name: 'gcr.io/${PROJECT_ID}/anthos-platform-installer'
-  id: 'create-clusters'
-  entrypoint: 'bash'
+- name: "gcr.io/cloud-builders/gcloud"
+  id: "cleanup-foundation"
+  dir: "0_foundation"
+  entrypoint: bash
   args:
-  - '-xe'
-  - '-c'
-  - |
-    sed -i "s/YOUR_PROJECT_ID/${PROJECT_ID}/g" 1_clusters/terraform.tfvars
+    - -c
+    - |
+      gcloud builds submit --config=cloudbuild-destroy.yaml
+  waitFor: ["build-foundation"]
 
-    cd 1_clusters
-    cat > backend.tf <<EOF
-    terraform {
-      backend "gcs" {
-        bucket  = "${PROJECT_ID}-anthos-platform-tf-state"
-        prefix  = "clusters"
-      }
-    }
-    EOF
-    terraform init
-    terraform apply -auto-approve
-- name: 'gcr.io/${PROJECT_ID}/anthos-platform-installer'
-  id: 'setup-gitlab'
-  entrypoint: 'bash'
-  args:
-  - '-xe'
-  - '-c'
-  - |
-    sed -i "s/YOUR_PROJECT_ID/${PROJECT_ID}/g" 2_gitlab/terraform.tfvars
-    sed -i "s/YOUR_PROJECT_ID/${PROJECT_ID}/g" 2_gitlab/backend.tf
-    sed -i "s/YOUR_PROJECT_ID/${PROJECT_ID}/g" 2_gitlab/gitlab-repos/backend.tf
 
-    cd 2_gitlab/
-    # Gitlab URL will be gitlab.$_DOMAIN
-    sed -i "s/YOUR_DOMAIN/${_DOMAIN}/g" terraform.tfvars
-    terraform init
-    terraform plan -out=terraform.tfplan
-    terraform apply -auto-approve terraform.tfplan
+# Clusters
 
-    export GITLAB_ADDRESS=$(terraform output gitlab_address)
 
-    # Wait for GitLab domain to resolve
-    until nslookup gitlab.${_DOMAIN}; do
-      echo -e "\e[33mWaiting for gitlab.${_DOMAIN} to resolve."
-      echo -e "\e[31mAdd an A Record that points *.${_DOMAIN} to $${GITLAB_ADDRESS}"
-      sleep 10
-    done
+# CICD
 
-    # Configure GitLab
-    gcloud container clusters get-credentials gitlab --region us-central1
-    export GITLAB_PASSWORD=$(kubectl get secrets gitlab-gitlab-initial-root-password -o jsonpath="{.data.password}" | base64 -d)
-    
-    # Create a personal access token with the value of the root password
-    export UNICORN_POD=$(kubectl get pods -l=app=unicorn -o jsonpath='{.items[0].metadata.name}')
-    export GITLAB_TOKEN=$${GITLAB_PASSWORD}
-    kubectl exec -it $$UNICORN_POD -c unicorn -- /bin/bash -c "
-    cd /srv/gitlab;
-    bin/rails r \"
-    token_digest = Gitlab::CryptoHelper.sha256 \\\"$${GITLAB_PASSWORD}\\\";
-    token=PersonalAccessToken.create!(name: \\\"Anthos Platform Installer\\\", scopes: [:api], user: User.where(id: 1).first, token_digest: token_digest);
-    token.save!
-    \";
-    " > /dev/null 2>&1 || true
 
-    # Add the GitLab instance's SSH host key
-    mkdir -p ~/.ssh
-    ssh-keyscan -t rsa gitlab.${_DOMAIN} >> ~/.ssh/known_hosts
+# ACM
 
-    export GITLAB_HOSTNAME=gitlab.${_DOMAIN}
-    git config --global user.email "anthos-platform-installer@example.com"
-    git config --global user.name "Anthos Platform Installer"
 
-    # Run create_repos.sh
-    export TERRAFORM_AUTO_APPROVE=true
-    ./create-repos.sh
-    cd ..
+# Apps
+      # [[ "${INSTALL_APPS}" == "false" ]] && exit 0
 
-    # Configure ACM CI
 
-    # Get an Oauth Token to authenticate with GitLab API
-    cat > auth.txt <<EOF
-    grant_type=password&username=root&password=$${GITLAB_PASSWORD}
-    EOF
-    export GITLAB_OAUTH_TOKEN=$(curl -k --data "@auth.txt" --request POST https://gitlab.${_DOMAIN}/oauth/token | jq -r .access_token)
+# - name: 'gcr.io/${PROJECT_ID}/anthos-platform-installer'
+#   id: 'create-foundation'
+#   entrypoint: 'bash'
+#   args:
+#   - '-xe'
+#   - '-c'
+#   - |
+#     sed -i "s/YOUR_PROJECT_ID/${PROJECT_ID}/g" 0_foundation/terraform.tfvars
+#     sed -i "s/YOUR_PROJECT_ID/${PROJECT_ID}/g" 0_foundation/backend.tf
 
-    # Get ACM repo project ID
-    export ACM_PROJECT_ID=$(curl -k -s "https://gitlab.${_DOMAIN}/api/v4/projects?search=anthos-config-management&access_token=$${GITLAB_OAUTH_TOKEN}" | jq -r .[0].id)
+#     cd 0_foundation
 
-    # Get runner registration token from GitLab
-    export ACM_RUNNER_TOKEN=$(curl -k -s "https://gitlab.${_DOMAIN}/api/v4/projects/$${ACM_PROJECT_ID}?access_token=$${GITLAB_OAUTH_TOKEN}" | jq -r .runners_token)
+#     terraform init
+#     terraform apply -auto-approve
+# - name: 'gcr.io/${PROJECT_ID}/anthos-platform-installer'
+#   id: 'create-clusters'
+#   entrypoint: 'bash'
+#   args:
+#   - '-xe'
+#   - '-c'
+#   - |
+#     sed -i "s/YOUR_PROJECT_ID/${PROJECT_ID}/g" 1_clusters/terraform.tfvars
 
-    # Install ACM
-    cd 3_acm
-    ./install_acm.sh
-    cd ..
+#     cd 1_clusters
+#     cat > backend.tf <<EOF
+#     terraform {
+#       backend "gcs" {
+#         bucket  = "${PROJECT_ID}-anthos-platform-tf-state"
+#         prefix  = "clusters"
+#       }
+#     }
+#     EOF
+#     terraform init
+#     terraform apply -auto-approve
+# - name: 'gcr.io/${PROJECT_ID}/anthos-platform-installer'
+#   id: 'setup-gitlab'
+#   entrypoint: 'bash'
+#   args:
+#   - '-xe'
+#   - '-c'
+#   - |
+#     sed -i "s/YOUR_PROJECT_ID/${PROJECT_ID}/g" 2_gitlab/terraform.tfvars
+#     sed -i "s/YOUR_PROJECT_ID/${PROJECT_ID}/g" 2_gitlab/backend.tf
+#     sed -i "s/YOUR_PROJECT_ID/${PROJECT_ID}/g" 2_gitlab/gitlab-repos/backend.tf
 
-    # Install demo apps Hipster Shop app (by microservice), and Petabank app
-    cd 4_demo
-    ./provision-applications.sh
+#     cd 2_gitlab/
+#     # Gitlab URL will be gitlab.$_DOMAIN
+#     sed -i "s/YOUR_DOMAIN/${_DOMAIN}/g" terraform.tfvars
+#     terraform init
+#     terraform plan -out=terraform.tfplan
+#     terraform apply -auto-approve terraform.tfplan
 
-    # Add IAM policies to GSA service accounts
-    export PROJECT_ID=${PROJECT_ID}
-    ./add-gsa-iam-policies.sh
+#     export GITLAB_ADDRESS=$(terraform output gitlab_address)
 
-    # Copy source code to repositories and trigger pipelines
-    ./build-applications.sh
+#     # Wait for GitLab domain to resolve
+#     until nslookup gitlab.${_DOMAIN}; do
+#       echo -e "\e[33mWaiting for gitlab.${_DOMAIN} to resolve."
+#       echo -e "\e[31mAdd an A Record that points *.${_DOMAIN} to $${GITLAB_ADDRESS}"
+#       sleep 10
+#     done
 
-    # Modify default Network Policies
-    ./modify-network-policies.sh
+#     # Configure GitLab
+#     gcloud container clusters get-credentials gitlab --region us-central1
+#     export GITLAB_PASSWORD=$(kubectl get secrets gitlab-gitlab-initial-root-password -o jsonpath="{.data.password}" | base64 -d)
 
-    # Delete apps created from initial pipeline run
-    ./delete-templates.sh
-    cd ..
+#     # Create a personal access token with the value of the root password
+#     export UNICORN_POD=$(kubectl get pods -l=app=unicorn -o jsonpath='{.items[0].metadata.name}')
+#     export GITLAB_TOKEN=$${GITLAB_PASSWORD}
+#     kubectl exec -it $$UNICORN_POD -c unicorn -- /bin/bash -c "
+#     cd /srv/gitlab;
+#     bin/rails r \"
+#     token_digest = Gitlab::CryptoHelper.sha256 \\\"$${GITLAB_PASSWORD}\\\";
+#     token=PersonalAccessToken.create!(name: \\\"Anthos Platform Installer\\\", scopes: [:api], user: User.where(id: 1).first, token_digest: token_digest);
+#     token.save!
+#     \";
+#     " > /dev/null 2>&1 || true
 
-    # Output final notes
-    echo -e "\e[32mLog in to your GitLab instance at: https://gitlab.${_DOMAIN}"
-    echo -e "\e[32mUsername: root"
-    echo -e "\e[32mPassword: $${GITLAB_PASSWORD}"
-    echo
-    echo -e "\e[32mVisit the user guide in the docs (docs/index.md) to go through a user journey (add, deploy, and change applications)."
+#     # Add the GitLab instance's SSH host key
+#     mkdir -p ~/.ssh
+#     ssh-keyscan -t rsa gitlab.${_DOMAIN} >> ~/.ssh/known_hosts
+
+#     export GITLAB_HOSTNAME=gitlab.${_DOMAIN}
+#     git config --global user.email "anthos-platform-installer@example.com"
+#     git config --global user.name "Anthos Platform Installer"
+
+#     # Run create_repos.sh
+#     export TERRAFORM_AUTO_APPROVE=true
+#     ./create-repos.sh
+#     cd ..
+
+#     # Configure ACM CI
+
+#     # Get an Oauth Token to authenticate with GitLab API
+#     cat > auth.txt <<EOF
+#     grant_type=password&username=root&password=$${GITLAB_PASSWORD}
+#     EOF
+#     export GITLAB_OAUTH_TOKEN=$(curl -k --data "@auth.txt" --request POST https://gitlab.${_DOMAIN}/oauth/token | jq -r .access_token)
+
+#     # Get ACM repo project ID
+#     export ACM_PROJECT_ID=$(curl -k -s "https://gitlab.${_DOMAIN}/api/v4/projects?search=anthos-config-management&access_token=$${GITLAB_OAUTH_TOKEN}" | jq -r .[0].id)
+
+#     # Get runner registration token from GitLab
+#     export ACM_RUNNER_TOKEN=$(curl -k -s "https://gitlab.${_DOMAIN}/api/v4/projects/$${ACM_PROJECT_ID}?access_token=$${GITLAB_OAUTH_TOKEN}" | jq -r .runners_token)
+
+#     # Install ACM
+#     cd 3_acm
+#     ./install_acm.sh
+#     cd ..
+
+#     # Install demo apps Hipster Shop app (by microservice), and Petabank app
+#     cd 4_demo
+#     ./provision-applications.sh
+
+#     # Add IAM policies to GSA service accounts
+#     export PROJECT_ID=${PROJECT_ID}
+#     ./add-gsa-iam-policies.sh
+
+#     # Copy source code to repositories and trigger pipelines
+#     ./build-applications.sh
+
+#     # Modify default Network Policies
+#     ./modify-network-policies.sh
+
+#     # Delete apps created from initial pipeline run
+#     ./delete-templates.sh
+#     cd ..
+
+#     # Output final notes
+#     echo -e "\e[32mLog in to your GitLab instance at: https://gitlab.${_DOMAIN}"
+#     echo -e "\e[32mUsername: root"
+#     echo -e "\e[32mPassword: $${GITLAB_PASSWORD}"
+#     echo
+#     echo -e "\e[32mVisit the user guide in the docs (docs/index.md) to go through a user journey (add, deploy, and change applications)."
