@@ -11,7 +11,7 @@ The following Critical User Journeys (CUJs) are covered:
   * [Setting up your change for production](#setting-up-your-change-for-production)
 * [Promoting changes from Staging to Production](#promoting-changes-from-staging-to-production)
 * [Adding a cluster to the platform](#adding-a-cluster-to-the-platform)
-* [Deleting an application (using CLI)](#deleting-an-application-using-cli)
+* WIP [Deleting an application (using CLI)](#deleting-an-application-using-cli)
 * [Deleting an application (manually)](#deleting-an-application-manually)
 
 ## Adding a new application (using CLI)
@@ -59,7 +59,7 @@ The following steps are performed by a **developer**, and can be performed local
 1. Clone your app repository (example uses the `$APP_NAME` go-app)
 
     ```shell
-    git clone git@$GITLAB_HOSTNAME:$APP_NAME/$APP_NAME.git
+    git clone https://@$GITLAB_HOSTNAME/$APP_NAME/$APP_NAME.git
     cd $APP_NAME
     ```
 
@@ -188,8 +188,8 @@ If you want to add another cluster (like asia-east1 in the above screenshots), r
     ```
 
     ```shell
-    # set to the domain used during install
-    export DOMAIN="ap-123412.cloud-tutorial.dev"
+    # set the gitlab hostname used during install
+    export GITLAB_HOSTNAME="gitlab.ap-123412.cloud-tutorial.dev"
     export NEW_REGION="asia-east1"
     export SHORT_CLUSTERNAME="prod-$NEW_REGION"
     gcloud beta container clusters create $SHORT_CLUSTERNAME \
@@ -209,16 +209,16 @@ If you want to add another cluster (like asia-east1 in the above screenshots), r
 1. Clone your ACM repo, as hosted in your GitLab instance. You will use this repo in later steps.
 
     ```shell
-    git clone git@gitlab.$DOMAIN:platform-admins/anthos-config-management.git
+    git clone https://$GITLAB_HOSTNAME/platform-admins/anthos-config-management.git
     ```
 
 1. Clone the `shared-ci-cd` and any `${APP}` and `${APP}-env` repos on your local machine, for any apps you want deployed in this new cluster.
 
     ```shell
     export APP_NAME=go-app
-    git clone git@gitlab.$DOMAIN:platform-admins/shared-ci-cd.git
-    git clone git@gitlab.$DOMAIN:$APP_NAME/$APP_NAME.git
-    git clone git@gitlab.$DOMAIN:$APP_NAME/$APP_NAME-env.git
+    git clone https://$GITLAB_HOSTNAME/platform-admins/shared-ci-cd.git
+    git clone https://$GITLAB_HOSTNAME/$APP_NAME/$APP_NAME.git
+    git clone https://$GITLAB_HOSTNAME/$APP_NAME/$APP_NAME-env.git
     ```
 
 1. Setup ACM on the new cluster by applying the config management operator manifest into your newly created cluster:
@@ -280,7 +280,7 @@ If you want to add another cluster (like asia-east1 in the above screenshots), r
      # clusterName is required and must be unique among all managed clusters
      clusterName: $SHORT_CLUSTERNAME
      git:
-       syncRepo: git@gitlab.$DOMAIN:platform-admins/anthos-config-management.git
+       syncRepo: git@$GITLAB_HOSTNAME:platform-admins/anthos-config-management.git
        syncBranch: master
        secretType: ssh
      policyController:
@@ -354,7 +354,7 @@ If you want to add another cluster (like asia-east1 in the above screenshots), r
       annotations:
         configmanagement.gke.io/cluster-selector: $SHORT_CLUSTERNAME
     data:
-      CI_SERVER_URL: https://gitlab.$DOMAIN
+      CI_SERVER_URL: https://$GITLAB_HOSTNAME/
       KUBERNETES_IMAGE: ubuntu:16.04
       KUBERNETES_NAMESPACE: acm-tests
       REGISTER_LOCKED: "true"
@@ -389,7 +389,7 @@ If you want to add another cluster (like asia-east1 in the above screenshots), r
       annotations:
         configmanagement.gke.io/cluster-selector: $SHORT_CLUSTERNAME
     data:
-      CI_SERVER_URL: "https://gitlab.$DOMAIN/"
+      CI_SERVER_URL: "https://$GITLAB_HOSTNAME/"
       CLONE_URL: ""
       RUNNER_REQUEST_CONCURRENCY: "1"
       RUNNER_EXECUTOR: "kubernetes"
@@ -499,7 +499,7 @@ The following steps are performed by an operator.
 1. Clone the `anthos-config-management` repo.
 
     ```shell
-    git clone git@$GITLAB_HOSTNAME:platform-admins/anthos-config-management.git
+    git clone https://$GITLAB_HOSTNAME/platform-admins/anthos-config-management.git
     ```
 
 1. Create a new branch in the local repo for deleting the app.
