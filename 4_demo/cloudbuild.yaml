@@ -19,13 +19,36 @@ tags:
 substitutions:
   _DOMAIN: ""
   _BUILD_IMAGES: "true"
+  _APPS: "hipster-loadgenerator hipster-shop hipster-frontend petabank"
 options:
   substitution_option: 'ALLOW_LOOSE'
 steps:
-- name: "gcr.io/cloud-builders/gcloud"
+- name: 'gcr.io/${PROJECT_ID}/anthos-platform-installer'
   id: "install-and-configure-demo-apps"
   entrypoint: bash
   args:
     - -c
     - |
-      # Install Demo Apps
+      # TODO: Convert to gzip
+      # Pull in starter-repos
+      gsutil cp -r gs://${PROJECT_ID}-starter-repos/starter-repos .
+
+      export GITLAB_PASSWORD=$(gcloud secrets versions access latest --secret="gitlab-password")
+      export GITLAB_HOSTNAME="gitlab.${_DOMAIN}"
+      export GITLAB_TOKEN="$${GITLAB_PASSWORD}"
+      export SERVICES="${_APPS}"
+
+      ./provision-applications.sh
+
+      # Add IAM policies to GSA service accounts
+      export PROJECT_ID=${PROJECT_ID}
+      ./add-gsa-iam-policies.sh
+
+      # Copy source code to repositories and trigger pipelines
+      ./build-applications.sh
+
+      # Modify default Network Policies
+      ./modify-network-policies.sh
+
+      # Delete apps created from initial pipeline run
+      ./delete-templates.sh

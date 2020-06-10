@@ -29,3 +29,32 @@ steps:
 
     terraform init
     terraform destroy -auto-approve
+
+- name: 'gcr.io/${PROJECT_ID}/anthos-platform-installer'
+  id: 'remove-attestors-attestations'
+  entrypoint: 'bash'
+  args:
+  - '-xe'
+  - '-c'
+  - |
+    if [ $(gcloud services list --filter="name~binaryauthorization.googleapis.com" --format="value(name)" | wc -w) -gt 0 ]; then
+      attestors=$(gcloud container binauthz attestors list --format="value('name')")
+
+      if [ $(echo $attestors | wc -w) -gt 0 ]; then
+          # Remove Attestors
+          for attestor in $attestors; do
+              gcloud container binauthz attestors delete $attestor
+          done
+
+          # Remove notes (because gcloud does not remove them)
+          access=$(gcloud auth print-access-token)
+          notes=$(curl -H "Authorization: Bearer ${access}" "https://containeranalysis.googleapis.com/v1/projects/${PROJECT_ID}/notes/")
+          if [ "$notes" != "{}" ]; then
+              for NOTE_ID in $(echo $notes | jq -r '.notes[].name' ); do
+                  curl -vvv -X DELETE \
+                      -H "Authorization: Bearer ${access}" \
+                      "https://containeranalysis.googleapis.com/v1/projects/${PROJECT_ID}/notes/${NOTE_ID##*/}"
+              done
+          fi
+      fi
+    fi # check for binary authorization

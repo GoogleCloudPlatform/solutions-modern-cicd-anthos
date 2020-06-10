@@ -118,26 +118,6 @@ steps:
     - |
       [[ "${INSTALL_APPS}" == "false" ]] && exit 0
       gcloud builds submit --substitutions=_DOMAIN=${_DOMAIN}
-
-################## MOVE TO BUILDER FILE
-#     # Install demo apps Hipster Shop app (by microservice), and Petabank app
-#     cd 4_demo
-#     ./provision-applications.sh
-
-#     # Add IAM policies to GSA service accounts
-#     export PROJECT_ID=${PROJECT_ID}
-#     ./add-gsa-iam-policies.sh
-
-#     # Copy source code to repositories and trigger pipelines
-#     ./build-applications.sh
-
-#     # Modify default Network Policies
-#     ./modify-network-policies.sh
-
-#     # Delete apps created from initial pipeline run
-#     ./delete-templates.sh
-#     cd ..
-
   waitFor:
     - trigger-acm-install
 
@@ -157,3 +137,5 @@ steps:
       echo "Retrieve password: $(gcloud secrets versions access latest --secret=\"gitlab-password\")"
       echo "true"
       echo "Visit the user guide in the docs (docs/index.md) to go through a user journey (add, deploy, and change applications)."
+  waitFor:
+    - trigger-app-install
