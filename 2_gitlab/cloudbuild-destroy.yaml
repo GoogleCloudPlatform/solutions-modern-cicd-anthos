@@ -47,6 +47,10 @@ steps:
     export GITLAB_HOSTNAME=$(terraform output gitlab_hostname)
 
     terraform destroy -auto-approve -var gitlab_token=$${GITLAB_TOKEN} -var gitlab_hostname=$${GITLAB_HOSTNAME}
+
+    gcloud secrets delete gitlab-user --quiet || true
+    gcloud secrets delete gitlab-password --quiet || true
+
     cd ..
 
 # Cluster destroy
