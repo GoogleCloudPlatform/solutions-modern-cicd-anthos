@@ -30,6 +30,7 @@ steps:
     - |
       [[ "${_BUILD_IMAGES}" == "false" ]] && exit 0
       gcloud builds submit --config=build-image/cloudbuild.yaml
+  waitFor: ["-"]
 
 ## Destroy in reverse order
 
@@ -38,6 +39,15 @@ steps:
 # 3 ACM
 
 # 2 CICD
+- name: "gcr.io/cloud-builders/gcloud"
+  id: "trigger-destroy-gitlab"
+  dir: "2_gitlab"
+  entrypoint: bash
+  args:
+    - -c
+    - |
+      gcloud builds submit --config=cloudbuild-destroy.yaml --substitutions="_DOMAIN=${DOMAIN}"
+  waitFor: ["trigger-destroy-clusters"]
 
 # 1 Clusters
 - name: "gcr.io/cloud-builders/gcloud"
