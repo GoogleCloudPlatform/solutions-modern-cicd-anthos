@@ -97,31 +97,29 @@ steps:
 
 # ACM
 
+- name: "gcr.io/cloud-builders/gcloud"
+  id: "trigger-acm-install"
+  dir: "3_acm"
+  entrypoint: bash
+  args:
+    - -c
+    - |
+      gcloud builds submit --substitutions=_DOMAIN=${_DOMAIN}
+  waitFor:
+    - trigger-gitlab
 
 # Apps
-      # [[ "${INSTALL_APPS}" == "false" ]] && exit 0
+- name: "gcr.io/cloud-builders/gcloud"
+  id: "trigger-app-install"
+  dir: "4_demo"
+  entrypoint: bash
+  args:
+    - -c
+    - |
+      [[ "${INSTALL_APPS}" == "false" ]] && exit 0
+      gcloud builds submit --substitutions=_DOMAIN=${_DOMAIN}
 
-
-
-#     # Configure ACM CI
-
-#     # Get an Oauth Token to authenticate with GitLab API
-#     cat > auth.txt <<EOF
-#     grant_type=password&username=root&password=$${GITLAB_PASSWORD}
-#     EOF
-#     export GITLAB_OAUTH_TOKEN=$(curl -k --data "@auth.txt" --request POST https://gitlab.${_DOMAIN}/oauth/token | jq -r .access_token)
-
-#     # Get ACM repo project ID
-#     export ACM_PROJECT_ID=$(curl -k -s "https://gitlab.${_DOMAIN}/api/v4/projects?search=anthos-config-management&access_token=$${GITLAB_OAUTH_TOKEN}" | jq -r .[0].id)
-
-#     # Get runner registration token from GitLab
-#     export ACM_RUNNER_TOKEN=$(curl -k -s "https://gitlab.${_DOMAIN}/api/v4/projects/$${ACM_PROJECT_ID}?access_token=$${GITLAB_OAUTH_TOKEN}" | jq -r .runners_token)
-
-#     # Install ACM
-#     cd 3_acm
-#     ./install_acm.sh
-#     cd ..
-
+################## MOVE TO BUILDER FILE
 #     # Install demo apps Hipster Shop app (by microservice), and Petabank app
 #     cd 4_demo
 #     ./provision-applications.sh
@@ -140,9 +138,22 @@ steps:
 #     ./delete-templates.sh
 #     cd ..
 
-#     # Output final notes
-#     echo -e "\e[32mLog in to your GitLab instance at: https://gitlab.${_DOMAIN}"
-#     echo -e "\e[32mUsername: root"
-#     echo -e "\e[32mPassword: $${GITLAB_PASSWORD}"
-#     echo
-#     echo -e "\e[32mVisit the user guide in the docs (docs/index.md) to go through a user journey (add, deploy, and change applications)."
+  waitFor:
+    - trigger-acm-install
+
+- name: 'gcr.io/${PROJECT_ID}/anthos-platform-installer'
+  id: "output-connect-details"
+  entrypoint: bash
+  args:
+    - -c
+    - |
+      export GITLAB_PASSWORD=$(gcloud secrets versions access latest --secret="gitlab-password")
+      export GITLAB_HOSTNAME="gitlab.${_DOMAIN}"
+
+      echo "Log in to your GitLab instance at: https://$${GITLAB_HOSTNAME}"
+      echo "Username: root"
+      echo "Password: $${GITLAB_PASSWORD}"
+      echo ""
+      echo "Retrieve password: $(gcloud secrets versions access latest --secret=\"gitlab-password\")"
+      echo "true"
+      echo "Visit the user guide in the docs (docs/index.md) to go through a user journey (add, deploy, and change applications)."

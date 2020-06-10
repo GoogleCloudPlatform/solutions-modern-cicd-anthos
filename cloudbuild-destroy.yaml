@@ -35,8 +35,26 @@ steps:
 ## Destroy in reverse order
 
 # 4 Apps
+- name: "gcr.io/cloud-builders/gcloud"
+  id: "trigger-destroy-demo-apps"
+  dir: "4_demo"
+  entrypoint: bash
+  args:
+    - -c
+    - |
+      gcloud builds submit --config=cloudbuild-destroy.yaml --substitutions="_DOMAIN=${DOMAIN}"
+  waitFor: ["-"]
 
 # 3 ACM
+- name: "gcr.io/cloud-builders/gcloud"
+  id: "trigger-destroy-acm"
+  dir: "3_acm"
+  entrypoint: bash
+  args:
+    - -c
+    - |
+      gcloud builds submit --config=cloudbuild-destroy.yaml --substitutions="_DOMAIN=${DOMAIN}"
+  waitFor: ["trigger-destroy-apps"]
 
 # 2 CICD
 - name: "gcr.io/cloud-builders/gcloud"
@@ -47,7 +65,7 @@ steps:
     - -c
     - |
       gcloud builds submit --config=cloudbuild-destroy.yaml --substitutions="_DOMAIN=${DOMAIN}"
-  waitFor: ["trigger-destroy-clusters"]
+  waitFor: ["trigger-destroy-acm"]
 
 # 1 Clusters
 - name: "gcr.io/cloud-builders/gcloud"
@@ -58,7 +76,7 @@ steps:
     - -c
     - |
       gcloud builds submit --config=cloudbuild-destroy.yaml
-  waitFor: ["build-install-image"]
+  waitFor: ["trigger-destroy-gitlab"]
 
 # 0 Foundation (last)
 - name: "gcr.io/cloud-builders/gcloud"

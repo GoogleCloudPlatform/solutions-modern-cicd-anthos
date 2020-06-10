@@ -21,12 +21,15 @@ export WORKINGDIR=$(pwd)
 mkdir -p ${WORKINGDIR}/ssh-keys
 
 pushd gitlab-repos
+  # TODO: Convert this into Terraform using Google Cloud KMS
   pushd ${WORKINGDIR}/ssh-keys
     for repo in ${REPOS}; do
        test -f ${repo} || ssh-keygen -f ${repo} -N ''
     done
     for cluster in ${CLUSTERS}; do
        test -f ${cluster} || ssh-keygen -f ${cluster} -N ''
+       # Create a secret with the private key
+       gcloud secrets create gitlab-cluster-key-${cluster} --replication-policy=automatic --data-file <(cat "${cluster}")
     done
   popd
 

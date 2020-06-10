@@ -39,19 +39,19 @@ steps:
     sed -i "s/YOUR_PROJECT_ID/${PROJECT_ID}/g" gitlab-repos/backend.tf
     sed -i "s/YOUR_DOMAIN/${_DOMAIN}/g" terraform.tfvars
 
-    cd gitlab-repos
+    pushd gitlab-repos
+
     terraform init
-    terraform refresh
+    export GITLAB_PASSWORD=$(gcloud secrets versions access latest --secret="gitlab-password")
+    export GITLAB_HOSTNAME="gitlab.${_DOMAIN}"
 
-    export GITLAB_TOKEN=$(terraform output gitlab_token)
-    export GITLAB_HOSTNAME=$(terraform output gitlab_hostname)
+    [[ -z "$${GITLAB_PASSWORD}" ]] && exit 0 # No need to continue if no password
+    terraform destroy -auto-approve -var gitlab_token=$${GITLAB_PASSWORD} -var gitlab_hostname=$${GITLAB_HOSTNAME}
 
-    terraform destroy -auto-approve -var gitlab_token=$${GITLAB_TOKEN} -var gitlab_hostname=$${GITLAB_HOSTNAME}
+    # remove private keys stored in secrets manager
+    gcloud secrets delete "gitlab-cluster-key-$${CLUSTER}" --quiet || true
 
-    gcloud secrets delete gitlab-user --quiet || true
-    gcloud secrets delete gitlab-password --quiet || true
-
-    cd ..
+    popd
 
 # Cluster destroy
 - name: 'gcr.io/${PROJECT_ID}/anthos-platform-installer'
@@ -69,3 +69,20 @@ steps:
 
     terraform init
     terraform destroy -auto-approve
+  waitFor:
+    - destroy-gitlab-install
+
+# Cluster Secrets
+- name: 'gcr.io/${PROJECT_ID}/anthos-platform-installer'
+  id: 'destroy-gitlab-secrets'
+  entrypoint: 'bash'
+  args:
+  - '-xe'
+  - '-c'
+  - |
+    [[ "${_DESTROY_CLUSTER}" == "true" ]] && exit 0
+    gcloud secrets delete gitlab-user --quiet || true
+    gcloud secrets delete gitlab-password --quiet || true
+  waitFor:
+    - destroy-gitlab-install
+    - destroy-gitlab-cluster

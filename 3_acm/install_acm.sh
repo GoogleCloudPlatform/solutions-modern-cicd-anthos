@@ -29,7 +29,7 @@ for CONTEXT in ${CLUSTERS}; do
   REGION=$(echo ${CONTEXT} | cut -d'-' -f 2-)
   gcloud container clusters get-credentials ${CONTEXT} --region ${REGION}
   ! kubectl config delete-context ${CONTEXT}  > /dev/null 2>&1
-  kubectl config rename-context $(kubectl config current-context) ${CONTEXT} 
+  kubectl config rename-context $(kubectl config current-context) ${CONTEXT}
 
   # We need to have this namespace before enabling ACM, because we need to create
   # a secret in it
@@ -44,7 +44,7 @@ for CONTEXT in ${CLUSTERS}; do
     KEYNAME=${CONTEXT}
     kubectl delete secret git-creds --namespace=config-management-system > /dev/null 2>&1 || true
     kubectl create secret generic git-creds --namespace=config-management-system \
-            --from-file=ssh=../ssh-keys/${KEYNAME}
+            --from-literal=ssh="$(gcloud secrets versions access latest --secret="gitlab-cluster-key-${KEYNAME}")"
     GITLAB_ADDRESS=$(gcloud compute addresses describe gitlab --region us-central1 --format 'value(address)')
     export GITLAB_HOSTNAME=${GITLAB_HOSTNAME}
     export CONTEXT=${CONTEXT}
