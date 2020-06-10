@@ -34,7 +34,7 @@ pushd gitlab-repos
   terraform plan -var gitlab_token=${GITLAB_TOKEN} -var gitlab_hostname=${GITLAB_HOSTNAME} -var ssh-key-path-base=${WORKINGDIR}/ssh-keys -out=terraform.tfplan
   terraform apply -auto-approve terraform.tfplan
 
-  # TODO: Move into terraform sometime in the future
+  # TODO: Move into terraform sometime in the future, for now, forcefully delete in destroy
   gcloud secrets create gitlab-user --replication-policy=automatic --data-file <(echo -n "root")
   gcloud secrets create gitlab-password --replication-policy=automatic --data-file <(echo -n "${GITLAB_TOKEN}")
 popd

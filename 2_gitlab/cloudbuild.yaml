@@ -49,6 +49,7 @@ steps:
       sleep 10
     done
 
+# TODO: How to make this idempotent (if configured already, skip)
 - name: 'gcr.io/${PROJECT_ID}/anthos-platform-installer'
   id: 'configure-gitlab'
   entrypoint: 'bash'
@@ -62,6 +63,7 @@ steps:
     sed -i "s/YOUR_DOMAIN/${_DOMAIN}/g" terraform.tfvars
 
     # Copy starter repos to local workspace
+    # TODO: Convert to gzip
     gsutil cp -r gs://${PROJECT_ID}-starter-repos/starter-repos .
 
     export WORKSPACEROOT=$(pwd)
