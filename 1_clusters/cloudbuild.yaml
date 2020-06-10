@@ -28,4 +28,5 @@ steps:
     sed -i "s/YOUR_PROJECT_ID/${PROJECT_ID}/g" backend.tf
 
     terraform init
-    terraform apply -auto-approve
+    terraform plan -out=terraform.tfplan
+    terraform apply -auto-approve terraform.tfplan

@@ -21,7 +21,7 @@ provider "gitlab" {
 }
 
 locals {
-  ssh-key-path = "../../ssh-keys"
+  ssh-key-path = var.ssh-key-path-base
 }
 
 resource "gitlab_group" "platform-admins" {

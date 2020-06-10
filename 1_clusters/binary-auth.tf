@@ -53,6 +53,8 @@ module "project-services" {
 
   project_id = var.project_id
 
+  disable_services_on_destroy = false
+
   activate_apis = local.admin_enabled_apis
 }
 
