@@ -12,19 +12,30 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package main
+package cmd
 
 import (
-	"anthos-platform/anthos-platform-cli/cmd"
-	version "anthos-platform/anthos-platform-cli/pkg/resources"
+	"anthos-platform/anthos-platform-cli/pkg/resources"
+	"fmt"
+
+	"github.com/spf13/cobra"
 )
 
-var VersionNumber string
-var Binary string
+func init() {
+	rootCmd.AddCommand(versionCmd)
+}
 
-func main() {
-	version.SetBuildNumber(VersionNumber)
-	version.SetBinary(Binary)
+var versionCmd = &cobra.Command{
+	Use:   "version",
+	Short: "Prints the version of this application",
+	Long:  `This is the X Version of the application`,
+	Run: func(cmd *cobra.Command, args []string) {
 
-	cmd.Execute()
+		version := resources.GetBuildVersion()
+		binary := resources.BinaryName()
+
+		// binary := "Anthos Platform"
+
+		fmt.Printf("%s: %s\n", binary, version)
+	},
 }
