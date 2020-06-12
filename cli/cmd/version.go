@@ -15,7 +15,7 @@
 package cmd
 
 import (
-	version "anthos-platform/anthos-platform-cli/pkg/resources"
+	"anthos-platform/anthos-platform-cli/pkg/resources"
 	"fmt"
 
 	"github.com/spf13/cobra"
@@ -31,8 +31,11 @@ var versionCmd = &cobra.Command{
 	Long:  `This is the X Version of the application`,
 	Run: func(cmd *cobra.Command, args []string) {
 
-		version := version.GetBuildVersion()
+		version := resources.GetBuildVersion()
+		binary := resources.BinaryName()
 
-		fmt.Printf("App Version: %s\n", version)
+		// binary := "Anthos Platform"
+
+		fmt.Printf("%s: %s\n", binary, version)
 	},
 }

@@ -10,15 +10,12 @@ VERSION ?= vlatest
 PLATFORMS := windows linux darwin
 os = $(word 1, $@)
 
-VERSION_MAJOR=0
-VERSION_MINOR=0
-VERSION_PATCH=1
 $(eval GIT_COMMIT=$(shell sh -c "git rev-parse --short HEAD"))
 
 .PHONY: $(PLATFORMS)
 $(PLATFORMS):
 		mkdir -p release
-		GOOS=$(os) GOARCH=amd64 go build -o release/$(BINARY)-$(VERSION)-$(os)-amd64 -ldflags "-X main.VersionNumber=${VERSION_MAJOR}.${VERSION_MINOR}.${VERSION_PATCH}-$(GIT_COMMIT)"
+		GOOS=$(os) GOARCH=amd64 go build -o release/$(BINARY)-$(VERSION)-$(os)-amd64 -ldflags "-X main.VersionNumber=$(GIT_COMMIT) -X main.Binary=${BINARY}"
 
 .PHONY: release
 release: windows linux darwin

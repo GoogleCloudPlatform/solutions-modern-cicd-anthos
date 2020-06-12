@@ -20,9 +20,11 @@ import (
 )
 
 var VersionNumber string
+var Binary string
 
 func main() {
 	version.SetBuildNumber(VersionNumber)
+	version.SetBinary(Binary)
 
 	cmd.Execute()
 }
