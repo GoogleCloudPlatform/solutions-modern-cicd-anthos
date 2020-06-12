@@ -18,6 +18,7 @@ tags:
 substitutions:
   _DOMAIN: ""
   _BUILD_IMAGES: "true"
+  _INSTALL_APPS: "true"
 options:
   substitution_option: 'ALLOW_LOOSE'
 steps:
@@ -116,7 +117,7 @@ steps:
   args:
     - -c
     - |
-      [[ "${INSTALL_APPS}" == "false" ]] && exit 0
+      [[ "${_INSTALL_APPS}" == "false" ]] && exit 0
       gcloud builds submit --substitutions=_DOMAIN=${_DOMAIN}
   waitFor:
     - trigger-acm-install
