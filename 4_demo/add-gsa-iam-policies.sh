@@ -18,10 +18,10 @@ if [ -z ${PROJECT_ID} ]; then
   read -s -p "What is the GCP Project ID that will contain the GSAs and their IAM Role Bindings?" PROJECT_ID
 fi
 
-SERVICES="hipster-loadgenerator hipster-shop hipster-frontend petabank"
+APPS="hipster-loadgenerator hipster-shop hipster-frontend petabank"
 
-for service in ${SERVICES}; do
-    GSA="${service}-gsa@${PROJECT_ID}.iam.gserviceaccount.com"
+for appname in ${APPS}; do
+    GSA="${appname}-gsa@${PROJECT_ID}.iam.gserviceaccount.com"
     gcloud projects add-iam-policy-binding ${PROJECT_ID} --member serviceAccount:${GSA} --role 'roles/monitoring.metricWriter'
     gcloud projects add-iam-policy-binding ${PROJECT_ID} --member serviceAccount:${GSA} --role 'roles/cloudtrace.agent'
     gcloud projects add-iam-policy-binding ${PROJECT_ID} --member serviceAccount:${GSA} --role 'roles/cloudprofiler.agent'

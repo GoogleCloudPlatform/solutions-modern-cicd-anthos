@@ -15,7 +15,7 @@
 timeout: 3600s # 1-hr
 tags:
   - modern-cicd-anthos
-  - modern-cicd-gitlab
+  - gitlab
 substitutions:
   _DOMAIN: ""
   _BUILD_IMAGES: "true"

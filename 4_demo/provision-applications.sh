@@ -21,11 +21,15 @@ if [ -z ${GITLAB_TOKEN} ];then
   read -p "What is the GitLab token? " GITLAB_TOKEN
 fi
 
-SERVICES="hipster-loadgenerator hipster-shop hipster-frontend petabank"
+
+if [ -z ${APPS} ];then
+  # If ${_APPS} is empty, use these apps to install
+  APPS="hipster-loadgenerator hipster-shop hipster-frontend petabank"
+fi
 
 # Install Hipster Shop app (by microservice) and Petabank app
-for service in ${SERVICES}; do
-  APP_DEPLOYMENT="${service}-app"
+for appname in ${APPS}; do
+  APP_DEPLOYMENT="${appname}-app"
   APP_EXISTS="$(kubectl get deployment ${APP_DEPLOYMENT} -n ${service})"
   if [ -z ${APP_EXISTS} ]; then
     anthos-platform-cli add app --gitlab-insecure --name ${service} --gitlab-hostname ${GITLAB_HOSTNAME} --gitlab-token ${GITLAB_TOKEN} --template-name golang-template

@@ -132,6 +132,16 @@ Within GitLab you will have the following repo structure:
     ```shell
     echo "https://gitlab.${DOMAIN}"
     ```
+1. User and Password for GitLab are stored in the [Secrets Manager](https://cloud.google.com/secret-manager)
+
+```shell
+export GITLAB_USER=$(gcloud secrets versions access latest --secret="gitlab-user")
+export GITLAB_PASSWORD=$(gcloud secrets versions access latest --secret="gitlab-password")
+
+echo "User: ${GITLAB_USER}"
+echo "Password: ${GITLAB_PASSWORD}"
+
+```
 
 ### Clean Up
 <!-- TODO: Domain name deletion will be added later  -->

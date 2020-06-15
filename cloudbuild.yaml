@@ -51,15 +51,6 @@ steps:
       [[ "${_BUILD_IMAGES}" == "false" ]] && exit 0
       gcloud builds submit --config=build-image/cloudbuild.yaml
 
-# - name: "gcr.io/cloud-builders/gcloud"
-#   id: cleanup-sub-jobs
-#   entrypoint: bash
-#   args:
-#     - -c
-#     - |
-#       gcloud builds list --ongoing --filter='tags[]~modern-cicd-anthos' --format='value(id)' | \
-#         xargs --no-run-if-empty gcloud builds cancel
-
 # Foundation
 - name: "gcr.io/cloud-builders/gcloud"
   id: "trigger-foundation"
@@ -128,15 +119,13 @@ steps:
   args:
     - -c
     - |
-      export GITLAB_PASSWORD=$(gcloud secrets versions access latest --secret="gitlab-password")
       export GITLAB_HOSTNAME="gitlab.${_DOMAIN}"
 
       echo "Log in to your GitLab instance at: https://$${GITLAB_HOSTNAME}"
       echo "Username: root"
-      echo "Password: $${GITLAB_PASSWORD}"
       echo ""
       echo "Retrieve password: $(gcloud secrets versions access latest --secret=\"gitlab-password\")"
-      echo "true"
+      echo ""
       echo "Visit the user guide in the docs (docs/index.md) to go through a user journey (add, deploy, and change applications)."
   waitFor:
     - trigger-app-install

@@ -36,7 +36,7 @@ steps:
       export GITLAB_PASSWORD=$(gcloud secrets versions access latest --secret="gitlab-password")
       export GITLAB_HOSTNAME="gitlab.${_DOMAIN}"
       export GITLAB_TOKEN="$${GITLAB_PASSWORD}"
-      export SERVICES="${_APPS}"
+      export APPS="${_APPS}"
 
       ./provision-applications.sh
 
