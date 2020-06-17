@@ -54,7 +54,7 @@ steps:
     - -c
     - |
       gcloud builds submit --config=cloudbuild-destroy.yaml --substitutions="_DOMAIN=${DOMAIN}"
-  waitFor: ["trigger-destroy-apps"]
+  waitFor: ["trigger-destroy-demo-apps"]
 
 # 2 CICD
 - name: "gcr.io/cloud-builders/gcloud"
