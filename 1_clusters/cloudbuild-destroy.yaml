@@ -1,0 +1,60 @@
+# Copyright 2020 Google LLC
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#      http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+timeout: 3600s # 1-hour
+tags:
+  - modern-cicd-anthos
+  - modern-cicd-clusters
+steps:
+- name: 'gcr.io/${PROJECT_ID}/anthos-platform-installer'
+  id: 'destroy-clusters'
+  entrypoint: 'bash'
+  args:
+  - '-xe'
+  - '-c'
+  - |
+    sed -i "s/YOUR_PROJECT_ID/${PROJECT_ID}/g" terraform.tfvars
+    sed -i "s/YOUR_PROJECT_ID/${PROJECT_ID}/g" backend.tf
+
+    terraform init
+    terraform destroy -auto-approve
+
+- name: 'gcr.io/${PROJECT_ID}/anthos-platform-installer'
+  id: 'remove-attestors-attestations'
+  entrypoint: 'bash'
+  args:
+  - '-xe'
+  - '-c'
+  - |
+    if [ $(gcloud services list --filter="name~binaryauthorization.googleapis.com" --format="value(name)" | wc -w) -gt 0 ]; then
+      attestors=$(gcloud container binauthz attestors list --format="value('name')")
+
+      if [ $(echo $attestors | wc -w) -gt 0 ]; then
+          # Remove Attestors
+          for attestor in $attestors; do
+              gcloud container binauthz attestors delete $attestor
+          done
+
+          # Remove notes (because gcloud does not remove them)
+          access=$(gcloud auth print-access-token)
+          notes=$(curl -H "Authorization: Bearer ${access}" "https://containeranalysis.googleapis.com/v1/projects/${PROJECT_ID}/notes/")
+          if [ "$notes" != "{}" ]; then
+              for NOTE_ID in $(echo $notes | jq -r '.notes[].name' ); do
+                  curl -vvv -X DELETE \
+                      -H "Authorization: Bearer ${access}" \
+                      "https://containeranalysis.googleapis.com/v1/projects/${PROJECT_ID}/notes/${NOTE_ID##*/}"
+              done
+          fi
+      fi
+    fi # check for binary authorization

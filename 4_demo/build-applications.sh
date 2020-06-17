@@ -21,7 +21,10 @@ if [ -z ${GITLAB_TOKEN} ];then
   read -p "What is the GitLab token? " GITLAB_TOKEN
 fi
 
-SERVICES="hipster-loadgenerator hipster-shop hipster-frontend petabank"
+if [ -z ${SERVICES} ];then
+  # Default list of services it not passed from builder
+  SERVICES="hipster-loadgenerator hipster-shop hipster-frontend petabank"
+fi
 
 for service in ${SERVICES}; do
   SERVICE_DIRECTORY="${service}-clone"
@@ -33,7 +36,7 @@ for service in ${SERVICES}; do
       HIPSTER_EXISTS=$(ls k8s/stg | grep -e "adservice.yaml")
       if [ -z "${HIPSTER_EXISTS}" ]; then
         git rm -r Dockerfile main.go skaffold.yaml k8s .gitlab-ci.yml
-        cp -r ../../starter-repos/hipster-shop/. ./
+        cp -r ./starter-repos/hipster-shop/. ./
         sed -i.bak "s/GITLAB_HOSTNAME/${GITLAB_HOSTNAME}/g" k8s/stg/kustomization.yaml
         sed -i.bak "s/GITLAB_HOSTNAME/${GITLAB_HOSTNAME}/g" k8s/prod/kustomization.yaml
         sed -i.bak "s/GITLAB_HOSTNAME/${GITLAB_HOSTNAME}/g" k8s/dev/kustomization.yaml
@@ -54,7 +57,7 @@ for service in ${SERVICES}; do
         # If template files have not been replaced, delete them
         git rm -r Dockerfile main.go skaffold.yaml k8s .gitlab-ci.yml
         # Copy the source code files
-        cp -r ../../starter-repos/${service}/. ./
+        cp -r ./starter-repos/${service}/. ./
         # Replace GITLAB_HOSTNAME with our own domain
         sed -i.bak "s/GITLAB_HOSTNAME/${GITLAB_HOSTNAME}/g" k8s/stg/kustomization.yaml
         sed -i.bak "s/GITLAB_HOSTNAME/${GITLAB_HOSTNAME}/g" k8s/prod/kustomization.yaml

@@ -80,10 +80,11 @@ Within GitLab you will have the following repo structure:
     gcloud config set core/project ${PROJECT_ID}
     export PROJECT_NUMBER=$(gcloud projects describe ${PROJECT_ID} --format 'value(projectNumber)')
     gcloud services enable cloudbuild.googleapis.com
+    gcloud services enable anthos.googleapis.com
     gcloud services enable serviceusage.googleapis.com
     gcloud services enable cloudkms.googleapis.com
-    gcloud projects add-iam-policy-binding ${PROJECT_ID} --member serviceAccount:${PROJECT_NUMBER}@cloudbuild.gserviceaccount.com   --role roles/owner
-    gcloud projects add-iam-policy-binding ${PROJECT_ID} --member serviceAccount:${PROJECT_NUMBER}@cloudbuild.gserviceaccount.com   --role roles/containeranalysis.admin
+    gcloud projects add-iam-policy-binding ${PROJECT_ID} --member serviceAccount:${PROJECT_NUMBER}@cloudbuild.gserviceaccount.com --role roles/owner
+    gcloud projects add-iam-policy-binding ${PROJECT_ID} --member serviceAccount:${PROJECT_NUMBER}@cloudbuild.gserviceaccount.com --role roles/containeranalysis.admin
     ```
 
 1. Provision the address that GitLab will use.
@@ -131,6 +132,16 @@ Within GitLab you will have the following repo structure:
     ```shell
     echo "https://gitlab.${DOMAIN}"
     ```
+1. User and Password for GitLab are stored in the [Secrets Manager](https://cloud.google.com/secret-manager)
+
+```shell
+export GITLAB_USER=$(gcloud secrets versions access latest --secret="gitlab-user")
+export GITLAB_PASSWORD=$(gcloud secrets versions access latest --secret="gitlab-password")
+
+echo "User: ${GITLAB_USER}"
+echo "Password: ${GITLAB_PASSWORD}"
+
+```
 
 ### Clean Up
 <!-- TODO: Domain name deletion will be added later  -->

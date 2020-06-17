@@ -14,16 +14,9 @@
  * limitations under the License.
  */
 
-variable "gitlab_token" {
-  description = "The token used to access the GitLab API"
-}
-
-variable "gitlab_hostname" {
-  description = "Hostname of the GitLab instance (for example my.gitlab.server)"
-}
-
-variable ssh-key-path-base {
-  type        = string
-  default     = "../../ssh-keys"
-  description = "Path containing the keys used for repositories"
+terraform {
+  backend "gcs" {
+    bucket  = "YOUR_PROJECT_ID-anthos-platform-tf-state"
+    prefix  = "foundation"
+  }
 }

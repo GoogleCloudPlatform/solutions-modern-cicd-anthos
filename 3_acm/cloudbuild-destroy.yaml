@@ -1,4 +1,3 @@
-#!/bin/bash -x
 # Copyright 2020 Google LLC
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -13,16 +12,20 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-
-APPS="hipster-loadgenerator hipster-shop hipster-frontend petabank"
-gcloud container clusters get-credentials staging-us-central1 --region us-central1
-
-echo "Deleting template deployments and services"
-for appname in ${APPS}; do
-  export TEMPLATE_APP=${appname}-app
-  export TEMPLATE_APP_EXISTS=$(kubectl get deployment ${TEMPLATE_APP} -n ${appname})
-  if [ "${TEMPLATE_APP_EXISTS}" ]; then
-    kubectl delete deployment ${TEMPLATE_APP} -n ${appname} --now || true
-    kubectl delete svc ${TEMPLATE_APP} -n ${appname} || true
-  fi
-done
+tags:
+  - modern-cicd-anthos
+  - modern-cicd-anthos-acm
+substitutions:
+  _DOMAIN: ""
+  _BUILD_IMAGES: "true"
+options:
+  substitution_option: 'ALLOW_LOOSE'
+steps:
+# Create build-installation-image
+- name: "gcr.io/cloud-builders/gcloud"
+  id: "remove-acm"
+  entrypoint: bash
+  args:
+    - -c
+    - |
+      echo "TODO: Back out ACM but needs to be defined, this is a 'DO NOTHING' step"

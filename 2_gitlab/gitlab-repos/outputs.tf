@@ -14,16 +14,12 @@
  * limitations under the License.
  */
 
-variable "gitlab_token" {
-  description = "The token used to access the GitLab API"
+output gitlab-token {
+  value       = var.gitlab_token
+  description = "Token/Password"
 }
 
-variable "gitlab_hostname" {
-  description = "Hostname of the GitLab instance (for example my.gitlab.server)"
-}
-
-variable ssh-key-path-base {
-  type        = string
-  default     = "../../ssh-keys"
-  description = "Path containing the keys used for repositories"
+output gitlab-hostname {
+  value       = var.gitlab_hostname
+  description = "Gitlab Hostname"
 }
