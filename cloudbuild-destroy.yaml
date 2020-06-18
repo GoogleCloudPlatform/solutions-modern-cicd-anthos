@@ -47,6 +47,7 @@ steps:
       gcloud services enable cloudkms.googleapis.com
       gcloud services enable binaryauthorization.googleapis.com
       gcloud services enable secretmanager.googleapis.com
+      gcloud services enable cloudresourcemanager.googleapis.com
   waitFor: ["-"]
 
 ## Destroy in reverse order
