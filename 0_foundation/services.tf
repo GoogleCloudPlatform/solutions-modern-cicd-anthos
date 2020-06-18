@@ -20,6 +20,9 @@ module "project-services" {
 
   project_id = var.project_id
 
+  # Don't disable the services
+  disable_services_on_destroy = false
+
   activate_apis = [
     "compute.googleapis.com",
     "container.googleapis.com",
