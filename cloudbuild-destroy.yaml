@@ -43,6 +43,7 @@ steps:
       gcloud services enable container.googleapis.com
       gcloud services enable anthos.googleapis.com
       gcloud services enable serviceusage.googleapis.com
+      gcloud services enable containeranalysis.googleapis.com
       gcloud services enable cloudkms.googleapis.com
   waitFor: ["-"]
 
