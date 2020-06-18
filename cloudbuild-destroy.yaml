@@ -42,8 +42,8 @@ steps:
   args:
     - -c
     - |
-      gcloud builds submit --config=cloudbuild-destroy.yaml --substitutions="_DOMAIN=${DOMAIN}"
-  waitFor: ["-"]
+      gcloud builds submit --config=cloudbuild-destroy.yaml --substitutions="_DOMAIN=${_DOMAIN}"
+  waitFor: ["build-install-image"]
 
 # 3 ACM
 - name: "gcr.io/cloud-builders/gcloud"
@@ -53,7 +53,7 @@ steps:
   args:
     - -c
     - |
-      gcloud builds submit --config=cloudbuild-destroy.yaml --substitutions="_DOMAIN=${DOMAIN}"
+      gcloud builds submit --config=cloudbuild-destroy.yaml --substitutions="_DOMAIN=${_DOMAIN}"
   waitFor: ["trigger-destroy-demo-apps"]
 
 # 2 CICD
@@ -64,7 +64,7 @@ steps:
   args:
     - -c
     - |
-      gcloud builds submit --config=cloudbuild-destroy.yaml --substitutions="_DOMAIN=${DOMAIN}"
+      gcloud builds submit --config=cloudbuild-destroy.yaml --substitutions="_DOMAIN=${_DOMAIN}"
   waitFor: ["trigger-destroy-acm"]
 
 # 1 Clusters
