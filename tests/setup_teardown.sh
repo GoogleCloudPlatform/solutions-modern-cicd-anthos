@@ -41,7 +41,7 @@ gcloud auth activate-service-account --key-file=${KEY_FILE}
 set -x
 
 # Make sure the project is clean before running the setup
-gcloud builds submit --config=cloudbuild-destroy.yaml
+gcloud builds submit --config=cloudbuild-destroy.yaml --substitutions=_DOMAIN=${domain}
 
 # Deploy the platform
 gcloud builds submit --config=cloudbuild.yaml --substitutions=_DOMAIN=${domain}
@@ -50,7 +50,7 @@ gcloud builds submit --config=cloudbuild.yaml --substitutions=_DOMAIN=${domain}
 if [ $? -eq 0 ]; then
 	sleep 5m
 	# Clean up after the run
-	gcloud builds submit --config=cloudbuild-destroy.yaml
+	gcloud builds submit --config=cloudbuild-destroy.yaml --substitutions=_DOMAIN=${domain}
 fi
 
 echo "All passed"
