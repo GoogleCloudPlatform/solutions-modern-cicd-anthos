@@ -104,7 +104,8 @@ steps:
   args:
     - -c
     - |
-      gcloud builds submit --config=cloudbuild-destroy.yaml
+      # Allow the foundation destroy to fail
+      gcloud builds submit --config=cloudbuild-destroy.yaml || true
   waitFor: ["trigger-destroy-clusters"]
 
 
