@@ -40,6 +40,13 @@ gcloud auth activate-service-account --key-file=${KEY_FILE}
 # Display commands, now that creds are set.
 set -x
 
+# Enable services that may not have been enabled on a clean project
+gcloud services enable cloudbuild.googleapis.com
+gcloud services enable container.googleapis.com
+gcloud services enable anthos.googleapis.com
+gcloud services enable serviceusage.googleapis.com
+gcloud services enable cloudkms.googleapis.com
+
 # Make sure the project is clean before running the setup
 gcloud builds submit --config=cloudbuild-destroy.yaml --substitutions=_DOMAIN=${domain}
 
