@@ -32,6 +32,20 @@ steps:
       gcloud builds submit --config=build-image/cloudbuild.yaml
   waitFor: ["-"]
 
+- name: "gcr.io/cloud-builders/gcloud"
+  id: "enable-services"
+  entrypoint: bash
+  args:
+    - -c
+    - |
+      # Enable services that may not have been enabled on a clean project
+      gcloud services enable cloudbuild.googleapis.com
+      gcloud services enable container.googleapis.com
+      gcloud services enable anthos.googleapis.com
+      gcloud services enable serviceusage.googleapis.com
+      gcloud services enable cloudkms.googleapis.com
+  waitFor: ["-"]
+
 ## Destroy in reverse order
 
 # 4 Apps
