@@ -20,11 +20,11 @@ The following instructions use a command line utility ([anthos-platform-cli](cli
 
 1. Download the `anthos-platform-cli` binary to your machine. Take note of getting the binary for the correct operating system.
 
-    [Mac OS](https://storage.googleapis.com/solutions-public-assets/anthos-platform-cli/v0.6.1/anthos-platform-cli-v0.6.1-darwin-amd64)
+    [Mac OS](https://storage.googleapis.com/solutions-public-assets/anthos-platform-cli/latest/anthos-platform-cli-vlatest-darwin-amd64)
 
-    [Linux](https://storage.googleapis.com/solutions-public-assets/anthos-platform-cli/v0.6.1/anthos-platform-cli-v0.6.1-linux-amd64)
+    [Linux](https://storage.googleapis.com/solutions-public-assets/anthos-platform-cli/latest/anthos-platform-cli-vlatest-linux-amd64)
 
-    [Windows](https://storage.googleapis.com/solutions-public-assets/anthos-platform-cli/v0.6.1/anthos-platform-cli-v0.6.1-windows-amd64)
+    [Windows](https://storage.googleapis.com/solutions-public-assets/anthos-platform-cli/latest/anthos-platform-cli-vlatest-windows-amd64)
 
 1. After downloading the binary, rename it and make it executable:
 
