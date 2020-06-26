@@ -16,9 +16,9 @@ include:
 - project: 'platform-admins/shared-ci-cd'
   file: 'ci/go-docker.yaml'
 - project: 'platform-admins/shared-ci-cd'
-  file: 'ci/kaniko.yaml'
+  file: 'skaffold/build.yaml'
 - project: 'platform-admins/shared-ci-cd'
-  file: 'cd/kustomize.yaml'
+  file: 'skaffold/render.yaml'
 - project: 'platform-admins/shared-ci-cd'
   file: 'cd/validate.yaml'
 - project: 'platform-admins/shared-ci-cd'
@@ -27,7 +27,7 @@ include:
 stages:
   - test
   - build
-  - hydrate-manifests
+  - render-manifests
   - prepare-config
   - validate-config
   - push-manifests
