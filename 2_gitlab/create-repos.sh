@@ -29,6 +29,7 @@ pushd gitlab-repos
     for cluster in ${CLUSTERS}; do
        test -f ${cluster} || ssh-keygen -f ${cluster} -N ''
        # Create a secret with the private key
+       gcloud secrets delete gitlab-cluster-key-${cluster} --quiet || true
        gcloud secrets create gitlab-cluster-key-${cluster} --replication-policy=automatic --data-file <(cat "${cluster}")
     done
   popd
@@ -38,7 +39,9 @@ pushd gitlab-repos
   terraform apply -auto-approve terraform.tfplan
 
   # TODO: Move into terraform sometime in the future, for now, forcefully delete in destroy
+  gcloud secrets delete gitlab-user --quiet || true
   gcloud secrets create gitlab-user --replication-policy=automatic --data-file <(echo -n "root")
+  gcloud secrets delete gitlab-password --quiet || true
   gcloud secrets create gitlab-password --replication-policy=automatic --data-file <(echo -n "${GITLAB_TOKEN}")
 popd
 
