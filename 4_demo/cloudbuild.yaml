@@ -31,12 +31,14 @@ steps:
     - |
       # TODO: Convert to gzip
       # Pull in starter-repos
-      gsutil cp -r gs://${PROJECT_ID}-starter-repos/starter-repos .
+      gsutil -m cp -r gs://${PROJECT_ID}-starter-repos/starter-repos .
 
       export GITLAB_PASSWORD=$(gcloud secrets versions access latest --secret="gitlab-password")
       export GITLAB_HOSTNAME="gitlab.${_DOMAIN}"
       export GITLAB_TOKEN="$${GITLAB_PASSWORD}"
       export APPS="${_APPS}"
+      git config --global user.email "anthos-platform-installer@example.com"
+      git config --global user.name "Anthos Platform Installer"
 
       ./provision-applications.sh
 
