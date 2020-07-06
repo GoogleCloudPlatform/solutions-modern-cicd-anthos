@@ -124,7 +124,7 @@ steps:
       echo "Log in to your GitLab instance at: https://$${GITLAB_HOSTNAME}"
       echo "Username: root"
       echo ""
-      echo "Retrieve password: $(gcloud secrets versions access latest --secret=gitlab-password)"
+      echo "To retrieve password run: \$(gcloud secrets versions access latest --secret=gitlab-password)"
       echo ""
       echo "Visit the user guide in the docs (docs/index.md) to go through a user journey (add, deploy, and change applications)."
   waitFor:
