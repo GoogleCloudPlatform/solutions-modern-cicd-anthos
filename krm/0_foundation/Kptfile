@@ -1,0 +1,14 @@
+apiVersion: kpt.dev/v1alpha1
+kind: Kptfile
+metadata:
+  name: 0_foundation
+packageMetadata:
+  shortDescription: Anthos CI/CD foundation layer
+openAPI:
+  definitions:
+    io.k8s.cli.setters.namespace:
+      x-k8s-cli:
+        setter:
+          name: namespace
+          value: YOUR_NAMESPACE
+      description: Namespace of Config Connector resources

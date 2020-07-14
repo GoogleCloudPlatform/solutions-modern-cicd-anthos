@@ -5,6 +5,7 @@ metadata:
     cnrm.cloud.google.com/disable-on-destroy: "false"
     cnrm.cloud.google.com/disable-dependent-services: "false"
   name: compute.googleapis.com
+  namespace: YOUR_NAMESPACE # {"$kpt-set":"namespace"}
 ---
 apiVersion: serviceusage.cnrm.cloud.google.com/v1beta1
 kind: Service
@@ -13,6 +14,7 @@ metadata:
     cnrm.cloud.google.com/disable-on-destroy: "false"
     cnrm.cloud.google.com/disable-dependent-services: "false"
   name: container.googleapis.com
+  namespace: YOUR_NAMESPACE # {"$kpt-set":"namespace"}
 ---
 apiVersion: serviceusage.cnrm.cloud.google.com/v1beta1
 kind: Service
@@ -21,6 +23,7 @@ metadata:
     cnrm.cloud.google.com/disable-on-destroy: "false"
     cnrm.cloud.google.com/disable-dependent-services: "false"
   name: cloudresourcemanager.googleapis.com
+  namespace: YOUR_NAMESPACE # {"$kpt-set":"namespace"}
 ---
 apiVersion: serviceusage.cnrm.cloud.google.com/v1beta1
 kind: Service
@@ -29,6 +32,7 @@ metadata:
     cnrm.cloud.google.com/disable-on-destroy: "false"
     cnrm.cloud.google.com/disable-dependent-services: "false"
   name: sqladmin.googleapis.com
+  namespace: YOUR_NAMESPACE # {"$kpt-set":"namespace"}
 ---
 apiVersion: serviceusage.cnrm.cloud.google.com/v1beta1
 kind: Service
@@ -37,3 +41,4 @@ metadata:
     cnrm.cloud.google.com/disable-on-destroy: "false"
     cnrm.cloud.google.com/disable-dependent-services: "false"
   name: artifactregistry.googleapis.com
+  namespace: YOUR_NAMESPACE # {"$kpt-set":"namespace"}
