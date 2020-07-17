@@ -1,7 +1,7 @@
 apiVersion: kpt.dev/v1alpha1
 kind: Kptfile
 metadata:
-  name: 0_foundation
+  name: cicd_foundation
 packageMetadata:
   shortDescription: Anthos CI/CD foundation layer
 openAPI:
@@ -11,4 +11,5 @@ openAPI:
         setter:
           name: namespace
           value: YOUR_NAMESPACE
+          required: true
       description: Namespace of Config Connector resources
