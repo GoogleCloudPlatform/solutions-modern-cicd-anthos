@@ -7,65 +7,18 @@ metadata:
     cnrm.cloud.google.com/remove-default-node-pool: "true" # don't create the default node pool
 spec:
   initialNodeCount: 1 # this field must be set to greater than 0
-  addonsConfig:
-    horizontalPodAutoscaling:
-      disabled: false
-    httpLoadBalancing:
-      disabled: false
-    istioConfig:
-      disabled: true
-    networkPolicyConfig:
-      disabled: false
-  clusterAutoscaling:
-    enabled: false
-  databaseEncryption:
-    state: DECRYPTED
-  defaultMaxPodsPerNode: 110
   enableBinaryAuthorization: true
   ipAllocationPolicy:
     clusterSecondaryRangeName: anthos-platform-pods-prod
     servicesSecondaryRangeName: anthos-platform-services-prod
   location: us-central1
-  loggingService: logging.googleapis.com/kubernetes
-  maintenancePolicy:
-    dailyMaintenanceWindow:
-      duration: PT4H0M0S
-      startTime: "05:00"
-  monitoringService: monitoring.googleapis.com/kubernetes
   networkPolicy:
     enabled: true
     provider: CALICO
   networkRef:
     name: anthos-platform
-  nodeConfig:
-    diskSizeGb: 100
-    diskType: pd-standard
-    imageType: COS
-    labels:
-      cluster_name: prod-us-central1
-      node_pool: wi-pool-prod-us-central1
-    machineType: n1-standard-2
-    metadata:
-      cluster_name: prod-us-central1
-      disable-legacy-endpoints: "true"
-      node_pool: wi-pool-prod-us-central1
-    oauthScopes:
-    - https://www.googleapis.com/auth/cloud-platform
-    serviceAccountRef:
-      name: tf-sa-prod-us-central1
-    shieldedInstanceConfig:
-      enableIntegrityMonitoring: true
-    tags:
-    - gke-prod-us-central1
-    - gke-prod-us-central1-wi-pool
-    workloadMetadataConfig:
-      nodeMetadata: GKE_METADATA_SERVER
-  podSecurityPolicyConfig:
-    enabled: false
   subnetworkRef:
     name: anthos-platform-central
-  verticalPodAutoscaling:
-    enabled: false
   workloadIdentityConfig:
     identityNamespace: YOUR_PROJECT.svc.id.goog # {"$kpt-set":"identity-namespace"}
 ---
@@ -82,36 +35,19 @@ spec:
     name: prod-us-central1
   initialNodeCount: 1
   location: us-central1
-  management:
-    autoRepair: true
-    autoUpgrade: true
-  maxPodsPerNode: 110
   nodeConfig:
-    diskSizeGb: 100
-    diskType: pd-standard
-    imageType: COS
     labels:
       cluster_name: prod-us-central1
       node_pool: wi-pool-prod-us-central1
     machineType: n1-standard-2
     metadata:
       cluster_name: prod-us-central1
-      disable-legacy-endpoints: "true"
       node_pool: wi-pool-prod-us-central1
-    oauthScopes:
-    - https://www.googleapis.com/auth/cloud-platform
     serviceAccountRef:
       name: tf-sa-prod-us-central1
-    shieldedInstanceConfig:
-      enableIntegrityMonitoring: true
     tags:
     - gke-prod-us-central1
     - gke-prod-us-central1-wi-pool
-    workloadMetadataConfig:
-      nodeMetadata: GKE_METADATA_SERVER
-  upgradeSettings:
-    maxSurge: 1
-    maxUnavailable: 0
 ---
 apiVersion: iam.cnrm.cloud.google.com/v1beta1
 kind: IAMServiceAccount

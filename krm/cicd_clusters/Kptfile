@@ -1,9 +1,9 @@
 apiVersion: kpt.dev/v1alpha1
 kind: Kptfile
 metadata:
-  name: .
+  name: cicd_clusters
 packageMetadata:
-  shortDescription: sample description
+  shortDescription: Anthos CI/CD clusters layer
 openAPI:
   definitions:
     io.k8s.cli.substitutions.identity-namespace:
@@ -20,9 +20,11 @@ openAPI:
         setter:
           name: namespace
           value: YOUR_NAMESPACE
+          required: true
     io.k8s.cli.setters.project-id:
       description: Project ID where the cluster will run
       x-k8s-cli:
         setter:
           name: project-id
           value: YOUR_PROJECT
+          required: true
