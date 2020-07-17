@@ -35,8 +35,10 @@ pushd gitlab-repos
   popd
 
   terraform init
-  terraform plan -var gitlab_token=${GITLAB_TOKEN} -var gitlab_hostname=${GITLAB_HOSTNAME} -var ssh-key-path-base=${WORKINGDIR}/ssh-keys -out=terraform.tfplan
+  terraform plan -var gitlab_token=${GITLAB_TOKEN} -var ssh-key-path-base=${WORKINGDIR}/ssh-keys -out=terraform.tfplan
   terraform apply -auto-approve terraform.tfplan
+
+  export GITLAB_HOSTNAME=$(terraform output gitlab_hostname)
 
   # TODO: Move into terraform sometime in the future, for now, forcefully delete in destroy
   gcloud secrets delete gitlab-user --quiet || true

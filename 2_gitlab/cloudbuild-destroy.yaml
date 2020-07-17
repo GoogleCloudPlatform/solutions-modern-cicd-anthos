@@ -17,7 +17,6 @@ tags:
   - modern-cicd-anthos
   - gitlab
 substitutions:
-  _DOMAIN: ""
   _BUILD_IMAGES: "true"
   _CREATE_GITLAB: "true"
   _DESTROY_CLUSTER: "true"
@@ -37,16 +36,14 @@ steps:
     sed -i "s/YOUR_PROJECT_ID/${PROJECT_ID}/g" terraform.tfvars
     sed -i "s/YOUR_PROJECT_ID/${PROJECT_ID}/g" backend.tf
     sed -i "s/YOUR_PROJECT_ID/${PROJECT_ID}/g" gitlab-repos/backend.tf
-    sed -i "s/YOUR_DOMAIN/${_DOMAIN}/g" terraform.tfvars
 
     pushd gitlab-repos
 
     terraform init
     export GITLAB_PASSWORD=$(gcloud secrets versions access latest --secret="gitlab-password")
-    export GITLAB_HOSTNAME="gitlab.${_DOMAIN}"
 
     [[ -z "$${GITLAB_PASSWORD}" ]] && exit 0 # No need to continue if no password
-    terraform destroy -auto-approve -var gitlab_token=$${GITLAB_PASSWORD} -var gitlab_hostname=$${GITLAB_HOSTNAME}
+    terraform destroy -auto-approve -var gitlab_token=$${GITLAB_PASSWORD}
 
     # remove private keys stored in secrets manager
     gcloud secrets delete "gitlab-cluster-key-$${CLUSTER}" --quiet || true
@@ -65,7 +62,11 @@ steps:
     sed -i "s/YOUR_PROJECT_ID/${PROJECT_ID}/g" terraform.tfvars
     sed -i "s/YOUR_PROJECT_ID/${PROJECT_ID}/g" backend.tf
     sed -i "s/YOUR_PROJECT_ID/${PROJECT_ID}/g" gitlab-repos/backend.tf
-    sed -i "s/YOUR_DOMAIN/${_DOMAIN}/g" terraform.tfvars
+
+    # TODO Manually empty bucket contents as otherwise gke-gitlab cannot delete them pending:
+    # https://github.com/terraform-google-modules/terraform-google-gke-gitlab/issues/49
+    gsutil rm "gs://${PROJECT_ID}-gitlab-artifacts/**" || true
+    gsutil rm "gs://${PROJECT_ID}-registry/**" || true
 
     terraform init
     terraform destroy -auto-approve

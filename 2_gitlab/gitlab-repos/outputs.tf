@@ -19,7 +19,7 @@ output gitlab-token {
   description = "Token/Password"
 }
 
-output gitlab-hostname {
-  value       = var.gitlab_hostname
+output gitlab_hostname {
+  value       = data.terraform_remote_state.gitlab.outputs.gitlab_hostname
   description = "Gitlab Hostname"
 }

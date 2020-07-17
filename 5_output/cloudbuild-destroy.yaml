@@ -14,17 +14,12 @@
 
 tags:
   - modern-cicd-anthos
-  - modern-cicd-anthos-acm
-substitutions:
-  _BUILD_IMAGES: "true"
-options:
-  substitution_option: 'ALLOW_LOOSE'
+  - modern-cicd-anthos-output
 steps:
-# Create build-installation-image
 - name: "gcr.io/cloud-builders/gcloud"
-  id: "remove-acm"
+  id: "output"
   entrypoint: bash
   args:
     - -c
     - |
-      echo "TODO: Back out ACM but needs to be defined, this is a 'DO NOTHING' step"
+      echo "TODO: 'DO NOTHING' step for now"

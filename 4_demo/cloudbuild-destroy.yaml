@@ -16,7 +16,6 @@ tags:
   - modern-cicd-anthos
   - modern-cicd-anthos-demo-apps
 substitutions:
-  _DOMAIN: ""
   _BUILD_IMAGES: "true"
 options:
   substitution_option: 'ALLOW_LOOSE'

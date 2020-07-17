@@ -16,7 +16,6 @@ timeout: 7200s # 2hr
 tags:
   - modern-cicd-anthos
 substitutions:
-  _DOMAIN: ""
   _BUILD_IMAGES: "true"
   _INSTALL_APPS: "true"
 options:
@@ -39,7 +38,7 @@ steps:
   - '-c'
   - |
     gsutil mb gs://${PROJECT_ID}-starter-repos || true
-    gsutil cp -r starter-repos gs://${PROJECT_ID}-starter-repos # TODO: use -m?
+    gsutil -m cp -r starter-repos gs://${PROJECT_ID}-starter-repos
 
 # Create build-installation-image
 - name: "gcr.io/cloud-builders/gcloud"
@@ -83,12 +82,11 @@ steps:
   args:
     - -c
     - |
-      gcloud builds submit --substitutions=_DOMAIN=${_DOMAIN}
+      gcloud builds submit
   waitFor:
     - trigger-clusters
 
 # ACM
-
 - name: "gcr.io/cloud-builders/gcloud"
   id: "trigger-acm-install"
   dir: "3_acm"
@@ -96,7 +94,7 @@ steps:
   args:
     - -c
     - |
-      gcloud builds submit --substitutions=_DOMAIN=${_DOMAIN}
+      gcloud builds submit
   waitFor:
     - trigger-gitlab
 
@@ -109,23 +107,17 @@ steps:
     - -c
     - |
       [[ "${_INSTALL_APPS}" == "false" ]] && exit 0
-      gcloud builds submit --substitutions=_DOMAIN=${_DOMAIN}
+      gcloud builds submit
   waitFor:
     - trigger-acm-install
 
-- name: 'gcr.io/${PROJECT_ID}/anthos-platform-installer'
+- name: "gcr.io/cloud-builders/gcloud"
   id: "output-connect-details"
+  dir: "5_output"
   entrypoint: bash
   args:
     - -c
     - |
-      export GITLAB_HOSTNAME="gitlab.${_DOMAIN}"
-
-      echo "Log in to your GitLab instance at: https://$${GITLAB_HOSTNAME}"
-      echo "Username: root"
-      echo ""
-      echo "To retrieve password run: \$(gcloud secrets versions access latest --secret=gitlab-password)"
-      echo ""
-      echo "Visit the user guide in the docs (docs/index.md) to go through a user journey (add, deploy, and change applications)."
+      gcloud builds submit
   waitFor:
     - trigger-app-install

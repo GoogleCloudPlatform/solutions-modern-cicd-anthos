@@ -17,7 +17,6 @@ tags:
   - modern-cicd-anthos
   - gitlab
 substitutions:
-  _DOMAIN: ""
   _BUILD_IMAGES: "true"
   _CREATE_GITLAB: "true"
 options:
@@ -34,18 +33,16 @@ steps:
     sed -i "s/YOUR_PROJECT_ID/${PROJECT_ID}/g" terraform.tfvars
     sed -i "s/YOUR_PROJECT_ID/${PROJECT_ID}/g" backend.tf
     sed -i "s/YOUR_PROJECT_ID/${PROJECT_ID}/g" gitlab-repos/backend.tf
-    sed -i "s/YOUR_DOMAIN/${_DOMAIN}/g" terraform.tfvars
 
     terraform init
     terraform plan -out=terraform.tfplan
     terraform apply -auto-approve terraform.tfplan
 
-    export GITLAB_ADDRESS=$(terraform output gitlab_address)
+    export GITLAB_HOSTNAME=$(terraform output gitlab_hostname)
 
     # Wait for GitLab domain to resolve
-    until nslookup gitlab.${_DOMAIN}; do
-      echo -e "\e[33mWaiting for gitlab.${_DOMAIN} to resolve."
-      echo -e "\e[31mAdd an A Record that points *.${_DOMAIN} to $${GITLAB_ADDRESS}"
+    until nslookup $${GITLAB_HOSTNAME}; do
+      echo -e "\e[33mWaiting for $${GITLAB_HOSTNAME} to resolve."
       sleep 10
     done
 
@@ -60,11 +57,10 @@ steps:
     sed -i "s/YOUR_PROJECT_ID/${PROJECT_ID}/g" terraform.tfvars
     sed -i "s/YOUR_PROJECT_ID/${PROJECT_ID}/g" backend.tf
     sed -i "s/YOUR_PROJECT_ID/${PROJECT_ID}/g" gitlab-repos/backend.tf
-    sed -i "s/YOUR_DOMAIN/${_DOMAIN}/g" terraform.tfvars
 
     # Copy starter repos to local workspace
     # TODO: Convert to gzip
-    gsutil cp -r gs://${PROJECT_ID}-starter-repos/starter-repos .
+    gsutil -m cp -r gs://${PROJECT_ID}-starter-repos/starter-repos .
 
     export WORKSPACEROOT=$(pwd)
     # Configure GitLab
@@ -72,9 +68,9 @@ steps:
     export GITLAB_PASSWORD=$(kubectl get secrets gitlab-gitlab-initial-root-password -o jsonpath="{.data.password}" | base64 -d)
 
     # Create a personal access token with the value of the root password
-    export UNICORN_POD=$(kubectl get pods -l=app=unicorn -o jsonpath='{.items[0].metadata.name}')
+    export WEBSERVICE_POD=$(kubectl get pods -l=app=webservice -o jsonpath='{.items[0].metadata.name}')
     export GITLAB_TOKEN=$${GITLAB_PASSWORD}
-    kubectl exec -it $$UNICORN_POD -c unicorn -- /bin/bash -c "
+    kubectl exec -it $$WEBSERVICE_POD -c webservice -- /bin/bash -c "
     cd /srv/gitlab;
     bin/rails r \"
     token_digest = Gitlab::CryptoHelper.sha256 \\\"$${GITLAB_PASSWORD}\\\";
@@ -87,7 +83,6 @@ steps:
     mkdir -p ~/.ssh
     ssh-keyscan -t rsa gitlab.${_DOMAIN} >> ~/.ssh/known_hosts
 
-    export GITLAB_HOSTNAME=gitlab.${_DOMAIN}
     git config --global user.email "anthos-platform-installer@example.com"
     git config --global user.name "Anthos Platform Installer"
 

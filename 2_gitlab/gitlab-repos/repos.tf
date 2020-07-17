@@ -16,7 +16,7 @@
 
 provider "gitlab" {
   token    = var.gitlab_token
-  base_url = "https://${var.gitlab_hostname}/api/v4/"
+  base_url = "https://${data.terraform_remote_state.gitlab.outputs.gitlab_hostname}/api/v4/"
   insecure = true
 }
 

@@ -46,7 +46,7 @@ resource "google_project_iam_member" "cluster_iam_artifactregistryreader" {
 
 module "anthos_platform_cluster" {
   source             = "terraform-google-modules/kubernetes-engine/google//modules/beta-public-cluster"
-  version            = "~> 7.3.0"
+  version            = "~> 10.0.0"
   project_id         = var.project_id
   name               = var.name
   region             = var.region

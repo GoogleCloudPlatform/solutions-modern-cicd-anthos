@@ -22,7 +22,7 @@ module "project-services" {
 
   # Don't disable the services
   disable_services_on_destroy = false
-  disable_dependent_services = false
+  disable_dependent_services  = false
 
   activate_apis = [
     "compute.googleapis.com",
