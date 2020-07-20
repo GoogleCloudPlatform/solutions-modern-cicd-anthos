@@ -1,0 +1,58 @@
+apiVersion: container.cnrm.cloud.google.com/v1beta1
+kind: ContainerCluster
+metadata:
+  name: dev-us-central1
+  namespace: YOUR_NAMESPACE # {"$kpt-set":"namespace"}
+  annotations:
+    cnrm.cloud.google.com/remove-default-node-pool: "true" # don't create the default node pool
+spec:
+  initialNodeCount: 1 # this field must be set to greater than 0
+  enableBinaryAuthorization: true
+  ipAllocationPolicy:
+    clusterSecondaryRangeName: anthos-platform-pods-dev
+    servicesSecondaryRangeName: anthos-platform-services-dev
+  location: us-central1
+  networkPolicy:
+    enabled: true
+    provider: CALICO
+  networkRef:
+    name: anthos-platform
+  subnetworkRef:
+    name: anthos-platform-central
+  workloadIdentityConfig:
+    identityNamespace: YOUR_PROJECT.svc.id.goog # {"$kpt-set":"identity-namespace"}
+---
+apiVersion: container.cnrm.cloud.google.com/v1beta1
+kind: ContainerNodePool
+metadata:
+  name: wi-pool-dev-us-central1 # ContainerNodePool name must be unique in a namespace (a GCP project)
+  namespace: YOUR_NAMESPACE # {"$kpt-set":"namespace"}
+spec:
+  autoscaling:
+    maxNodeCount: 3
+    minNodeCount: 1
+  clusterRef:
+    name: dev-us-central1
+  initialNodeCount: 1
+  location: us-central1
+  nodeConfig:
+    labels:
+      cluster_name: dev-us-central1
+      node_pool: wi-pool-dev-us-central1
+    machineType: n1-standard-2
+    metadata:
+      cluster_name: dev-us-central1
+      node_pool: wi-pool-dev-us-central1
+    serviceAccountRef:
+      name: tf-sa-dev-us-central1
+    tags:
+    - gke-dev-us-central1
+    - gke-dev-us-central1-wi-pool
+---
+apiVersion: iam.cnrm.cloud.google.com/v1beta1
+kind: IAMServiceAccount
+metadata:
+  name: tf-sa-dev-us-central1
+  namespace: YOUR_NAMESPACE # {"$kpt-set":"namespace"}
+spec:
+  displayName: Cluster Service Account for dev-us-central1

@@ -1,0 +1,58 @@
+apiVersion: container.cnrm.cloud.google.com/v1beta1
+kind: ContainerCluster
+metadata:
+  name: prod-us-east1
+  namespace: YOUR_NAMESPACE # {"$kpt-set":"namespace"}
+  annotations:
+    cnrm.cloud.google.com/remove-default-node-pool: "true" # don't create the default node pool
+spec:
+  initialNodeCount: 1 # this field must be set to greater than 0
+  enableBinaryAuthorization: true
+  ipAllocationPolicy:
+    clusterSecondaryRangeName: anthos-platform-pods-prod
+    servicesSecondaryRangeName: anthos-platform-services-prod
+  location: us-east1
+  networkPolicy:
+    enabled: true
+    provider: CALICO
+  networkRef:
+    name: anthos-platform
+  subnetworkRef:
+    name: anthos-platform-east
+  workloadIdentityConfig:
+    identityNamespace: YOUR_PROJECT.svc.id.goog # {"$kpt-set":"identity-namespace"}
+---
+apiVersion: container.cnrm.cloud.google.com/v1beta1
+kind: ContainerNodePool
+metadata:
+  name: wi-pool-prod-us-east1 # ContainerNodePool name must be unique in a namespace (a GCP project)
+  namespace: YOUR_NAMESPACE # {"$kpt-set":"namespace"}
+spec:
+  autoscaling:
+    maxNodeCount: 3
+    minNodeCount: 1
+  clusterRef:
+    name: prod-us-east1
+  initialNodeCount: 1
+  location: us-east1
+  nodeConfig:
+    labels:
+      cluster_name: prod-us-east1
+      node_pool: wi-pool-prod-us-east1
+    machineType: n1-standard-2
+    metadata:
+      cluster_name: prod-us-east1
+      node_pool: wi-pool-prod-us-east1
+    serviceAccountRef:
+      name: tf-sa-prod-us-east1
+    tags:
+    - gke-prod-us-east1
+    - gke-prod-us-east1-wi-pool
+---
+apiVersion: iam.cnrm.cloud.google.com/v1beta1
+kind: IAMServiceAccount
+metadata:
+  name: tf-sa-prod-us-east1
+  namespace: YOUR_NAMESPACE # {"$kpt-set":"namespace"}
+spec:
+  displayName: Cluster Service Account for prod-us-east1

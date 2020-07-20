@@ -1,0 +1,30 @@
+apiVersion: kpt.dev/v1alpha1
+kind: Kptfile
+metadata:
+  name: cicd_clusters
+packageMetadata:
+  shortDescription: Anthos CI/CD clusters layer
+openAPI:
+  definitions:
+    io.k8s.cli.substitutions.identity-namespace:
+      x-k8s-cli:
+        substitution:
+          name: identity-namespace
+          pattern: ${project-id}.svc.id.goog
+          values:
+          - marker: ${project-id}
+            ref: '#/definitions/io.k8s.cli.setters.project-id'
+    io.k8s.cli.setters.namespace:
+      description: Namespace of Config Connector resources
+      x-k8s-cli:
+        setter:
+          name: namespace
+          value: YOUR_NAMESPACE
+          required: true
+    io.k8s.cli.setters.project-id:
+      description: Project ID where the cluster will run
+      x-k8s-cli:
+        setter:
+          name: project-id
+          value: YOUR_PROJECT
+          required: true
