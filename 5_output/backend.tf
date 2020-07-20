@@ -16,15 +16,15 @@
 
 terraform {
   backend "gcs" {
-    bucket  = "YOUR_PROJECT_ID-anthos-platform-tf-state"
-    prefix  = "output"
+    bucket = "YOUR_PROJECT_ID-anthos-platform-tf-state"
+    prefix = "output"
   }
 }
 
 data "terraform_remote_state" "gitlab" {
   backend = "gcs"
   config = {
-    bucket  = "YOUR_PROJECT_ID-anthos-platform-tf-state"
-    prefix  = "gitlab"
+    bucket = "YOUR_PROJECT_ID-anthos-platform-tf-state"
+    prefix = "gitlab"
   }
 }

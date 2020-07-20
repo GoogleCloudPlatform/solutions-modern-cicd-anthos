@@ -25,8 +25,8 @@ resource "null_resource" "resource-to-wait-on" {
 }
 
 resource "google_kms_key_ring" "keyring" {
-  name     = "attestor-key-ring-${random_pet.keyring-name.id}"
-  location = var.keyring-region
+  name       = "attestor-key-ring-${random_pet.keyring-name.id}"
+  location   = var.keyring-region
   depends_on = [null_resource.resource-to-wait-on]
 }
 
