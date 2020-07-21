@@ -23,7 +23,7 @@ In this repository we lay out a prescriptive way to create a multi-team software
 using Anthos. The platform has the following capabilities:
 
 * Allow platform administrators to create and update best practices for provisioning apps
-* Ensure App Developers can iterate independently in their own "landing zones" without interfereing with each other
+* Ensure App Developers can iterate independently in their own "landing zones" without interfering with each other
 * Allow security teams to seamlessly implement and propagate policy across the platform
 * Use GitOps for deployment
 
@@ -51,8 +51,6 @@ Within GitLab you will have the following repo structure:
 * An example [applcation repo](starter-repos/golang-template/) for a Go app
 
 ## Pre-requisites
-
-1. You must have control of a DNS domain where you can add a wildcard A record.
 
 1. Clone this repo to your local machine.
 
@@ -88,35 +86,10 @@ Within GitLab you will have the following repo structure:
     gcloud projects add-iam-policy-binding ${PROJECT_ID} --member serviceAccount:${PROJECT_NUMBER}@cloudbuild.gserviceaccount.com --role roles/containeranalysis.admin
     ```
 
-1. Provision the address that GitLab will use.
-
-    ```shell
-    gcloud services enable compute.googleapis.com
-    gcloud compute addresses create --region ${REGION} gitlab
-    ```
-
-1. Map your GitLab address above to your DNS by creating a wildcard DNS record.
-
-    ```shell
-    gcloud compute addresses list --filter="name=('gitlab')" --format "value(address)"
-    ```
-
-    For example if your domain is `example.org` and you want to use the
-    `platform` subdomain. You would need to create an A record that points
-    `*.platform.example.org` to the address printed in the command above.
-
-    To test that DNS is working as expected, make sure that the following command
-    returns your GitLab address:
-
-    ```shell
-    nslookup gitlab.platform.example.org
-    ```
-
 1. Run Cloud Build to create the necessary resources.
 
     ```shell
-    export DOMAIN=platform.example.org #note, do not prepend "gitlab"
-    gcloud builds submit --substitutions=_DOMAIN=${DOMAIN}
+    gcloud builds submit
     ```
 
     > :warning: This operation may take up to 30 minutes depending on region. Do not close the console or connection as the operation is NOT idempotent. If a failure occurs, [clean up](#clean-up) the environment and attempt again.
@@ -131,7 +104,7 @@ Within GitLab you will have the following repo structure:
 1. URL for Gitlab
 
     ```shell
-    echo "https://gitlab.${DOMAIN}"
+    echo "https://gitlab.endpoints.${PROJECT_ID}.cloud.goog"
     ```
 1. User and Password for GitLab are stored in the [Secrets Manager](https://cloud.google.com/secret-manager)
 
@@ -150,14 +123,14 @@ echo "Password: ${GITLAB_PASSWORD}"
 
     ```shell
     gcloud builds submit --config cloudbuild-destroy.yaml
+    gcloud endpoints services delete gitlab.endpoints.${PROJECT_ID}.cloud.goog
+    gcloud endpoints services delete registry.endpoints.${PROJECT_ID}.cloud.goog
     ```
 
 1. Unset variables (optional)
 
     ```shell
     unset PROJECT_ID
-    unset DOMAIN
-    unset SUBDOMAIN
     unset REGION
     ```
 

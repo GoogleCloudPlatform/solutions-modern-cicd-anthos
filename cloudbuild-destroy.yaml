@@ -16,7 +16,6 @@ timeout: 3600s
 tags:
   - modern-cicd-anthos
 substitutions:
-  _DOMAIN: ""
   _BUILD_IMAGES: "true"
 options:
     substitution_option: 'ALLOW_LOOSE'
@@ -51,6 +50,16 @@ steps:
   waitFor: ["-"]
 
 ## Destroy in reverse order
+#
+# 5 Output
+- name: "gcr.io/cloud-builders/gcloud"
+  id: "trigger-destroy-output"
+  dir: "5_output"
+  entrypoint: bash
+  args:
+    - -c
+    - |
+      gcloud builds submit --config=cloudbuild-destroy.yaml
 
 # 4 Apps
 - name: "gcr.io/cloud-builders/gcloud"
@@ -60,8 +69,8 @@ steps:
   args:
     - -c
     - |
-      gcloud builds submit --config=cloudbuild-destroy.yaml --substitutions="_DOMAIN=${_DOMAIN}"
-  waitFor: ["build-install-image"]
+      gcloud builds submit --config=cloudbuild-destroy.yaml
+  waitFor: ["trigger-destroy-output"]
 
 # 3 ACM
 - name: "gcr.io/cloud-builders/gcloud"
@@ -71,7 +80,7 @@ steps:
   args:
     - -c
     - |
-      gcloud builds submit --config=cloudbuild-destroy.yaml --substitutions="_DOMAIN=${_DOMAIN}"
+      gcloud builds submit --config=cloudbuild-destroy.yaml
   waitFor: ["trigger-destroy-demo-apps"]
 
 # 2 CICD
@@ -82,7 +91,7 @@ steps:
   args:
     - -c
     - |
-      gcloud builds submit --config=cloudbuild-destroy.yaml --substitutions="_DOMAIN=${_DOMAIN}"
+      gcloud builds submit --config=cloudbuild-destroy.yaml
   waitFor: ["trigger-destroy-acm"]
 
 # 1 Clusters

@@ -17,7 +17,6 @@ tags:
   - modern-cicd-anthos
   - modern-cicd-anthos-acm
 substitutions:
-  _DOMAIN: ""
   _BUILD_IMAGES: "true"
 options:
   substitution_option: 'ALLOW_LOOSE'
@@ -28,22 +27,26 @@ steps:
   args:
     - -c
     - |
+      sed -i "s/YOUR_PROJECT_ID/${PROJECT_ID}/g" backend.tf
+
       # Grab latest ACM Operator
       gsutil cp gs://config-management-release/released/latest/config-management-operator.yaml config-management-operator.yaml
 
+      terraform init
+      terraform apply
+      export GITLAB_HOSTNAME=$(terraform output gitlab_hostname)
       export GITLAB_PASSWORD=$(gcloud secrets versions access latest --secret="gitlab-password")
-      export GITLAB_HOSTNAME="gitlab.${_DOMAIN}"
 
       cat > auth.txt <<EOF
       grant_type=password&username=root&password=$${GITLAB_PASSWORD}
       EOF
 
-      export GITLAB_OAUTH_TOKEN=$(curl -k --data "@auth.txt" --request POST https://gitlab.${_DOMAIN}/oauth/token | jq -r .access_token)
+      export GITLAB_OAUTH_TOKEN=$(curl -k --data "@auth.txt" --request POST https://$${GITLAB_HOSTNAME}/oauth/token | jq -r .access_token)
 
       # Get ACM repo project ID
-      export ACM_PROJECT_ID=$(curl -k -s "https://gitlab.${_DOMAIN}/api/v4/projects?search=anthos-config-management&access_token=$${GITLAB_OAUTH_TOKEN}" | jq -r .[0].id)
+      export ACM_PROJECT_ID=$(curl -k -s "https://$${GITLAB_HOSTNAME}/api/v4/projects?search=anthos-config-management&access_token=$${GITLAB_OAUTH_TOKEN}" | jq -r .[0].id)
 
       # Get runner registration token from GitLab
-      export ACM_RUNNER_TOKEN=$(curl -k -s "https://gitlab.${_DOMAIN}/api/v4/projects/$${ACM_PROJECT_ID}?access_token=$${GITLAB_OAUTH_TOKEN}" | jq -r .runners_token)
+      export ACM_RUNNER_TOKEN=$(curl -k -s "https://$${GITLAB_HOSTNAME}/api/v4/projects/$${ACM_PROJECT_ID}?access_token=$${GITLAB_OAUTH_TOKEN}" | jq -r .runners_token)
 
       ./install_acm.sh

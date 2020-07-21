@@ -20,12 +20,12 @@ locals {
 
 provider "google" {
   project = var.project_id
-  version = "= 3.28.0"
+  version = "~> 3.29.0"
 }
 
 provider "google-beta" {
   project = var.project_id
-  version = "= 3.28.0"
+  version = "~> 3.29.0"
 }
 
 data "google_compute_network" "anthos-platform" {

@@ -16,7 +16,7 @@
 
 terraform {
   backend "gcs" {
-    bucket  = "YOUR_PROJECT_ID-anthos-platform-tf-state"
-    prefix  = "gitlab"
+    bucket = "YOUR_PROJECT_ID-anthos-platform-tf-state"
+    prefix = "gitlab"
   }
 }

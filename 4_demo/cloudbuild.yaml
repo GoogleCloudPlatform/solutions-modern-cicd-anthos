@@ -17,7 +17,6 @@ tags:
   - modern-cicd-anthos
   - modern-cicd-anthos-demo-apps
 substitutions:
-  _DOMAIN: ""
   _BUILD_IMAGES: "true"
   _APPS: "hipster-loadgenerator hipster-shop hipster-frontend petabank"
 options:
@@ -30,13 +29,19 @@ steps:
     - -c
     - |
       # TODO: Convert to gzip
+      sed -i "s/YOUR_PROJECT_ID/${PROJECT_ID}/g" backend.tf
+
       # Pull in starter-repos
       gsutil -m cp -r gs://${PROJECT_ID}-starter-repos/starter-repos .
 
+      terraform init
+      terraform apply
+
+      export GITLAB_HOSTNAME=$(terraform output gitlab_hostname)
       export GITLAB_PASSWORD=$(gcloud secrets versions access latest --secret="gitlab-password")
-      export GITLAB_HOSTNAME="gitlab.${_DOMAIN}"
       export GITLAB_TOKEN="$${GITLAB_PASSWORD}"
       export APPS="${_APPS}"
+
       git config --global user.email "anthos-platform-installer@example.com"
       git config --global user.name "Anthos Platform Installer"
 

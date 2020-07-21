@@ -25,8 +25,8 @@ resource "null_resource" "resource-to-wait-on" {
 }
 
 resource "google_kms_key_ring" "keyring" {
-  name     = "attestor-key-ring-${random_pet.keyring-name.id}"
-  location = var.keyring-region
+  name       = "attestor-key-ring-${random_pet.keyring-name.id}"
+  location   = var.keyring-region
   depends_on = [null_resource.resource-to-wait-on]
 }
 
@@ -38,9 +38,9 @@ locals {
     "security"
   ]
   admin_enabled_apis = [
-    "containeranalysis.googleapis.com",
     "binaryauthorization.googleapis.com",
     "cloudkms.googleapis.com",
+    "containeranalysis.googleapis.com",
     "secretmanager.googleapis.com"
   ]
 
@@ -66,6 +66,9 @@ module "quality-attestor" {
 
   attestor-name = local.attestors[0]
   keyring-id    = google_kms_key_ring.keyring.id
+
+  disable_dependent_services  = false
+  disable_services_on_destroy = false
 }
 
 # Create Builder attestor
@@ -76,6 +79,9 @@ module "build-attestor" {
 
   attestor-name = local.attestors[1]
   keyring-id    = google_kms_key_ring.keyring.id
+
+  disable_dependent_services  = false
+  disable_services_on_destroy = false
 }
 
 # Create Security attestor
@@ -86,6 +92,9 @@ module "security-attestor" {
 
   attestor-name = local.attestors[2]
   keyring-id    = google_kms_key_ring.keyring.id
+
+  disable_dependent_services  = false
+  disable_services_on_destroy = false
 }
 
 resource "google_binary_authorization_policy" "policy" {
