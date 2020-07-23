@@ -1,0 +1,12 @@
+- op: replace
+  path: /metadata/name
+  value: prod-us-east1
+- op: replace
+  path: /spec/location
+  value: us-east1
+- op: replace
+  path: /spec/subnetworkRef/name
+  value: anthos-platform-east
+- op: replace
+  path: /spec/ipAllocationPolicy/location
+  value: us-east1

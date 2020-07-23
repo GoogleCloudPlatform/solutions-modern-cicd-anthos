@@ -1,0 +1,12 @@
+- op: replace
+  path: /metadata/name
+  value: wi-pool-prod-us-east1
+- op: replace
+  path: /spec/clusterRef/name
+  value: prod-us-east1
+- op: add
+  path: /spec/nodeConfig/serviceAccountRef/name
+  value: tf-sa-prod-us-east1
+- op: replace
+  path: /spec/location
+  value: us-east1

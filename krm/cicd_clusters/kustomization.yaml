@@ -1,0 +1,5 @@
+resources:
+- ./clusters/dev
+- ./clusters/staging
+- ./clusters/prod-central
+- ./clusters/prod-east

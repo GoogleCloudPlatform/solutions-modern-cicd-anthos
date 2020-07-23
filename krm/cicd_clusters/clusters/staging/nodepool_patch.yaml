@@ -1,0 +1,9 @@
+- op: replace
+  path: /metadata/name
+  value: wi-pool-staging-us-central1
+- op: replace
+  path: /spec/clusterRef/name
+  value: staging-us-central1
+- op: add
+  path: /spec/nodeConfig/serviceAccountRef/name
+  value: tf-sa-staging-us-central1

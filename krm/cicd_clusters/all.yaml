@@ -1,0 +1,188 @@
+apiVersion: container.cnrm.cloud.google.com/v1beta1
+kind: ContainerCluster
+metadata:
+  annotations:
+    cnrm.cloud.google.com/remove-default-node-pool: "true"
+  name: dev-us-central1
+spec:
+  enableBinaryAuthorization: true
+  initialNodeCount: 1
+  ipAllocationPolicy:
+    clusterSecondaryRangeName: anthos-platform-pods-dev
+    enabled: true
+    location: us-central1
+    networkPolicy: null
+    provider: CALICO
+    servicesSecondaryRangeName: anthos-platform-services-dev
+  networkRef:
+    name: anthos-platform
+  subnetworkRef:
+    name: anthos-platform-central
+  workloadIdentityConfig:
+    identityNamespace: YOUR_PROJECT.svc.id.goog
+---
+apiVersion: container.cnrm.cloud.google.com/v1beta1
+kind: ContainerCluster
+metadata:
+  annotations:
+    cnrm.cloud.google.com/remove-default-node-pool: "true"
+  name: prod-us-central1
+spec:
+  enableBinaryAuthorization: true
+  initialNodeCount: 1
+  ipAllocationPolicy:
+    clusterSecondaryRangeName: anthos-platform-pods-prod
+    enabled: true
+    location: us-central1
+    networkPolicy: null
+    provider: CALICO
+    servicesSecondaryRangeName: anthos-platform-services-prod
+  networkRef:
+    name: anthos-platform
+  subnetworkRef:
+    name: anthos-platform-central
+  workloadIdentityConfig:
+    identityNamespace: YOUR_PROJECT.svc.id.goog
+---
+apiVersion: container.cnrm.cloud.google.com/v1beta1
+kind: ContainerCluster
+metadata:
+  annotations:
+    cnrm.cloud.google.com/remove-default-node-pool: "true"
+  name: prod-us-east1
+spec:
+  enableBinaryAuthorization: true
+  initialNodeCount: 1
+  ipAllocationPolicy:
+    clusterSecondaryRangeName: anthos-platform-pods-prod
+    enabled: true
+    location: us-east1
+    networkPolicy: null
+    provider: CALICO
+    servicesSecondaryRangeName: anthos-platform-services-prod
+  location: us-east1
+  networkRef:
+    name: anthos-platform
+  subnetworkRef:
+    name: anthos-platform-east
+  workloadIdentityConfig:
+    identityNamespace: YOUR_PROJECT.svc.id.goog
+---
+apiVersion: container.cnrm.cloud.google.com/v1beta1
+kind: ContainerCluster
+metadata:
+  annotations:
+    cnrm.cloud.google.com/remove-default-node-pool: "true"
+  name: staging-us-central1
+spec:
+  enableBinaryAuthorization: true
+  initialNodeCount: 1
+  ipAllocationPolicy:
+    clusterSecondaryRangeName: anthos-platform-pods-staging
+    enabled: true
+    location: us-central1
+    networkPolicy: null
+    provider: CALICO
+    servicesSecondaryRangeName: anthos-platform-services-staging
+  networkRef:
+    name: anthos-platform
+  subnetworkRef:
+    name: anthos-platform-central
+  workloadIdentityConfig:
+    identityNamespace: YOUR_PROJECT.svc.id.goog
+---
+apiVersion: container.cnrm.cloud.google.com/v1beta1
+kind: ContainerNodePool
+metadata:
+  name: wi-pool-dev-us-central1
+spec:
+  autoscaling:
+    maxNodeCount: 3
+    minNodeCount: 1
+  clusterRef:
+    name: dev-us-central1
+  initialNodeCount: 1
+  location: us-central1
+  nodeConfig:
+    machineType: n1-standard-2
+    serviceAccountRef:
+      name: tf-sa-dev-us-central1
+---
+apiVersion: container.cnrm.cloud.google.com/v1beta1
+kind: ContainerNodePool
+metadata:
+  name: wi-pool-prod-us-central1
+spec:
+  autoscaling:
+    maxNodeCount: 3
+    minNodeCount: 1
+  clusterRef:
+    name: prod-us-central1
+  initialNodeCount: 1
+  location: us-central1
+  nodeConfig:
+    machineType: n1-standard-2
+    serviceAccountRef:
+      name: tf-sa-prod-us-central1
+---
+apiVersion: container.cnrm.cloud.google.com/v1beta1
+kind: ContainerNodePool
+metadata:
+  name: wi-pool-prod-us-east1
+spec:
+  autoscaling:
+    maxNodeCount: 3
+    minNodeCount: 1
+  clusterRef:
+    name: prod-us-east1
+  initialNodeCount: 1
+  location: us-east1
+  nodeConfig:
+    machineType: n1-standard-2
+    serviceAccountRef:
+      name: tf-sa-prod-us-east1
+---
+apiVersion: container.cnrm.cloud.google.com/v1beta1
+kind: ContainerNodePool
+metadata:
+  name: wi-pool-staging-us-central1
+spec:
+  autoscaling:
+    maxNodeCount: 3
+    minNodeCount: 1
+  clusterRef:
+    name: staging-us-central1
+  initialNodeCount: 1
+  location: us-central1
+  nodeConfig:
+    machineType: n1-standard-2
+    serviceAccountRef:
+      name: tf-sa-staging-us-central1
+---
+apiVersion: iam.cnrm.cloud.google.com/v1beta1
+kind: IAMServiceAccount
+metadata:
+  name: tf-sa-dev-us-central1
+spec:
+  displayName: Cluster Service Account
+---
+apiVersion: iam.cnrm.cloud.google.com/v1beta1
+kind: IAMServiceAccount
+metadata:
+  name: tf-sa-prod-us-central1
+spec:
+  displayName: Cluster Service Account
+---
+apiVersion: iam.cnrm.cloud.google.com/v1beta1
+kind: IAMServiceAccount
+metadata:
+  name: tf-sa-prod-us-east1
+spec:
+  displayName: Cluster Service Account
+---
+apiVersion: iam.cnrm.cloud.google.com/v1beta1
+kind: IAMServiceAccount
+metadata:
+  name: tf-sa-staging-us-central1
+spec:
+  displayName: Cluster Service Account

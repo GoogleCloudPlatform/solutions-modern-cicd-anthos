@@ -1,0 +1,9 @@
+- op: replace
+  path: /metadata/name
+  value: dev-us-central1
+- op: add
+  path: /spec/ipAllocationPolicy/clusterSecondaryRangeName
+  value: anthos-platform-pods-dev
+- op: add
+  path: /spec/ipAllocationPolicy/servicesSecondaryRangeName
+  value: anthos-platform-services-dev

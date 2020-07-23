@@ -1,0 +1,22 @@
+resources:
+- ../../bases/cluster
+
+patchesJson6902:
+- target:
+    group: container.cnrm.cloud.google.com
+    version: v1beta1
+    kind: ContainerCluster
+    name: cluster
+  path: cluster_patch.yaml
+- target:
+    group: iam.cnrm.cloud.google.com
+    version: v1beta1
+    kind: IAMServiceAccount
+    name: gke-sa
+  path: iam_patch.yaml
+- target:
+    group: container.cnrm.cloud.google.com
+    version: v1beta1
+    kind: ContainerNodePool
+    name: nodepool
+  path: nodepool_patch.yaml

@@ -1,0 +1,20 @@
+apiVersion: container.cnrm.cloud.google.com/v1beta1
+kind: ContainerCluster
+metadata:
+  name: cluster
+  annotations:
+    cnrm.cloud.google.com/remove-default-node-pool: "true" # don't create the default node pool
+spec:
+  initialNodeCount: 1 # this field must be set to greater than 0
+  enableBinaryAuthorization: true
+  ipAllocationPolicy:
+    location: us-central1
+    networkPolicy:
+    enabled: true
+    provider: CALICO
+  networkRef:
+    name: anthos-platform
+  subnetworkRef:
+    name: anthos-platform-central
+  workloadIdentityConfig:
+    identityNamespace: YOUR_PROJECT.svc.id.goog # {"$kpt-set":"identity-namespace"}

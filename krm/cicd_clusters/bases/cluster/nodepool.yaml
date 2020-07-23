@@ -1,0 +1,16 @@
+apiVersion: container.cnrm.cloud.google.com/v1beta1
+kind: ContainerNodePool
+metadata:
+  name: nodepool # ContainerNodePool name must be unique in a namespace (a GCP project)
+spec:
+  autoscaling:
+    maxNodeCount: 3
+    minNodeCount: 1
+  clusterRef:
+    name: cluster-name
+  initialNodeCount: 1
+  location: us-central1
+  nodeConfig:
+    machineType: n1-standard-2
+    serviceAccountRef:
+      name: sa-name
