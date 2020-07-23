@@ -7,14 +7,18 @@ Anthos CI/CD clusters layer
 
 # SYNOPSIS
 
+To regenerate the package: 
+
+    kustomize build cicd_clusters > cicd_clusters/all.yaml
+
 To apply the package:
 
-    kubectl apply -R -f cicd_clusters
+    kubectl apply -R -f cicd_clusters/all.yaml
 
-To edit the package:
+<!-- To edit the package:
 
     kpt cfg list-setters cicd_clusters/
-    kpt cfg set cicd_clusters/ SETTER VALUE
+    kpt cfg set cicd_clusters/ SETTER VALUE -->
 
 # Description
 
