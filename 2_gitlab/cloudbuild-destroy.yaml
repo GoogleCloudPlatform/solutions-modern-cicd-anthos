@@ -21,11 +21,12 @@ substitutions:
   _CREATE_GITLAB: "true"
   _DESTROY_CLUSTER: "true"
   _DESTROY_REPOS: "true"
+  _PROJECT_ID: ${PROJECT_ID}
 options:
   substitution_option: 'ALLOW_LOOSE'
 steps:
 # Uninstall gitlab additions
-- name: 'gcr.io/${PROJECT_ID}/anthos-platform-installer'
+- name: 'gcr.io/${_PROJECT_ID}/anthos-platform-installer'
   id: 'destroy-gitlab-install'
   entrypoint: 'bash'
   args:
@@ -33,25 +34,25 @@ steps:
   - '-c'
   - |
     [[ "${_DESTROY_REPOS}" == "false" ]] && exit 0
-    sed -i "s/YOUR_PROJECT_ID/${PROJECT_ID}/g" terraform.tfvars
-    sed -i "s/YOUR_PROJECT_ID/${PROJECT_ID}/g" backend.tf
-    sed -i "s/YOUR_PROJECT_ID/${PROJECT_ID}/g" gitlab-repos/backend.tf
+    sed -i "s/YOUR_PROJECT_ID/${_PROJECT_ID}/g" terraform.tfvars
+    sed -i "s/YOUR_PROJECT_ID/${_PROJECT_ID}/g" backend.tf
+    sed -i "s/YOUR_PROJECT_ID/${_PROJECT_ID}/g" gitlab-repos/backend.tf
 
     pushd gitlab-repos
 
     terraform init
-    export GITLAB_PASSWORD=$(gcloud secrets versions access latest --secret="gitlab-password")
+    export GITLAB_PASSWORD=$(gcloud secrets versions access latest --secret="gitlab-password --project=${_PROJECT_ID}")
 
     [[ -z "$${GITLAB_PASSWORD}" ]] && exit 0 # No need to continue if no password
     terraform destroy -auto-approve -var gitlab_token=$${GITLAB_PASSWORD}
 
     # remove private keys stored in secrets manager
-    gcloud secrets delete "gitlab-cluster-key-$${CLUSTER}" --quiet || true
+    gcloud secrets delete "gitlab-cluster-key-$${CLUSTER}" --quiet --project=${_PROJECT_ID} || true
 
     popd
 
 # Cluster destroy
-- name: 'gcr.io/${PROJECT_ID}/anthos-platform-installer'
+- name: 'gcr.io/${_PROJECT_ID}/anthos-platform-installer'
   id: 'destroy-gitlab-cluster'
   entrypoint: 'bash'
   args:
@@ -59,14 +60,14 @@ steps:
   - '-c'
   - |
     [[ "${_DESTROY_CLUSTER}" == "false" ]] && exit 0
-    sed -i "s/YOUR_PROJECT_ID/${PROJECT_ID}/g" terraform.tfvars
-    sed -i "s/YOUR_PROJECT_ID/${PROJECT_ID}/g" backend.tf
-    sed -i "s/YOUR_PROJECT_ID/${PROJECT_ID}/g" gitlab-repos/backend.tf
+    sed -i "s/YOUR_PROJECT_ID/${_PROJECT_ID}/g" terraform.tfvars
+    sed -i "s/YOUR_PROJECT_ID/${_PROJECT_ID}/g" backend.tf
+    sed -i "s/YOUR_PROJECT_ID/${_PROJECT_ID}/g" gitlab-repos/backend.tf
 
     # TODO Manually empty bucket contents as otherwise gke-gitlab cannot delete them pending:
     # https://github.com/terraform-google-modules/terraform-google-gke-gitlab/issues/49
-    gsutil rm "gs://${PROJECT_ID}-gitlab-artifacts/**" || true
-    gsutil rm "gs://${PROJECT_ID}-registry/**" || true
+    gsutil rm "gs://${_PROJECT_ID}-gitlab-artifacts/**" || true
+    gsutil rm "gs://${_PROJECT_ID}-registry/**" || true
 
     terraform init
     terraform destroy -auto-approve
@@ -74,7 +75,7 @@ steps:
     - destroy-gitlab-install
 
 # Cluster Secrets
-- name: 'gcr.io/${PROJECT_ID}/anthos-platform-installer'
+- name: 'gcr.io/${_PROJECT_ID}/anthos-platform-installer'
   id: 'destroy-gitlab-secrets'
   entrypoint: 'bash'
   args:

@@ -18,16 +18,20 @@ tags:
   - modern-cicd-anthos-acm
 substitutions:
   _BUILD_IMAGES: "true"
+  _PROJECT_ID: ${PROJECT_ID}
 options:
   substitution_option: 'ALLOW_LOOSE'
 steps:
-- name: 'gcr.io/${PROJECT_ID}/anthos-platform-installer'
+- name: 'gcr.io/${_PROJECT_ID}/anthos-platform-installer'
   id: "install-and-configure-acm"
   entrypoint: bash
   args:
     - -c
     - |
-      sed -i "s/YOUR_PROJECT_ID/${PROJECT_ID}/g" backend.tf
+      sed -i "s/YOUR_PROJECT_ID/${_PROJECT_ID}/g" backend.tf
+
+      # Change project
+      gcloud config set project ${_PROJECT_ID}
 
       # Grab latest ACM Operator
       gsutil cp gs://config-management-release/released/latest/config-management-operator.yaml config-management-operator.yaml

@@ -18,6 +18,7 @@ tags:
 substitutions:
   _BUILD_IMAGES: "true"
   _INSTALL_APPS: "true"
+  _PROJECT_ID: ${PROJECT_ID}
 options:
   substitution_option: 'ALLOW_LOOSE'
 steps:
@@ -28,7 +29,7 @@ steps:
   - '-xe'
   - '-c'
   - |
-    gsutil mb gs://${PROJECT_ID}-anthos-platform-tf-state || true
+    gsutil mb gs://${_PROJECT_ID}-anthos-platform-tf-state || true
 
 - name: 'gcr.io/cloud-builders/gsutil'
   id: 'starter-repo-reference'
@@ -37,8 +38,8 @@ steps:
   - '-xe'
   - '-c'
   - |
-    gsutil mb gs://${PROJECT_ID}-starter-repos || true
-    gsutil -m cp -r starter-repos gs://${PROJECT_ID}-starter-repos
+    gsutil mb gs://${_PROJECT_ID}-starter-repos || true
+    gsutil -m cp -r starter-repos gs://${_PROJECT_ID}-starter-repos
 
 # Create build-installation-image
 - name: "gcr.io/cloud-builders/gcloud"
@@ -48,7 +49,7 @@ steps:
     - -c
     - |
       [[ "${_BUILD_IMAGES}" == "false" ]] && exit 0
-      gcloud builds submit --config=build-image/cloudbuild.yaml
+      gcloud builds submit --config=build-image/cloudbuild.yaml --substitutions _PROJECT_ID=${_PROJECT_ID}
 
 # Foundation
 - name: "gcr.io/cloud-builders/gcloud"
@@ -58,7 +59,7 @@ steps:
   args:
     - -c
     - |
-      gcloud builds submit
+      gcloud builds submit --substitutions _PROJECT_ID=${_PROJECT_ID}
   waitFor:
     - build-install-image
 
@@ -70,7 +71,7 @@ steps:
   args:
     - -c
     - |
-      gcloud builds submit
+      gcloud builds submit --substitutions _PROJECT_ID=${_PROJECT_ID}
   waitFor:
     - trigger-foundation
 
@@ -82,7 +83,7 @@ steps:
   args:
     - -c
     - |
-      gcloud builds submit
+      gcloud builds submit --substitutions _PROJECT_ID=${_PROJECT_ID}
   waitFor:
     - trigger-clusters
 
@@ -94,7 +95,7 @@ steps:
   args:
     - -c
     - |
-      gcloud builds submit
+      gcloud builds submit --substitutions _PROJECT_ID=${_PROJECT_ID}
   waitFor:
     - trigger-gitlab
 
@@ -107,7 +108,7 @@ steps:
     - -c
     - |
       [[ "${_INSTALL_APPS}" == "false" ]] && exit 0
-      gcloud builds submit
+      gcloud builds submit --substitutions _PROJECT_ID=${_PROJECT_ID}
   waitFor:
     - trigger-acm-install
 
@@ -118,6 +119,6 @@ steps:
   args:
     - -c
     - |
-      gcloud builds submit
+      gcloud builds submit --substitutions _PROJECT_ID=${_PROJECT_ID}
   waitFor:
     - trigger-app-install

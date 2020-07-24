@@ -16,16 +16,18 @@ timeout: 3600s # 1-hour
 tags:
   - modern-cicd-anthos
   - modern-cicd-foundation
+substitutions:
+  _PROJECT_ID: ${PROJECT_ID}
 steps:
-- name: 'gcr.io/${PROJECT_ID}/anthos-platform-installer'
+- name: 'gcr.io/${_PROJECT_ID}/anthos-platform-installer'
   id: 'destroy-foundation'
   entrypoint: 'bash'
   args:
   - '-xe'
   - '-c'
   - |
-    sed -i "s/YOUR_PROJECT_ID/${PROJECT_ID}/g" terraform.tfvars
-    sed -i "s/YOUR_PROJECT_ID/${PROJECT_ID}/g" backend.tf
+    sed -i "s/YOUR_PROJECT_ID/${_PROJECT_ID}/g" terraform.tfvars
+    sed -i "s/YOUR_PROJECT_ID/${_PROJECT_ID}/g" backend.tf
 
     terraform init
     terraform destroy -auto-approve

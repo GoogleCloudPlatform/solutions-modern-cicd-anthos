@@ -19,20 +19,21 @@ tags:
 substitutions:
   _BUILD_IMAGES: "true"
   _APPS: "hipster-loadgenerator hipster-shop hipster-frontend petabank"
+  _PROJECT_ID: ${PROJECT_ID}
 options:
   substitution_option: 'ALLOW_LOOSE'
 steps:
-- name: 'gcr.io/${PROJECT_ID}/anthos-platform-installer'
+- name: 'gcr.io/${_PROJECT_ID}/anthos-platform-installer'
   id: "install-and-configure-demo-apps"
   entrypoint: bash
   args:
     - -c
     - |
       # TODO: Convert to gzip
-      sed -i "s/YOUR_PROJECT_ID/${PROJECT_ID}/g" backend.tf
+      sed -i "s/YOUR_PROJECT_ID/${_PROJECT_ID}/g" backend.tf
 
       # Pull in starter-repos
-      gsutil -m cp -r gs://${PROJECT_ID}-starter-repos/starter-repos .
+      gsutil -m cp -r gs://${_PROJECT_ID}-starter-repos/starter-repos .
 
       terraform init
       terraform apply
@@ -48,7 +49,7 @@ steps:
       ./provision-applications.sh
 
       # Add IAM policies to GSA service accounts
-      export PROJECT_ID=${PROJECT_ID}
+      export PROJECT_ID=${_PROJECT_ID}
       ./add-gsa-iam-policies.sh
 
       # Copy source code to repositories and trigger pipelines
