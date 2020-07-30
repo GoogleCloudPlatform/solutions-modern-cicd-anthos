@@ -1,0 +1,11 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: controller-manager
+spec:
+  template:
+    spec:
+      containers:
+      # Change the value of image field below to your controller image URL
+      - image: gcr.io/sunilarora-sandbox/controller:94419e6
+        name: manager

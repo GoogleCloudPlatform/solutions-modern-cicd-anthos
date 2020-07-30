@@ -1,0 +1,25 @@
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: manager-binding
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: manager-cluster-role
+subjects:
+  - kind: ServiceAccount
+    name: gitlab-cnrm-controller-manager
+    namespace: gitlab-cnrm-system
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: manager-watcher-binding
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: manager-ns-role
+subjects:
+  - kind: ServiceAccount
+    name: gitlab-cnrm-controller-manager
+    namespace: gitlab-cnrm-system
