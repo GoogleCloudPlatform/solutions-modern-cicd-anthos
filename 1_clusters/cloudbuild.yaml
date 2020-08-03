@@ -16,16 +16,20 @@ timeout: 3600s # 1-hr
 tags:
   - modern-cicd-anthos
   - modern-cicd-clusters
+substitutions:
+  _PROJECT_ID: ${PROJECT_ID}
 steps:
-- name: 'gcr.io/${PROJECT_ID}/anthos-platform-installer'
+- name: 'gcr.io/${_PROJECT_ID}/anthos-platform-installer'
   id: 'create-clusters'
   entrypoint: 'bash'
   args:
   - '-xe'
   - '-c'
   - |
-    sed -i "s/YOUR_PROJECT_ID/${PROJECT_ID}/g" terraform.tfvars
-    sed -i "s/YOUR_PROJECT_ID/${PROJECT_ID}/g" backend.tf
+    sed -i "s/YOUR_PROJECT_ID/${_PROJECT_ID}/g" terraform.tfvars
+    sed -i "s/YOUR_PROJECT_ID/${_PROJECT_ID}/g" backend.tf
+
+    export TF_LOG="DEBUG"
 
     terraform init
     terraform plan -out=terraform.tfplan

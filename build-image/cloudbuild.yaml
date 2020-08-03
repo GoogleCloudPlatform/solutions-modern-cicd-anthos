@@ -18,6 +18,6 @@ steps:
 - name: 'gcr.io/kaniko-project/executor:latest'
   id: 'build-installer-image'
   args:
-  - --destination=gcr.io/${PROJECT_ID}/anthos-platform-installer
+  - --destination=gcr.io/${_PROJECT_ID}/anthos-platform-installer
   - --cache=true
   - --cache-ttl=12h

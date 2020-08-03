@@ -17,6 +17,7 @@ tags:
   - modern-cicd-anthos
 substitutions:
   _BUILD_IMAGES: "true"
+  _PROJECT_ID: ${PROJECT_ID}
 options:
     substitution_option: 'ALLOW_LOOSE'
 steps:
@@ -28,7 +29,7 @@ steps:
     - -c
     - |
       [[ "${_BUILD_IMAGES}" == "false" ]] && exit 0
-      gcloud builds submit --config=build-image/cloudbuild.yaml
+      gcloud builds submit --config=build-image/cloudbuild.yaml --substitutions _PROJECT_ID=${_PROJECT_ID}
   waitFor: ["-"]
 
 - name: "gcr.io/cloud-builders/gcloud"
@@ -38,15 +39,15 @@ steps:
     - -c
     - |
       # Enable services that may not have been enabled on a clean project
-      gcloud services enable cloudbuild.googleapis.com
-      gcloud services enable container.googleapis.com
-      gcloud services enable anthos.googleapis.com
-      gcloud services enable serviceusage.googleapis.com
-      gcloud services enable containeranalysis.googleapis.com
-      gcloud services enable cloudkms.googleapis.com
-      gcloud services enable binaryauthorization.googleapis.com
-      gcloud services enable secretmanager.googleapis.com
-      gcloud services enable cloudresourcemanager.googleapis.com
+      gcloud services enable cloudbuild.googleapis.com --project=${_PROJECT_ID}
+      gcloud services enable container.googleapis.com --project=${_PROJECT_ID}
+      gcloud services enable anthos.googleapis.com --project=${_PROJECT_ID}
+      gcloud services enable serviceusage.googleapis.com --project=${_PROJECT_ID}
+      gcloud services enable containeranalysis.googleapis.com --project=${_PROJECT_ID}
+      gcloud services enable cloudkms.googleapis.com --project=${_PROJECT_ID}
+      gcloud services enable binaryauthorization.googleapis.com --project=${_PROJECT_ID}
+      gcloud services enable secretmanager.googleapis.com --project=${_PROJECT_ID}
+      gcloud services enable cloudresourcemanager.googleapis.com --project=${_PROJECT_ID}
   waitFor: ["-"]
 
 ## Destroy in reverse order
@@ -59,7 +60,7 @@ steps:
   args:
     - -c
     - |
-      gcloud builds submit --config=cloudbuild-destroy.yaml
+      gcloud builds submit --config=cloudbuild-destroy.yaml --substitutions _PROJECT_ID=${_PROJECT_ID}
 
 # 4 Apps
 - name: "gcr.io/cloud-builders/gcloud"
@@ -69,7 +70,7 @@ steps:
   args:
     - -c
     - |
-      gcloud builds submit --config=cloudbuild-destroy.yaml
+      gcloud builds submit --config=cloudbuild-destroy.yaml --substitutions _PROJECT_ID=${_PROJECT_ID}
   waitFor: ["trigger-destroy-output"]
 
 # 3 ACM
@@ -80,7 +81,7 @@ steps:
   args:
     - -c
     - |
-      gcloud builds submit --config=cloudbuild-destroy.yaml
+      gcloud builds submit --config=cloudbuild-destroy.yaml --substitutions _PROJECT_ID=${_PROJECT_ID}
   waitFor: ["trigger-destroy-demo-apps"]
 
 # 2 CICD
@@ -91,7 +92,7 @@ steps:
   args:
     - -c
     - |
-      gcloud builds submit --config=cloudbuild-destroy.yaml
+      gcloud builds submit --config=cloudbuild-destroy.yaml --substitutions _PROJECT_ID=${_PROJECT_ID}
   waitFor: ["trigger-destroy-acm"]
 
 # 1 Clusters
@@ -102,7 +103,7 @@ steps:
   args:
     - -c
     - |
-      gcloud builds submit --config=cloudbuild-destroy.yaml
+      gcloud builds submit --config=cloudbuild-destroy.yaml --substitutions _PROJECT_ID=${_PROJECT_ID}
   waitFor: ["trigger-destroy-gitlab"]
 
 # 0 Foundation (last)
@@ -114,7 +115,7 @@ steps:
     - -c
     - |
       # Allow the foundation destroy to fail
-      gcloud builds submit --config=cloudbuild-destroy.yaml || true
+      gcloud builds submit --config=cloudbuild-destroy.yaml --substitutions _PROJECT_ID=${_PROJECT_ID} || true
   waitFor: ["trigger-destroy-clusters"]
 
 

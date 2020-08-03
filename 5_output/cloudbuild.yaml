@@ -16,16 +16,18 @@ timeout: 3600s # 1hr
 tags:
   - modern-cicd-anthos
   - modern-cicd-anthos-output
+substitutions:
+  _PROJECT_ID: ${PROJECT_ID}
 options:
   substitution_option: 'ALLOW_LOOSE'
 steps:
-- name: 'gcr.io/${PROJECT_ID}/anthos-platform-installer'
+- name: 'gcr.io/${_PROJECT_ID}/anthos-platform-installer'
   id: "output"
   entrypoint: bash
   args:
     - -c
     - |
-      sed -i "s/YOUR_PROJECT_ID/${PROJECT_ID}/g" backend.tf
+      sed -i "s/YOUR_PROJECT_ID/${_PROJECT_ID}/g" backend.tf
 
       terraform init
       terraform apply

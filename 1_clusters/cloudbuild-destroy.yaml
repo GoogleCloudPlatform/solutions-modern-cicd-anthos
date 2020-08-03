@@ -16,21 +16,23 @@ timeout: 3600s # 1-hour
 tags:
   - modern-cicd-anthos
   - modern-cicd-clusters
+substitutions:
+  _PROJECT_ID: ${PROJECT_ID}
 steps:
-- name: 'gcr.io/${PROJECT_ID}/anthos-platform-installer'
+- name: 'gcr.io/${_PROJECT_ID}/anthos-platform-installer'
   id: 'destroy-clusters'
   entrypoint: 'bash'
   args:
   - '-xe'
   - '-c'
   - |
-    sed -i "s/YOUR_PROJECT_ID/${PROJECT_ID}/g" terraform.tfvars
-    sed -i "s/YOUR_PROJECT_ID/${PROJECT_ID}/g" backend.tf
+    sed -i "s/YOUR_PROJECT_ID/${_PROJECT_ID}/g" terraform.tfvars
+    sed -i "s/YOUR_PROJECT_ID/${_PROJECT_ID}/g" backend.tf
 
     terraform init
     terraform destroy -auto-approve
 
-- name: 'gcr.io/${PROJECT_ID}/anthos-platform-installer'
+- name: 'gcr.io/${_PROJECT_ID}/anthos-platform-installer'
   id: 'remove-attestors-attestations'
   entrypoint: 'bash'
   args:
@@ -48,12 +50,12 @@ steps:
 
           # Remove notes (because gcloud does not remove them)
           access=$(gcloud auth print-access-token)
-          notes=$(curl -H "Authorization: Bearer ${access}" "https://containeranalysis.googleapis.com/v1/projects/${PROJECT_ID}/notes/")
+          notes=$(curl -H "Authorization: Bearer ${access}" "https://containeranalysis.googleapis.com/v1/projects/${_PROJECT_ID}/notes/")
           if [ "$notes" != "{}" ]; then
               for NOTE_ID in $(echo $notes | jq -r '.notes[].name' ); do
                   curl -vvv -X DELETE \
                       -H "Authorization: Bearer ${access}" \
-                      "https://containeranalysis.googleapis.com/v1/projects/${PROJECT_ID}/notes/${NOTE_ID##*/}"
+                      "https://containeranalysis.googleapis.com/v1/projects/${_PROJECT_ID}/notes/${NOTE_ID##*/}"
               done
           fi
       fi

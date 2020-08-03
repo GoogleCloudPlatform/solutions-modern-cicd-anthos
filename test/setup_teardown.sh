@@ -38,14 +38,29 @@ gcloud auth activate-service-account --key-file=${KEY_FILE}
 # Display commands, now that creds are set.
 set -x
 
+# Retrieve current email
+INT_SA_EMAIL=$(gcloud auth list --filter=status:ACTIVE --format="value(account)")
+
+# Create a temporary project for tests
+gcloud builds submit --config=test/setup/cloudbuild.yaml \
+  --substitutions _ORG_ID=${_ORG_ID},_FOLDER_ID=${_FOLDER_ID},_BILLING_ACCOUNT=${_BILLING_ACCOUNT},_INT_SA_EMAIL=${INT_SA_EMAIL}
+
+# Wait for the project to be fully created
+sleep 60
+
+# Retrieve the newly created project
+TEMP_PROJECT_ID=$(gcloud projects list --filter="labels.cft-ci-module=anthos-platform" --format=json --sort-by=~createTime | jq -r "first(.[]).projectId")
+
+echo "Running tests inside project: $TEMP_PROJECT_ID"
+
 # Deploy the platform
-gcloud builds submit --config=cloudbuild.yaml
+gcloud builds submit --config=cloudbuild.yaml --substitutions _PROJECT_ID=${TEMP_PROJECT_ID}
 
 # If the setup succeeded then tear it down.
 if [ $? -eq 0 ]; then
 	sleep 5m
 	# Clean up after the run
-	gcloud builds submit --config=cloudbuild-destroy.yaml
+	gcloud builds submit --config=cloudbuild-destroy.yaml --substitutions _PROJECT_ID=${TEMP_PROJECT_ID}
 fi
 
 echo "All passed"

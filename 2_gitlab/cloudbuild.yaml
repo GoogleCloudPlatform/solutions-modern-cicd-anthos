@@ -22,7 +22,7 @@ substitutions:
 options:
     substitution_option: 'ALLOW_LOOSE'
 steps:
-- name: 'gcr.io/${PROJECT_ID}/anthos-platform-installer'
+- name: 'gcr.io/${_PROJECT_ID}/anthos-platform-installer'
   id: 'create-gitlab'
   entrypoint: 'bash'
   args:
@@ -30,9 +30,9 @@ steps:
   - '-c'
   - |
     [[ "${_CREATE_CLUSTER}" == "false" ]] && exit 0
-    sed -i "s/YOUR_PROJECT_ID/${PROJECT_ID}/g" terraform.tfvars
-    sed -i "s/YOUR_PROJECT_ID/${PROJECT_ID}/g" backend.tf
-    sed -i "s/YOUR_PROJECT_ID/${PROJECT_ID}/g" gitlab-repos/backend.tf
+    sed -i "s/YOUR_PROJECT_ID/${_PROJECT_ID}/g" terraform.tfvars
+    sed -i "s/YOUR_PROJECT_ID/${_PROJECT_ID}/g" backend.tf
+    sed -i "s/YOUR_PROJECT_ID/${_PROJECT_ID}/g" gitlab-repos/backend.tf
 
     terraform init
     terraform plan -out=terraform.tfplan
@@ -47,24 +47,27 @@ steps:
     done
 
 # TODO: How to make this idempotent (if configured already, skip)
-- name: 'gcr.io/${PROJECT_ID}/anthos-platform-installer'
+- name: 'gcr.io/${_PROJECT_ID}/anthos-platform-installer'
   id: 'configure-gitlab'
   entrypoint: 'bash'
   args:
   - '-xe'
   - '-c'
   - |
-    sed -i "s/YOUR_PROJECT_ID/${PROJECT_ID}/g" terraform.tfvars
-    sed -i "s/YOUR_PROJECT_ID/${PROJECT_ID}/g" backend.tf
-    sed -i "s/YOUR_PROJECT_ID/${PROJECT_ID}/g" gitlab-repos/backend.tf
+    sed -i "s/YOUR_PROJECT_ID/${_PROJECT_ID}/g" terraform.tfvars
+    sed -i "s/YOUR_PROJECT_ID/${_PROJECT_ID}/g" backend.tf
+    sed -i "s/YOUR_PROJECT_ID/${_PROJECT_ID}/g" gitlab-repos/backend.tf
+
+    # Change project
+    gcloud config set project ${_PROJECT_ID}
 
     # Copy starter repos to local workspace
     # TODO: Convert to gzip
-    gsutil -m cp -r gs://${PROJECT_ID}-starter-repos/starter-repos .
+    gsutil -m cp -r gs://${_PROJECT_ID}-starter-repos/starter-repos .
 
     export WORKSPACEROOT=$(pwd)
     # Configure GitLab
-    gcloud container clusters get-credentials gitlab --region us-central1
+    gcloud container clusters get-credentials gitlab --region us-central1 --project=${_PROJECT_ID}
     export GITLAB_PASSWORD=$(kubectl get secrets gitlab-gitlab-initial-root-password -o jsonpath="{.data.password}" | base64 -d)
 
     # Create a personal access token with the value of the root password
