@@ -1,0 +1,93 @@
+apiVersion: compute.cnrm.cloud.google.com/v1beta1
+kind: ComputeAddress
+metadata:
+  name: gitlab-sql
+  namespace: gitlab-2 # {"$kpt-set":"namespace"}
+spec:
+  address: 10.1.0.0
+  addressType: INTERNAL
+  location: global
+  networkRef:
+    name: gitlab
+  prefixLength: 16
+  purpose: VPC_PEERING
+---
+apiVersion: servicenetworking.cnrm.cloud.google.com/v1beta1
+kind: ServiceNetworkingConnection
+metadata:
+  name: private-vpc-connection
+  namespace: gitlab-2 # {"$kpt-set":"namespace"}
+spec:
+  networkRef:
+    name: gitlab
+  reservedPeeringRanges:
+  - name: gitlab-sql
+  service: servicenetworking.googleapis.com
+---
+apiVersion: sql.cnrm.cloud.google.com/v1beta1
+kind: SQLInstance
+metadata:
+  name: gitlab-db
+  namespace: gitlab-2 # {"$kpt-set":"namespace"}
+spec:
+  databaseVersion: POSTGRES_9_6
+  region: us-central1
+  settings:
+    activationPolicy: ALWAYS
+    backupConfiguration:
+      startTime: "14:00"
+    diskAutoresize: true
+    diskSize: 10
+    diskType: PD_SSD
+    ipConfiguration:
+      privateNetworkRef:
+        external: projects/YOUR_PROJECT/global/networks/gitlab # {"$kpt-set":"network-external"}
+    locationPreference:
+      zone: us-central1-a
+    pricingPlan: PER_USE
+    replicationType: SYNCHRONOUS
+    tier: db-custom-4-15360
+---
+apiVersion: sql.cnrm.cloud.google.com/v1beta1
+kind: SQLDatabase
+metadata:
+  name: gitlabhq-production
+  namespace: gitlab-2 # {"$kpt-set":"namespace"}
+spec:
+  instanceRef:
+    name: gitlab-db
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: gitlab-db-password
+  namespace: gitlab-2 # {"$kpt-set":"namespace"}
+data:
+  password: cGFzc3dvcmQ=
+---
+apiVersion: sql.cnrm.cloud.google.com/v1beta1
+kind: SQLUser
+metadata:
+  name: gitlab
+  namespace: gitlab-2 # {"$kpt-set":"namespace"}
+spec:
+  instanceRef:
+    name: gitlab-db
+  password:
+    valueFrom:
+      secretKeyRef:
+        name: gitlab-db-password
+        key: password
+---
+apiVersion: redis.cnrm.cloud.google.com/v1beta1
+kind: RedisInstance
+metadata:
+  name: gitlab
+  namespace: gitlab-2 # {"$kpt-set":"namespace"}
+spec:
+  tier: STANDARD_HA
+  memorySizeGb: 5
+  region: us-central1
+  authorizedNetworkRef:
+    name: gitlab
+  displayName: Gitlab Redis
