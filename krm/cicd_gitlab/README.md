@@ -26,6 +26,10 @@ kpt cfg cicd_gitlab set namespace A_NAMESPACE
 
 ### Apply the package
 
+Create the SQLDatabase secret:
+
+kubectl -n A_NAMESPACE create secret generic gitlab-db-password-new --from-literal password=<PASSWORD>
+
 ```
 kpt live init cicd_gitlab
 kpt live apply cicd_gitlab
