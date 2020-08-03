@@ -2,7 +2,7 @@ apiVersion: compute.cnrm.cloud.google.com/v1beta1
 kind: ComputeAddress
 metadata:
   name: gitlab-sql
-  namespace: gitlab-2 # {"$kpt-set":"namespace"}
+  namespace: gitlab # {"$kpt-set":"namespace"}
 spec:
   address: 10.1.0.0
   addressType: INTERNAL
@@ -16,7 +16,7 @@ apiVersion: servicenetworking.cnrm.cloud.google.com/v1beta1
 kind: ServiceNetworkingConnection
 metadata:
   name: private-vpc-connection
-  namespace: gitlab-2 # {"$kpt-set":"namespace"}
+  namespace: gitlab # {"$kpt-set":"namespace"}
 spec:
   networkRef:
     name: gitlab
@@ -28,7 +28,7 @@ apiVersion: sql.cnrm.cloud.google.com/v1beta1
 kind: SQLInstance
 metadata:
   name: gitlab-db
-  namespace: gitlab-2 # {"$kpt-set":"namespace"}
+  namespace: gitlab # {"$kpt-set":"namespace"}
 spec:
   databaseVersion: POSTGRES_9_6
   region: us-central1
@@ -52,7 +52,7 @@ apiVersion: sql.cnrm.cloud.google.com/v1beta1
 kind: SQLDatabase
 metadata:
   name: gitlabhq-production
-  namespace: gitlab-2 # {"$kpt-set":"namespace"}
+  namespace: gitlab # {"$kpt-set":"namespace"}
 spec:
   instanceRef:
     name: gitlab-db
@@ -61,7 +61,7 @@ apiVersion: v1
 kind: Secret
 metadata:
   name: gitlab-db-password
-  namespace: gitlab-2 # {"$kpt-set":"namespace"}
+  namespace: gitlab # {"$kpt-set":"namespace"}
 data:
   password: cGFzc3dvcmQ=
 ---
@@ -69,7 +69,7 @@ apiVersion: sql.cnrm.cloud.google.com/v1beta1
 kind: SQLUser
 metadata:
   name: gitlab
-  namespace: gitlab-2 # {"$kpt-set":"namespace"}
+  namespace: gitlab # {"$kpt-set":"namespace"}
 spec:
   instanceRef:
     name: gitlab-db
@@ -83,7 +83,7 @@ apiVersion: redis.cnrm.cloud.google.com/v1beta1
 kind: RedisInstance
 metadata:
   name: gitlab
-  namespace: gitlab-2 # {"$kpt-set":"namespace"}
+  namespace: gitlab # {"$kpt-set":"namespace"}
 spec:
   tier: STANDARD_HA
   memorySizeGb: 5

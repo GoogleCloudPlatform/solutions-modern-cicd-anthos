@@ -4,7 +4,7 @@ metadata:
   name: gitlab
   annotations:
     cnrm.cloud.google.com/remove-default-node-pool: "true" # don't create the default node pool
-  namespace: gitlab-2 # {"$kpt-set":"namespace"}
+  namespace: gitlab # {"$kpt-set":"namespace"}
 spec:
   location: us-central1
   initialNodeCount: 1 # this field must be set to greater than 0
@@ -23,7 +23,7 @@ apiVersion: container.cnrm.cloud.google.com/v1beta1
 kind: ContainerNodePool
 metadata:
   name: gitlab
-  namespace: gitlab-2 # {"$kpt-set":"namespace"}
+  namespace: gitlab # {"$kpt-set":"namespace"}
 spec:
   clusterRef:
     name: gitlab
@@ -47,6 +47,6 @@ apiVersion: iam.cnrm.cloud.google.com/v1beta1
 kind: IAMServiceAccount
 metadata:
   name: gitlab-cluster
-  namespace: gitlab-2 # {"$kpt-set":"namespace"}
+  namespace: gitlab # {"$kpt-set":"namespace"}
 spec:
   displayName: Service Account for GitLab cluster

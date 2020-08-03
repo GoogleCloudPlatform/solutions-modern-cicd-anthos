@@ -10,8 +10,8 @@ openAPI:
       x-k8s-cli:
         setter:
           name: namespace
-          value: gitlab-2
-          required: true
+          value: gitlab
+          isSet: true
       description: Namespace for GitLab deployment
     io.k8s.cli.setters.project-id:
       description: GCP Project ID
