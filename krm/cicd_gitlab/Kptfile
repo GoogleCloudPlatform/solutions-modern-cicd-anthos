@@ -1,0 +1,110 @@
+apiVersion: kpt.dev/v1alpha1
+kind: Kptfile
+metadata:
+  name: cicd_gitlab
+packageMetadata:
+  shortDescription: Deploys GitLab on GCP
+openAPI:
+  definitions:
+    io.k8s.cli.setters.namespace:
+      x-k8s-cli:
+        setter:
+          name: namespace
+          value: gitlab
+          isSet: true
+      description: Namespace for GitLab deployment
+    io.k8s.cli.setters.project-id:
+      description: GCP Project ID
+      x-k8s-cli:
+        setter:
+          name: project-id
+          value: YOUR_PROJECT
+          required: true
+    io.k8s.cli.substitutions.gcs-gitlab-backups:
+      x-k8s-cli:
+        substitution:
+          name: gcs-gitlab-backups
+          pattern: ${project-id}-gitlab-backups
+          values:
+          - marker: ${project-id}
+            ref: '#/definitions/io.k8s.cli.setters.project-id'
+    io.k8s.cli.substitutions.gcs-gitlab-uploads:
+      x-k8s-cli:
+        substitution:
+          name: gcs-gitlab-uploads
+          pattern: ${project-id}-gitlab-uploads
+          values:
+          - marker: ${project-id}
+            ref: '#/definitions/io.k8s.cli.setters.project-id'
+    io.k8s.cli.substitutions.gcs-gitlab-artifacts:
+      x-k8s-cli:
+        substitution:
+          name: gcs-gitlab-artifacts
+          pattern: ${project-id}-gitlab-artifacts
+          values:
+          - marker: ${project-id}
+            ref: '#/definitions/io.k8s.cli.setters.project-id'
+    io.k8s.cli.substitutions.gcs-git-lfs:
+      x-k8s-cli:
+        substitution:
+          name: gcs-git-lfs
+          pattern: ${project-id}-git-lfs
+          values:
+          - marker: ${project-id}
+            ref: '#/definitions/io.k8s.cli.setters.project-id'
+    io.k8s.cli.substitutions.gcs-git-packages:
+      x-k8s-cli:
+        substitution:
+          name: gcs-git-packages
+          pattern: ${project-id}-git-packages
+          values:
+          - marker: ${project-id}
+            ref: '#/definitions/io.k8s.cli.setters.project-id'
+    io.k8s.cli.substitutions.gcs-registry:
+      x-k8s-cli:
+        substitution:
+          name: gcs-registry
+          pattern: ${project-id}-registry
+          values:
+          - marker: ${project-id}
+            ref: '#/definitions/io.k8s.cli.setters.project-id'
+    io.k8s.cli.substitutions.gcs-pseudo:
+      x-k8s-cli:
+        substitution:
+          name: gcs-pseudo
+          pattern: ${project-id}-pseudo
+          values:
+          - marker: ${project-id}
+            ref: '#/definitions/io.k8s.cli.setters.project-id'
+    io.k8s.cli.substitutions.gcs-runner-cache:
+      x-k8s-cli:
+        substitution:
+          name: gcs-runner-cache
+          pattern: ${project-id}-runner-cache
+          values:
+          - marker: ${project-id}
+            ref: '#/definitions/io.k8s.cli.setters.project-id'
+    io.k8s.cli.substitutions.gcs-sa:
+      x-k8s-cli:
+        substitution:
+          name: gcs-sa
+          pattern: serviceAccount:gitlab-gcs@${project-id}.iam.gserviceaccount.com
+          values:
+          - marker: ${project-id}
+            ref: '#/definitions/io.k8s.cli.setters.project-id'
+    io.k8s.cli.substitutions.project-external:
+      x-k8s-cli:
+        substitution:
+          name: project-external
+          pattern: projects/${project-id}
+          values:
+          - marker: ${project-id}
+            ref: '#/definitions/io.k8s.cli.setters.project-id'
+    io.k8s.cli.substitutions.network-external:
+      x-k8s-cli:
+        substitution:
+          name: network-external
+          pattern: projects/${project-id}/global/networks/gitlab
+          values:
+          - marker: ${project-id}
+            ref: '#/definitions/io.k8s.cli.setters.project-id'

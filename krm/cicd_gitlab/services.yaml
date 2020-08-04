@@ -1,0 +1,29 @@
+apiVersion: serviceusage.cnrm.cloud.google.com/v1beta1
+kind: Service
+metadata:
+  name: compute.googleapis.com
+  namespace: gitlab # {"$kpt-set":"namespace"}
+---
+apiVersion: serviceusage.cnrm.cloud.google.com/v1beta1
+kind: Service
+metadata:
+  name: container.googleapis.com
+  namespace: gitlab # {"$kpt-set":"namespace"}
+---
+apiVersion: serviceusage.cnrm.cloud.google.com/v1beta1
+kind: Service
+metadata:
+  name: servicenetworking.googleapis.com
+  namespace: gitlab # {"$kpt-set":"namespace"}
+---
+apiVersion: serviceusage.cnrm.cloud.google.com/v1beta1
+kind: Service
+metadata:
+  name: cloudresourcemanager.googleapis.com
+  namespace: gitlab # {"$kpt-set":"namespace"}
+---
+apiVersion: serviceusage.cnrm.cloud.google.com/v1beta1
+kind: Service
+metadata:
+  name: redis.googleapis.com
+  namespace: gitlab # {"$kpt-set":"namespace"}
