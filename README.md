@@ -89,7 +89,7 @@ Within GitLab you will have the following repo structure:
 1. Run Cloud Build to create the necessary resources.
 
     ```shell
-    gcloud builds submit
+    gcloud builds submit --substitutions=_PROJECT_ID=${PROJECT_ID}
     ```
 
     > :warning: This operation may take up to 30 minutes depending on region. Do not close the console or connection as the operation is NOT idempotent. If a failure occurs, [clean up](#clean-up) the environment and attempt again.
@@ -122,7 +122,7 @@ echo "Password: ${GITLAB_PASSWORD}"
 1. Remove infrastructure
 
     ```shell
-    gcloud builds submit --config cloudbuild-destroy.yaml
+    gcloud builds submit --substitutions=_PROJECT_ID=${PROJECT_ID} --config cloudbuild-destroy.yaml
     gcloud endpoints services delete gitlab.endpoints.${PROJECT_ID}.cloud.goog
     gcloud endpoints services delete registry.endpoints.${PROJECT_ID}.cloud.goog
     ```
