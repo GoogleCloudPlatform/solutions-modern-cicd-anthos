@@ -11,14 +11,13 @@ openAPI:
         setter:
           name: namespace
           value: gitlab
-          isSet: true
       description: Namespace for GitLab deployment
     io.k8s.cli.setters.project-id:
       description: GCP Project ID
       x-k8s-cli:
         setter:
           name: project-id
-          value: YOUR_PROJECT
+          value: a-project-id
           required: true
     io.k8s.cli.substitutions.gcs-gitlab-backups:
       x-k8s-cli:
