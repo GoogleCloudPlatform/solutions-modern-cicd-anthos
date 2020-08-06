@@ -22,19 +22,19 @@ metadata:
   namespace: gitlab # {"$kpt-set":"namespace"}
 spec:
   member: serviceAccount:gitlab-gcs@YOUR_PROJECT.iam.gserviceaccount.com # {"$kpt-set":"gcs-sa"}
-  role: roles/storage.admin
   resourceRef:
     apiVersion: resourcemanager.cnrm.cloud.google.com/v1beta1
     kind: Project
     external: projects/YOUR_PROJECT # {"$kpt-set":"project-external"}
+  role: roles/storage.admin
 ---
 apiVersion: storage.cnrm.cloud.google.com/v1beta1
 kind: StorageBucket
 metadata:
-  annotations:
-    cnrm.cloud.google.com/force-destroy: "false"
   name: YOUR_PROJECT-gitlab-backups # {"$kpt-set":"gcs-gitlab-backups"}
   namespace: gitlab # {"$kpt-set":"namespace"}
+  annotations:
+    cnrm.cloud.google.com/force-destroy: "false"
 spec:
   location: US-CENTRAL1
   storageClass: STANDARD
@@ -42,10 +42,10 @@ spec:
 apiVersion: storage.cnrm.cloud.google.com/v1beta1
 kind: StorageBucket
 metadata:
-  annotations:
-    cnrm.cloud.google.com/force-destroy: "false"
   name: YOUR_PROJECT-gitlab-uploads # {"$kpt-set":"gcs-gitlab-uploads"}
   namespace: gitlab # {"$kpt-set":"namespace"}
+  annotations:
+    cnrm.cloud.google.com/force-destroy: "false"
 spec:
   location: US-CENTRAL1
   storageClass: STANDARD
@@ -53,10 +53,10 @@ spec:
 apiVersion: storage.cnrm.cloud.google.com/v1beta1
 kind: StorageBucket
 metadata:
-  annotations:
-    cnrm.cloud.google.com/force-destroy: "false"
   name: YOUR_PROJECT-gitlab-artifacts # {"$kpt-set":"gcs-gitlab-artifacts"}
   namespace: gitlab # {"$kpt-set":"namespace"}
+  annotations:
+    cnrm.cloud.google.com/force-destroy: "false"
 spec:
   location: US-CENTRAL1
   storageClass: STANDARD
@@ -64,10 +64,10 @@ spec:
 apiVersion: storage.cnrm.cloud.google.com/v1beta1
 kind: StorageBucket
 metadata:
-  annotations:
-    cnrm.cloud.google.com/force-destroy: "false"
   name: YOUR_PROJECT-git-lfs # {"$kpt-set":"gcs-git-lfs"}
   namespace: gitlab # {"$kpt-set":"namespace"}
+  annotations:
+    cnrm.cloud.google.com/force-destroy: "false"
 spec:
   location: US-CENTRAL1
   storageClass: STANDARD
@@ -75,10 +75,10 @@ spec:
 apiVersion: storage.cnrm.cloud.google.com/v1beta1
 kind: StorageBucket
 metadata:
-  annotations:
-    cnrm.cloud.google.com/force-destroy: "false"
   name: YOUR_PROJECT-git-packages # {"$kpt-set":"gcs-git-packages"}
   namespace: gitlab # {"$kpt-set":"namespace"}
+  annotations:
+    cnrm.cloud.google.com/force-destroy: "false"
 spec:
   location: US-CENTRAL1
   storageClass: STANDARD
@@ -86,10 +86,10 @@ spec:
 apiVersion: storage.cnrm.cloud.google.com/v1beta1
 kind: StorageBucket
 metadata:
-  annotations:
-    cnrm.cloud.google.com/force-destroy: "false"
   name: YOUR_PROJECT-registry # {"$kpt-set":"gcs-registry"}
   namespace: gitlab # {"$kpt-set":"namespace"}
+  annotations:
+    cnrm.cloud.google.com/force-destroy: "false"
 spec:
   location: US-CENTRAL1
   storageClass: STANDARD
@@ -97,10 +97,10 @@ spec:
 apiVersion: storage.cnrm.cloud.google.com/v1beta1
 kind: StorageBucket
 metadata:
-  annotations:
-    cnrm.cloud.google.com/force-destroy: "false"
   name: YOUR_PROJECT-pseudo # {"$kpt-set":"gcs-pseudo"}
   namespace: gitlab # {"$kpt-set":"namespace"}
+  annotations:
+    cnrm.cloud.google.com/force-destroy: "false"
 spec:
   location: US-CENTRAL1
   storageClass: STANDARD
@@ -108,10 +108,10 @@ spec:
 apiVersion: storage.cnrm.cloud.google.com/v1beta1
 kind: StorageBucket
 metadata:
-  annotations:
-    cnrm.cloud.google.com/force-destroy: "false"
   name: YOUR_PROJECT-runner-cache # {"$kpt-set":"gcs-runner-cache"}
   namespace: gitlab # {"$kpt-set":"namespace"}
+  annotations:
+    cnrm.cloud.google.com/force-destroy: "false"
 spec:
   location: US-CENTRAL1
   storageClass: STANDARD

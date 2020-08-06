@@ -18,11 +18,11 @@ metadata:
   name: private-vpc-connection
   namespace: gitlab # {"$kpt-set":"namespace"}
 spec:
+  service: servicenetworking.googleapis.com
   networkRef:
     name: gitlab
   reservedPeeringRanges:
-    - name: gitlab-sql
-  service: servicenetworking.googleapis.com
+  - name: gitlab-sql
 ---
 apiVersion: sql.cnrm.cloud.google.com/v1beta1
 kind: SQLInstance
@@ -77,9 +77,9 @@ metadata:
   name: gitlab
   namespace: gitlab # {"$kpt-set":"namespace"}
 spec:
-  tier: STANDARD_HA
-  memorySizeGb: 5
-  region: us-central1
   authorizedNetworkRef:
     name: gitlab
   displayName: Gitlab Redis
+  memorySizeGb: 5
+  region: us-central1
+  tier: STANDARD_HA
