@@ -41,7 +41,7 @@ spec:
     diskType: PD_SSD
     ipConfiguration:
       privateNetworkRef:
-        external: projects/YOUR_PROJECT/global/networks/gitlab # {"$kpt-set":"network-external"}
+        external: projects/a-project-id/global/networks/gitlab # {"$kpt-set":"network-external"}
     locationPreference:
       zone: us-central1-a
     pricingPlan: PER_USE

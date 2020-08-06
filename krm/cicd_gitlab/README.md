@@ -18,23 +18,29 @@ kpt pkg get https://github.com/GoogleCloudPlatform/solutions-modern-cicd-anthos.
 
 ### Customize the package:
 
+See all the setters:
+
 ```
 kpt cfg list-setters cicd_gitlab
-kpt cfg set cicd_gitlab project-id A_PROJECT
-kpt cfg set cicd_gitlab namespace A_NAMESPACET
+```
+
+`project-id` is required:
+
+```
+kpt cfg set cicd_gitlab project-id my-project
 ```
 
 ### Apply the package
-
-Create the SQLDatabase secret:
-
-```
-kubectl -n A_NAMESPACE create secret generic gitlab-db-password --from-literal password=<PASSWORD>
-```
 
 Initialize and apply the package:
 
 ```
 kpt live init cicd_gitlab
 kpt live apply cicd_gitlab
+```
+
+Create the SQLDatabase secret:
+
+```
+kubectl -n gitlab create secret generic gitlab-db-password --from-literal password=<PASSWORD>
 ```
