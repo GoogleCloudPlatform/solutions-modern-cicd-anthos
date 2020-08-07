@@ -1,0 +1,602 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: gitlab-cnrm-system
+---
+apiVersion: apiextensions.k8s.io/v1beta1
+kind: CustomResourceDefinition
+metadata:
+  annotations:
+    cnrm.gitlab.com/version: 0.0.0-dev
+  creationTimestamp: null
+  labels:
+    cnrm.gitlab.com/managed-by-kcc: "true"
+    cnrm.gitlab.com/system: "true"
+    cnrm.gitlab.com/tf2crd: "true"
+  name: deploykeys.cnrm.gitlab.com
+spec:
+  group: cnrm.gitlab.com
+  names:
+    categories:
+    - saas
+    kind: DeployKey
+    plural: deploykeys
+    shortNames:
+    - gitdeploykey
+    - gitdeploykeys
+    singular: deploykey
+  scope: Namespaced
+  validation:
+    openAPIV3Schema:
+      properties:
+        apiVersion:
+          description: 'apiVersion defines the versioned schema of this representation
+            of an object. Servers should convert recognized schemas to the latest
+            internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/api-conventions.md#resources'
+          type: string
+        kind:
+          description: 'kind is a string value representing the REST resource this
+            object represents. Servers may infer this from the endpoint the client
+            submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/api-conventions.md#types-kinds'
+          type: string
+        metadata:
+          type: object
+        spec:
+          properties:
+            canPush:
+              type: boolean
+            key:
+              type: string
+            projectRef:
+              oneOf:
+              - not:
+                  required:
+                  - external
+                required:
+                - name
+              - not:
+                  anyOf:
+                  - required:
+                    - name
+                  - required:
+                    - namespace
+                required:
+                - external
+              properties:
+                external:
+                  description: The projectId of a Project.
+                  type: string
+                name:
+                  description: 'Name of the referent. More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names'
+                  type: string
+                namespace:
+                  description: 'Namespace of the referent. More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/namespaces/'
+                  type: string
+              type: object
+            title:
+              type: string
+          required:
+          - key
+          - projectRef
+          - title
+          type: object
+        status:
+          properties:
+            conditions:
+              description: Conditions represents the latest available observation
+                of the resource's current state.
+              items:
+                properties:
+                  lastTransitionTime:
+                    description: Last time the condition transitioned from one status
+                      to another.
+                    type: string
+                  message:
+                    description: Human-readable message indicating details about last
+                      transition.
+                    type: string
+                  reason:
+                    description: Unique, one-word, CamelCase reason for the condition's
+                      last transition.
+                    type: string
+                  status:
+                    description: Status is the status of the condition. Can be True,
+                      False, Unknown.
+                    type: string
+                  type:
+                    description: Type is the type of the condition.
+                    type: string
+                type: object
+              type: array
+            keyId:
+              type: string
+          type: object
+      required:
+      - spec
+      type: object
+  version: v1beta1
+status:
+  acceptedNames:
+    kind: ""
+    plural: ""
+  conditions: []
+  storedVersions: []
+---
+apiVersion: apiextensions.k8s.io/v1beta1
+kind: CustomResourceDefinition
+metadata:
+  annotations:
+    cnrm.gitlab.com/version: 0.0.0-dev
+  creationTimestamp: null
+  labels:
+    cnrm.gitlab.com/managed-by-kcc: "true"
+    cnrm.gitlab.com/system: "true"
+    cnrm.gitlab.com/tf2crd: "true"
+  name: groups.cnrm.gitlab.com
+spec:
+  group: cnrm.gitlab.com
+  names:
+    categories:
+    - saas
+    kind: Group
+    plural: groups
+    shortNames:
+    - gitgroup
+    - gitgroups
+    singular: group
+  scope: Namespaced
+  validation:
+    openAPIV3Schema:
+      properties:
+        apiVersion:
+          description: 'apiVersion defines the versioned schema of this representation
+            of an object. Servers should convert recognized schemas to the latest
+            internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/api-conventions.md#resources'
+          type: string
+        kind:
+          description: 'kind is a string value representing the REST resource this
+            object represents. Servers may infer this from the endpoint the client
+            submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/api-conventions.md#types-kinds'
+          type: string
+        metadata:
+          type: object
+        spec:
+          properties:
+            description:
+              type: string
+            lfsEnabled:
+              type: boolean
+            parentId:
+              type: integer
+            path:
+              type: string
+            requestAccessEnabled:
+              type: boolean
+            visibilityLevel:
+              type: string
+          required:
+          - path
+          type: object
+        status:
+          properties:
+            conditions:
+              description: Conditions represents the latest available observation
+                of the resource's current state.
+              items:
+                properties:
+                  lastTransitionTime:
+                    description: Last time the condition transitioned from one status
+                      to another.
+                    type: string
+                  message:
+                    description: Human-readable message indicating details about last
+                      transition.
+                    type: string
+                  reason:
+                    description: Unique, one-word, CamelCase reason for the condition's
+                      last transition.
+                    type: string
+                  status:
+                    description: Status is the status of the condition. Can be True,
+                      False, Unknown.
+                    type: string
+                  type:
+                    description: Type is the type of the condition.
+                    type: string
+                type: object
+              type: array
+            fullName:
+              type: string
+            fullPath:
+              type: string
+            groupId:
+              type: string
+            runnersToken:
+              type: string
+            webUrl:
+              type: string
+          type: object
+      required:
+      - spec
+      type: object
+  version: v1beta1
+status:
+  acceptedNames:
+    kind: ""
+    plural: ""
+  conditions: []
+  storedVersions: []
+---
+apiVersion: apiextensions.k8s.io/v1beta1
+kind: CustomResourceDefinition
+metadata:
+  annotations:
+    cnrm.gitlab.com/version: 0.0.0-dev
+  creationTimestamp: null
+  labels:
+    cnrm.gitlab.com/managed-by-kcc: "true"
+    cnrm.gitlab.com/system: "true"
+    cnrm.gitlab.com/tf2crd: "true"
+  name: projects.cnrm.gitlab.com
+spec:
+  group: cnrm.gitlab.com
+  names:
+    categories:
+    - saas
+    kind: Project
+    plural: projects
+    shortNames:
+    - gitproject
+    - gitprojects
+    singular: project
+  scope: Namespaced
+  validation:
+    openAPIV3Schema:
+      properties:
+        apiVersion:
+          description: 'apiVersion defines the versioned schema of this representation
+            of an object. Servers should convert recognized schemas to the latest
+            internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/api-conventions.md#resources'
+          type: string
+        kind:
+          description: 'kind is a string value representing the REST resource this
+            object represents. Servers may infer this from the endpoint the client
+            submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/api-conventions.md#types-kinds'
+          type: string
+        metadata:
+          type: object
+        spec:
+          properties:
+            approvalsBeforeMerge:
+              type: integer
+            archived:
+              description: Whether the project is archived.
+              type: boolean
+            containerRegistryEnabled:
+              type: boolean
+            defaultBranch:
+              type: string
+            description:
+              type: string
+            groupRef:
+              oneOf:
+              - not:
+                  required:
+                  - external
+                required:
+                - name
+              - not:
+                  anyOf:
+                  - required:
+                    - name
+                  - required:
+                    - namespace
+                required:
+                - external
+              properties:
+                external:
+                  description: The groupId of a Group.
+                  type: string
+                name:
+                  description: 'Name of the referent. More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names'
+                  type: string
+                namespace:
+                  description: 'Namespace of the referent. More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/namespaces/'
+                  type: string
+              type: object
+            initializeWithReadme:
+              type: boolean
+            issuesEnabled:
+              type: boolean
+            lfsEnabled:
+              type: boolean
+            mergeMethod:
+              type: string
+            mergeRequestsEnabled:
+              type: boolean
+            onlyAllowMergeIfAllDiscussionsAreResolved:
+              type: boolean
+            onlyAllowMergeIfPipelineSucceeds:
+              type: boolean
+            path:
+              type: string
+            pipelinesEnabled:
+              type: boolean
+            removeSourceBranchAfterMerge:
+              type: boolean
+            requestAccessEnabled:
+              type: boolean
+            sharedRunnersEnabled:
+              type: boolean
+            sharedWithGroups:
+              items:
+                properties:
+                  groupAccessLevel:
+                    type: string
+                  groupId:
+                    type: integer
+                  groupName:
+                    type: string
+                required:
+                - groupAccessLevel
+                - groupId
+                type: object
+              type: array
+            snippetsEnabled:
+              type: boolean
+            tags:
+              items:
+                type: string
+              type: array
+            visibilityLevel:
+              type: string
+            wikiEnabled:
+              type: boolean
+          type: object
+        status:
+          properties:
+            conditions:
+              description: Conditions represents the latest available observation
+                of the resource's current state.
+              items:
+                properties:
+                  lastTransitionTime:
+                    description: Last time the condition transitioned from one status
+                      to another.
+                    type: string
+                  message:
+                    description: Human-readable message indicating details about last
+                      transition.
+                    type: string
+                  reason:
+                    description: Unique, one-word, CamelCase reason for the condition's
+                      last transition.
+                    type: string
+                  status:
+                    description: Status is the status of the condition. Can be True,
+                      False, Unknown.
+                    type: string
+                  type:
+                    description: Type is the type of the condition.
+                    type: string
+                type: object
+              type: array
+            httpUrlToRepo:
+              type: string
+            projectId:
+              type: string
+            runnersToken:
+              type: string
+            sshUrlToRepo:
+              type: string
+            webUrl:
+              type: string
+          type: object
+      type: object
+  version: v1beta1
+status:
+  acceptedNames:
+    kind: ""
+    plural: ""
+  conditions: []
+  storedVersions: []
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: gitlab-cnrm-controller-manager
+  namespace: gitlab-cnrm-system
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: gitlab-cnrm-admin
+rules:
+- apiGroups:
+  - cnrm.gitlab.com
+  resources:
+  - '*'
+  verbs:
+  - get
+  - list
+  - watch
+  - create
+  - update
+  - patch
+  - delete
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: gitlab-cnrm-manager-cluster-role
+rules:
+- apiGroups:
+  - apiextensions.k8s.io
+  resources:
+  - customresourcedefinitions
+  verbs:
+  - get
+  - list
+  - watch
+- apiGroups:
+  - ""
+  resources:
+  - namespaces
+  verbs:
+  - get
+  - list
+  - watch
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: gitlab-cnrm-manager-ns-role
+rules:
+- apiGroups:
+  - ""
+  resources:
+  - events
+  - configmaps
+  - secrets
+  - services
+  verbs:
+  - get
+  - list
+  - watch
+  - create
+  - update
+  - patch
+  - delete
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: gitlab-cnrm-admin-binding
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: gitlab-cnrm-admin
+subjects:
+- kind: ServiceAccount
+  name: gitlab-cnrm-controller-manager
+  namespace: gitlab-cnrm-system
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: gitlab-cnrm-manager-binding
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: gitlab-cnrm-manager-cluster-role
+subjects:
+- kind: ServiceAccount
+  name: gitlab-cnrm-controller-manager
+  namespace: gitlab-cnrm-system
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: gitlab-cnrm-manager-watcher-binding
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: gitlab-cnrm-manager-ns-role
+subjects:
+- kind: ServiceAccount
+  name: gitlab-cnrm-controller-manager
+  namespace: gitlab-cnrm-system
+---
+apiVersion: v1
+data:
+  gitlab-base-url: ""
+kind: ConfigMap
+metadata:
+  name: gitlab-cnrm-gitlab-config-7h2f55g85d
+  namespace: gitlab-cnrm-system
+---
+apiVersion: v1
+data:
+  gitlab-token: ""
+kind: Secret
+metadata:
+  name: gitlab-cnrm-gitlab-creds-g8cfhhcc4h
+  namespace: gitlab-cnrm-system
+type: Opaque
+---
+apiVersion: v1
+kind: Service
+metadata:
+  annotations:
+    prometheus.io/port: "8888"
+    prometheus.io/scrape: "true"
+  labels:
+    cnrm.cloud.google.com/monitored: "true"
+  name: gitlab-cnrm-manager
+  namespace: gitlab-cnrm-system
+spec:
+  ports:
+  - name: controller-manager
+    port: 443
+  - name: metrics
+    port: 8888
+  selector:
+    cnrm.cloud.google.com/component: cnrm-controller-manager
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  labels:
+    cnrm.cloud.google.com/component: cnrm-controller-manager
+  name: gitlab-cnrm-controller-manager
+  namespace: gitlab-cnrm-system
+spec:
+  selector:
+    matchLabels:
+      cnrm.cloud.google.com/component: cnrm-controller-manager
+  serviceName: gitlab-cnrm-manager
+  template:
+    metadata:
+      labels:
+        cnrm.cloud.google.com/component: cnrm-controller-manager
+    spec:
+      containers:
+      - args:
+        - --stderrthreshold=INFO
+        - --prometheus-scrape-endpoint=:8888
+        command:
+        - /configconnector/manager
+        env:
+        - name: GITLAB_TOKEN
+          valueFrom:
+            secretKeyRef:
+              key: gitlab-token
+              name: gitlab-cnrm-gitlab-creds-g8cfhhcc4h
+        - name: GITLAB_BASE_URL
+          valueFrom:
+            configMapKeyRef:
+              key: gitlab-base-url
+              name: gitlab-cnrm-gitlab-config-7h2f55g85d
+        image: gcr.io/sunilarora-sandbox/controller:94419e6
+        imagePullPolicy: Always
+        name: manager
+        readinessProbe:
+          exec:
+            command:
+            - cat
+            - /tmp/ready
+          initialDelaySeconds: 3
+          periodSeconds: 3
+        resources:
+          limits:
+            cpu: 200m
+            memory: 512Mi
+          requests:
+            cpu: 100m
+            memory: 256Mi
+        securityContext:
+          privileged: false
+          runAsNonRoot: true
+          runAsUser: 1000
+      serviceAccountName: gitlab-cnrm-controller-manager
+      terminationGracePeriodSeconds: 10

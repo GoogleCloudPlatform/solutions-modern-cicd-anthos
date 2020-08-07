@@ -1,0 +1,77 @@
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: controller-manager
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: manager
+  labels:
+    cnrm.cloud.google.com/monitored: "true"
+  annotations:
+    prometheus.io/scrape: 'true'
+    prometheus.io/port: '8888'
+spec:
+  selector:
+    cnrm.cloud.google.com/component: cnrm-controller-manager
+  ports:
+  - port: 443
+    name: controller-manager
+  - port: 8888
+    name: metrics
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: controller-manager
+  labels:
+    cnrm.cloud.google.com/component: cnrm-controller-manager
+spec:
+  selector:
+    matchLabels:
+      cnrm.cloud.google.com/component: cnrm-controller-manager
+  serviceName: manager
+  template:
+    metadata:
+      labels:
+        cnrm.cloud.google.com/component: cnrm-controller-manager
+    spec:
+      serviceAccountName: controller-manager
+      containers:
+      - command:
+        - /configconnector/manager
+        args: ["--stderrthreshold=INFO", "--prometheus-scrape-endpoint=:8888"]
+        image: controller:latest
+        imagePullPolicy: Always
+        name: manager
+        env:
+        - name: GITLAB_TOKEN
+          valueFrom:
+            secretKeyRef:
+              name: gitlab-creds
+              key: gitlab-token
+        - name: GITLAB_BASE_URL
+          valueFrom:
+            configMapKeyRef:
+              name: gitlab-config
+              key: gitlab-base-url
+        resources:
+          limits:
+            cpu: 200m
+            memory: 512Mi
+          requests:
+            cpu: 100m
+            memory: 256Mi
+        securityContext:
+          privileged: false
+          runAsUser: 1000
+          runAsNonRoot: true
+        readinessProbe:
+          exec:
+            command:
+            - cat
+            - /tmp/ready
+          initialDelaySeconds: 3
+          periodSeconds: 3
+      terminationGracePeriodSeconds: 10

@@ -1,0 +1,6 @@
+resources:
+  - manager_bindings.yaml
+  - cnrm_admin_binding.yaml
+  - cnrm_admin.yaml
+  - manager_cluster_role.yaml
+  - manager_ns_role.yaml

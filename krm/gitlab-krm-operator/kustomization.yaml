@@ -1,0 +1,23 @@
+namePrefix: gitlab-cnrm-
+namespace: gitlab-cnrm-system
+resources:
+  - ./namespace.yaml
+  - ./rbac/manager_bindings.yaml
+  - ./rbac/cnrm_admin_binding.yaml
+  - ./rbac/cnrm_admin.yaml
+  - ./rbac/manager_cluster_role.yaml
+  - ./rbac/manager_ns_role.yaml
+  - ./manager/manager.yaml
+  - ./crds/resources/cnrm_v1beta1_deploykey.yaml
+  - ./crds/resources/cnrm_v1beta1_group.yaml
+  - ./crds/resources/cnrm_v1beta1_project.yaml
+patchesStrategicMerge:
+  - ./manager/manager_image_patch.yaml
+secretGenerator:
+  - name: gitlab-creds
+    literals:
+    - gitlab-token=""
+configMapGenerator:
+  - name: gitlab-config
+    literals:
+      - gitlab-base-url=""
