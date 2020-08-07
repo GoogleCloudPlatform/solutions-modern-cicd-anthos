@@ -48,7 +48,7 @@ Within GitLab you will have the following repo structure:
 * [CI stages/steps](starter-repos/shared-ci-cd/ci/)
 * [CD methodologies](starter-repos/shared-ci-cd/cd/)
 * [Kubernetes configs](starter-repos/shared-kustomize-bases/) (via Kustomize)
-* An example [applcation repo](starter-repos/golang-template/) for a Go app
+* An example [application repo](starter-repos/golang-template/) for a Go app
 
 ## Pre-requisites
 
