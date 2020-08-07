@@ -16,7 +16,7 @@
 
 module "gke-gitlab" {
   source  = "terraform-google-modules/gke-gitlab/google"
-  version = "~> 0.2.0"
+  version = "~> 0.3.0"
 
   project_id            = var.project_id
   domain                = "${trimprefix(module.cloud-endpoints-dns-gitlab.endpoint_computed, "gitlab.")}"
@@ -54,4 +54,60 @@ resource "google_compute_address" "gitlab" {
 
 resource "random_id" "database_id" {
   byte_length = 8
+}
+
+module "gke_auth" {
+  source           = "terraform-google-modules/kubernetes-engine/google//modules/auth"
+
+  project_id       = var.project_id
+  cluster_name     = module.gke-gitlab.cluster_name
+  location         = module.gke-gitlab.cluster_location
+}
+
+provider "kubernetes" {
+  load_config_file = false
+
+  cluster_ca_certificate = module.gke_auth.cluster_ca_certificate
+  host                   = module.gke_auth.host
+  token                  = module.gke_auth.token
+}
+
+resource "kubernetes_role" "kaniko-builder" {
+  metadata {
+    name = "kaniko-builder"
+  }
+
+  rule {
+    api_groups     = [""]
+    resources      = ["secrets"]
+    verbs          = ["*"]
+  }
+  rule {
+    api_groups     = [""]
+    resources      = ["pods"]
+    verbs          = ["*"]
+  }
+  rule {
+    api_groups     = [""]
+    resources      = ["pods/exec"]
+    verbs          = ["*"]
+  }
+}
+
+# Required for allowing Skaffold to create/delete kaniko pods and secrets during image build
+resource "kubernetes_role_binding" "ci-kaniko-builder" {
+  metadata {
+    name      = "ci-kaniko-builder"
+    namespace = "default"
+  }
+  role_ref {
+    api_group = "rbac.authorization.k8s.io"
+    kind      = "Role"
+    name      = "kaniko-builder"
+  }
+  subject {
+    kind      = "ServiceAccount"
+    name      = "default"
+    namespace = "default"
+  }
 }
