@@ -15,8 +15,8 @@
 kind: ClusterSelector
 apiVersion: configmanagement.gke.io/v1
 metadata:
-  name: staging-us-central1
+  name: staging-us-west2
 spec:
   selector:
     matchLabels:
-      clusterName: staging-us-central1
+      clusterName: staging-us-west2

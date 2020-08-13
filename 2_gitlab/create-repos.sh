@@ -14,7 +14,7 @@
 # limitations under the License.
 
 REPOS="anthos-config-management shared-kustomize-bases shared-ci-cd kustomize-docker kaniko-docker golang-template golang-template-env java-template java-template-env"
-CLUSTERS="prod-us-central1 prod-us-east1 staging-us-central1"
+CLUSTERS="prod-us-central1 prod-us-east1 staging-us-west2"
 # Create SSH keys so ACM syncers can read from the repos
 # at base of 2_gitlab
 export WORKINGDIR=$(pwd)

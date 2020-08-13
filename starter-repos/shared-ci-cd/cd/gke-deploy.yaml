@@ -12,15 +12,15 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-deploy-staging-us-central1:
+deploy-staging-us-west2:
   # Only deploy to staging env from $APP-env staging branch, kicking off rollout
   only:
     refs:
       - staging
-  stage: deploy-staging-us-central1
+  stage: deploy-staging-us-west2
   image: gcr.io/cloud-builders/gke-deploy:stable
   tags:
-  - cluster:staging-us-central1
+  - cluster:staging-us-west2
   script:
     # Work around for https://github.com/kubernetes/kubernetes/issues/36072
     # Stated solution is to use "--force" or "kubectl create"; gke-deploy does not have this option so the following works

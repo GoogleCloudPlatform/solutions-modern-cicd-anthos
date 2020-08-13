@@ -18,12 +18,12 @@ stages:
 - read
 - validate
 
-Vet staging-us-central1:
+Vet staging-us-west2:
   stage: vet
   image: gcr.io/config-management-release/nomos:v1.2.0-rc.60
   tags:
   - app:acm-tests
-  - cluster:staging-us-central1
+  - cluster:staging-us-west2
   variables:
     USER: root
     KUBECONFIG: kubeconfig

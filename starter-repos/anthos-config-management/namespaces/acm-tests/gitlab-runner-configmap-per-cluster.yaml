@@ -79,7 +79,7 @@ kind: ConfigMap
 metadata:
   name: gitlab-runner-config-acm
   annotations:
-    configmanagement.gke.io/cluster-selector: staging-us-central1
+    configmanagement.gke.io/cluster-selector: staging-us-west2
 data:
   CI_SERVER_URL: https://GITLAB_HOSTNAME
   CLONE_URL: ""
@@ -103,4 +103,4 @@ data:
   REGISTER_LOCKED: "true"
   RUNNER_EXECUTOR: kubernetes
   RUNNER_REQUEST_CONCURRENCY: "1"
-  RUNNER_TAG_LIST: app:acm-tests, cluster:staging-us-central1
+  RUNNER_TAG_LIST: app:acm-tests, cluster:staging-us-west2

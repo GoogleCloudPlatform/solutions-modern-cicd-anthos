@@ -25,8 +25,8 @@ resource "google_compute_network" "anthos-platform" {
   depends_on              = [module.project-services.project_id]
 }
 
-resource "google_compute_subnetwork" "anthos-platform-central" {
-  name          = "anthos-platform-central"
+resource "google_compute_subnetwork" "anthos-platform-central1" {
+  name          = "anthos-platform-central1"
   ip_cidr_range = "10.2.0.0/16"
   region        = "us-central1"
   network       = google_compute_network.anthos-platform.self_link
@@ -36,38 +36,54 @@ resource "google_compute_subnetwork" "anthos-platform-central" {
     ip_cidr_range = "172.16.0.0/16"
   }
   secondary_ip_range {
-    range_name    = "anthos-platform-pods-staging"
-    ip_cidr_range = "172.17.0.0/16"
-  }
-  secondary_ip_range {
-    range_name    = "anthos-platform-pods-dev"
-    ip_cidr_range = "172.18.0.0/16"
-  }
-  secondary_ip_range {
     range_name    = "anthos-platform-services-prod"
-    ip_cidr_range = "192.168.0.0/24"
-  }
-  secondary_ip_range {
-    range_name    = "anthos-platform-services-staging"
-    ip_cidr_range = "192.168.1.0/24"
-  }
-  secondary_ip_range {
-    range_name    = "anthos-platform-services-dev"
     ip_cidr_range = "192.168.2.0/24"
   }
 }
 
-resource "google_compute_subnetwork" "anthos-platform-east" {
-  name          = "anthos-platform-east"
+resource "google_compute_subnetwork" "anthos-platform-east1" {
+  name          = "anthos-platform-east1"
   ip_cidr_range = "10.3.0.0/16"
   region        = "us-east1"
   network       = google_compute_network.anthos-platform.self_link
   secondary_ip_range {
     range_name    = "anthos-platform-pods-prod"
-    ip_cidr_range = "172.19.0.0/16"
+    ip_cidr_range = "172.17.0.0/16"
   }
   secondary_ip_range {
     range_name    = "anthos-platform-services-prod"
     ip_cidr_range = "192.168.3.0/24"
+  }
+}
+
+resource "google_compute_subnetwork" "anthos-platform-west1" {
+  name          = "anthos-platform-west1"
+  ip_cidr_range = "10.4.0.0/16"
+  region        = "us-west1"
+  network       = google_compute_network.anthos-platform.self_link
+  
+  secondary_ip_range {
+    range_name    = "anthos-platform-pods-dev"
+    ip_cidr_range = "172.18.0.0/16"
+  }
+  secondary_ip_range {
+    range_name    = "anthos-platform-services-dev"
+    ip_cidr_range = "192.168.4.0/24"
+  }
+}
+
+resource "google_compute_subnetwork" "anthos-platform-west2" {
+  name          = "anthos-platform-west2"
+  ip_cidr_range = "10.5.0.0/16"
+  region        = "us-west2"
+  network       = google_compute_network.anthos-platform.self_link
+  
+  secondary_ip_range {
+    range_name    = "anthos-platform-pods-staging"
+    ip_cidr_range = "172.19.0.0/16"
+  }
+  secondary_ip_range {
+    range_name    = "anthos-platform-services-staging"
+    ip_cidr_range = "192.168.5.0/24"
   }
 }

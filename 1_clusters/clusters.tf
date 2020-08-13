@@ -32,23 +32,33 @@ data "google_compute_network" "anthos-platform" {
   name = "anthos-platform"
 }
 
-data "google_compute_subnetwork" "anthos-platform-central" {
-  name   = "anthos-platform-central"
+data "google_compute_subnetwork" "anthos-platform-central1" {
+  name   = "anthos-platform-central1"
   region = "us-central1"
 }
 
-data "google_compute_subnetwork" "anthos-platform-east" {
-  name   = "anthos-platform-east"
+data "google_compute_subnetwork" "anthos-platform-east1" {
+  name   = "anthos-platform-east1"
   region = "us-east1"
+}
+
+data "google_compute_subnetwork" "anthos-platform-west1" {
+  name   = "anthos-platform-west1"
+  region = "us-west1"
+}
+
+data "google_compute_subnetwork" "anthos-platform-west2" {
+  name   = "anthos-platform-west2"
+  region = "us-west2"
 }
 
 module "anthos-platform-dev" {
   source            = "./modules/anthos-platform-cluster"
   project_id        = var.project_id
-  name              = "dev-us-central1"
-  region            = "us-central1"
+  name              = "dev-us-west1"
+  region            = "us-west1"
   network           = data.google_compute_network.anthos-platform.name
-  subnetwork        = data.google_compute_subnetwork.anthos-platform-central.name
+  subnetwork        = data.google_compute_subnetwork.anthos-platform-west1.name
   ip_range_pods     = "anthos-platform-pods-dev"
   ip_range_services = "anthos-platform-services-dev"
 }
@@ -56,10 +66,10 @@ module "anthos-platform-dev" {
 module "anthos-platform-staging" {
   source            = "./modules/anthos-platform-cluster"
   project_id        = var.project_id
-  name              = "staging-us-central1"
-  region            = "us-central1"
+  name              = "staging-us-west2"
+  region            = "us-west2"
   network           = data.google_compute_network.anthos-platform.name
-  subnetwork        = data.google_compute_subnetwork.anthos-platform-central.name
+  subnetwork        = data.google_compute_subnetwork.anthos-platform-west2.name
   ip_range_pods     = "anthos-platform-pods-staging"
   ip_range_services = "anthos-platform-services-staging"
 }
@@ -70,7 +80,7 @@ module "anthos-platform-prod-central" {
   name              = "prod-us-central1"
   region            = "us-central1"
   network           = data.google_compute_network.anthos-platform.name
-  subnetwork        = data.google_compute_subnetwork.anthos-platform-central.name
+  subnetwork        = data.google_compute_subnetwork.anthos-platform-central1.name
   ip_range_pods     = "anthos-platform-pods-prod"
   ip_range_services = "anthos-platform-services-prod"
 }
@@ -81,7 +91,7 @@ module "anthos-platform-prod-east" {
   name              = "prod-us-east1"
   region            = "us-east1"
   network           = data.google_compute_network.anthos-platform.name
-  subnetwork        = data.google_compute_subnetwork.anthos-platform-east.name
+  subnetwork        = data.google_compute_subnetwork.anthos-platform-east1.name
   ip_range_pods     = "anthos-platform-pods-prod"
   ip_range_services = "anthos-platform-services-prod"
 }

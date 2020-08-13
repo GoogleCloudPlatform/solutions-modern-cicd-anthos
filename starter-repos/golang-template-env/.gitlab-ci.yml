@@ -16,9 +16,9 @@ include:
 - project: 'platform-admins/shared-ci-cd'
   file: 'cd/gke-deploy.yaml'
 
-deploy-staging-us-central1:
+deploy-staging-us-west2:
   tags:
-  - cluster:staging-us-central1, app:APP_NAME
+  - cluster:staging-us-west2, app:APP_NAME
 
 deploy-prod-us-central1:
   tags:
@@ -29,7 +29,7 @@ deploy-prod-us-east1:
   - cluster:prod-us-east1, app:APP_NAME
 
 stages:
-  - deploy-staging-us-central1
+  - deploy-staging-us-west2
   - deploy-prod-us-central1
   - rollout-approval
   - deploy-prod-us-east1
