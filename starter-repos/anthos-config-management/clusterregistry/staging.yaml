@@ -15,7 +15,7 @@
 kind: Cluster
 apiVersion: clusterregistry.k8s.io/v1alpha1
 metadata:
-  name: staging-us-central1
+  name: staging-us-west2
   labels:
     environment: staging
-    clusterName: staging-us-central1
+    clusterName: staging-us-west2

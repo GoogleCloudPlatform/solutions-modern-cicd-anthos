@@ -90,7 +90,7 @@ The following steps are performed by a **developer**, and can be performed local
     ```shell
     export PROJECT_ID=$(gcloud config get-value project)
     gcloud beta artifacts repositories create $USER --repository-format=Docker --location=us-central1
-    gcloud beta artifacts repositories add-iam-policy-binding --member serviceAccount:tf-sa-dev-us-central1@${PROJECT_ID}.iam.gserviceaccount.com --role roles/artifactregistry.reader --location us-central1 $USER
+    gcloud beta artifacts repositories add-iam-policy-binding --member serviceAccount:tf-sa-dev-us-west1@${PROJECT_ID}.iam.gserviceaccount.com --role roles/artifactregistry.reader --location us-central1 $USER
     ```
 
 1. Set up Docker authentication to the registry.

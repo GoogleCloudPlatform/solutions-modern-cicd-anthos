@@ -15,7 +15,7 @@
 
 
 APPS="hipster-loadgenerator hipster-shop hipster-frontend petabank"
-gcloud container clusters get-credentials staging-us-central1 --region us-central1
+gcloud container clusters get-credentials staging-us-west2 --region us-west2
 
 echo "Deleting template deployments and services"
 for appname in ${APPS}; do

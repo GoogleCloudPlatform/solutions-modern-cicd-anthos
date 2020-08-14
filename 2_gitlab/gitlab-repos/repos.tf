@@ -103,10 +103,10 @@ resource "gitlab_project" "java-template-env" {
   default_branch   = "master"
 }
 
-resource "gitlab_deploy_key" "acm-staging-us-central1" {
+resource "gitlab_deploy_key" "acm-staging-us-west2" {
   project    = "platform-admins/anthos-config-management"
   title      = "Staging deploy key"
-  key        = file("${local.ssh-key-path}/staging-us-central1.pub")
+  key        = file("${local.ssh-key-path}/staging-us-west2.pub")
   depends_on = [gitlab_project.anthos-config-management]
 }
 

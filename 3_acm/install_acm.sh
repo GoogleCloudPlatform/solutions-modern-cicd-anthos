@@ -23,7 +23,7 @@ if [ -z ${ACM_RUNNER_TOKEN} ]; then
   read -s -p "What is the runner registration token for ACM (see Settings > CI/CD > Runners in the anthos-config-management project)?" ACM_RUNNER_TOKEN
 fi
 
-CLUSTERS="prod-us-central1 prod-us-east1 staging-us-central1"
+CLUSTERS="prod-us-central1 prod-us-east1 staging-us-west2"
 
 for CONTEXT in ${CLUSTERS}; do
   REGION=$(echo ${CONTEXT} | cut -d'-' -f 2-)
