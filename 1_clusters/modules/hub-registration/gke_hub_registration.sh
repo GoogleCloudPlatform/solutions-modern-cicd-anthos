@@ -1,3 +1,4 @@
+#!/bin/bash -xe
 # Copyright 2020 Google LLC
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -12,27 +13,21 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-timeout: 3600s # 1-hr
-tags:
-  - modern-cicd-anthos
-  - modern-cicd-clusters
-substitutions:
-  _PROJECT_ID: ${PROJECT_ID}
-steps:
-- name: 'gcr.io/${_PROJECT_ID}/anthos-platform-installer'
-  id: 'create-clusters'
-  entrypoint: 'bash'
-  args:
-  - '-xe'
-  - '-c'
-  - |
-    sed -i "s/YOUR_PROJECT_ID/${_PROJECT_ID}/g" terraform.tfvars
-    sed -i "s/YOUR_PROJECT_ID/${_PROJECT_ID}/g" backend.tf
+set -e
 
-    export TF_LOG="DEBUG"
+if [ "$#" -lt 3 ]; then
+    >&2 echo "Not all expected arguments set."
+    exit 1
+fi
 
-    terraform init
-    terraform plan -out=terraform.tfplan
-    terraform apply -auto-approve terraform.tfplan
+CLUSTER_LOCATION=$1
+CLUSTER_NAME=$2
+SERVICE_ACCOUNT_KEY=$3
 
-    ./enable_mci.sh ${_PROJECT_ID} prod-us-central1
+#write temp key, cleanup at exit
+tmp_file=$(mktemp)
+# shellcheck disable=SC2064
+trap "rm -rf $tmp_file" EXIT
+echo "${SERVICE_ACCOUNT_KEY}" | base64 --decode > "$tmp_file"
+
+gcloud container hub memberships register "${CLUSTER_NAME}" --gke-cluster="${CLUSTER_LOCATION}"/"${CLUSTER_NAME}" --service-account-key-file="${tmp_file}" --quiet
