@@ -34,18 +34,6 @@ variable "location" {
   type        = string
 }
 
-variable "skip_gcloud_download" {
-  description = "Whether to skip downloading gcloud (assumes gcloud and kubectl already available outside the module)"
-  type        = bool
-  default     = true
-}
-
-variable "gcloud_sdk_version" {
-  description = "The gcloud sdk version to use. Minimum required version is 293.0.0"
-  type        = string
-  default     = "296.0.1"
-}
-
 variable "gke_hub_membership_name" {
   description = "Memebership name that uniquely represents the cluster being registered on the Hub"
   type        = string
