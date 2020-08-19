@@ -61,6 +61,7 @@ module "anthos-platform-dev" {
   subnetwork        = data.google_compute_subnetwork.anthos-platform-west1.name
   ip_range_pods     = "anthos-platform-pods-dev"
   ip_range_services = "anthos-platform-services-dev"
+  release_channel   = "STABLE"
 }
 
 module "anthos-platform-staging" {
@@ -72,6 +73,7 @@ module "anthos-platform-staging" {
   subnetwork        = data.google_compute_subnetwork.anthos-platform-west2.name
   ip_range_pods     = "anthos-platform-pods-staging"
   ip_range_services = "anthos-platform-services-staging"
+  release_channel   = "STABLE"
 }
 
 module "anthos-platform-prod-central" {
@@ -83,6 +85,7 @@ module "anthos-platform-prod-central" {
   subnetwork        = data.google_compute_subnetwork.anthos-platform-central1.name
   ip_range_pods     = "anthos-platform-pods-prod"
   ip_range_services = "anthos-platform-services-prod"
+  release_channel   = "STABLE"
 }
 
 module "anthos-platform-prod-east" {
@@ -94,4 +97,35 @@ module "anthos-platform-prod-east" {
   subnetwork        = data.google_compute_subnetwork.anthos-platform-east1.name
   ip_range_pods     = "anthos-platform-pods-prod"
   ip_range_services = "anthos-platform-services-prod"
+  release_channel   = "STABLE"
+}
+
+resource "google_service_account" "gke_hub_sa" {
+  project      = var.project_id
+  account_id   = var.gke_hub_sa_name
+  display_name = "Service Account for GKE Hub Registration"
+}
+
+resource "google_project_iam_member" "gke_hub_member" {
+  project = var.project_id
+  role    = "roles/gkehub.connect"
+  member  = "serviceAccount:${google_service_account.gke_hub_sa.email}"
+}
+
+module "anthos-platform-hub-prod-central" {
+  source            = "./modules/hub-registration"
+  project_id        = var.project_id
+  gke_hub_sa        = google_service_account.gke_hub_sa.name
+  cluster_name      = module.anthos-platform-prod-central.cluster-name
+  cluster_endpoint  = module.anthos-platform-prod-central.endpoint
+  location          = module.anthos-platform-prod-central.region
+}
+
+module "anthos-platform-hub-prod-east" {
+  source            = "./modules/hub-registration"
+  project_id        = var.project_id
+  gke_hub_sa        = google_service_account.gke_hub_sa.name
+  cluster_name      = module.anthos-platform-prod-east.cluster-name
+  cluster_endpoint  = module.anthos-platform-prod-east.endpoint
+  location          = module.anthos-platform-prod-east.region
 }

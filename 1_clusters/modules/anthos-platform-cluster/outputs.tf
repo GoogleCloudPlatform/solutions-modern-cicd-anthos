@@ -28,3 +28,8 @@ output "cluster-name" {
   value       = var.name
   description = "Cluster Name"
 }
+
+output "endpoint" {
+  value       = module.anthos_platform_cluster.endpoint
+  description = "Cluster endpoint used to identify the cluster"
+}

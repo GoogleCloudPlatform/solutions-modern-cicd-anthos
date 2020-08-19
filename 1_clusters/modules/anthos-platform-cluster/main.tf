@@ -55,6 +55,7 @@ module "anthos_platform_cluster" {
   ip_range_pods      = var.ip_range_pods
   ip_range_services  = var.ip_range_services
   kubernetes_version = var.gke_kubernetes_version
+  release_channel    = var.release_channel
   regional           = true
 
   enable_binary_authorization = true
