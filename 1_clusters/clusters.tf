@@ -129,3 +129,10 @@ module "anthos-platform-hub-prod-east" {
   cluster_endpoint  = module.anthos-platform-prod-east.endpoint
   location          = module.anthos-platform-prod-east.region
 }
+
+module "anthos-platform-mci-central" {
+  source            = "./modules/mci"
+  project_id        = var.project_id
+  cluster_name      = module.anthos-platform-prod-central.cluster-name
+  wait              = module.anthos-platform-hub-prod-central.wait
+}
