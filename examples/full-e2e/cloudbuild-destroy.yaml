@@ -24,7 +24,7 @@ steps:
 # Create build-installation-image
 - name: "gcr.io/cloud-builders/gcloud"
   id: "build-install-image"
-
+  dir: "provision"
   entrypoint: bash
   args:
     - -c

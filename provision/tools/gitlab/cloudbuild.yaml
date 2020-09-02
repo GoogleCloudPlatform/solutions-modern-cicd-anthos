@@ -1,0 +1,47 @@
+# Copyright 2020 Google LLC
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#      http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+timeout: 3600s # 1-hr
+tags:
+  - modern-cicd-anthos
+  - gitlab
+substitutions:
+  _BUILD_IMAGES: "true"
+  _CREATE_GITLAB: "true"
+options:
+    substitution_option: 'ALLOW_LOOSE'
+steps:
+- name: 'gcr.io/${_PROJECT_ID}/anthos-platform-installer'
+  id: 'create-gitlab'
+  entrypoint: 'bash'
+  args:
+  - '-xe'
+  - '-c'
+  - |
+    [[ "${_CREATE_CLUSTER}" == "false" ]] && exit 0
+    sed -i "s/YOUR_PROJECT_ID/${_PROJECT_ID}/g" terraform.tfvars
+    sed -i "s/YOUR_PROJECT_ID/${_PROJECT_ID}/g" backend.tf
+
+    terraform init
+    terraform plan -out=terraform.tfplan
+    terraform apply -auto-approve terraform.tfplan
+
+    export GITLAB_HOSTNAME=$(terraform output gitlab_hostname)
+
+    # Wait for GitLab domain to resolve
+    until nslookup $${GITLAB_HOSTNAME}; do
+      echo -e "\e[33mWaiting for $${GITLAB_HOSTNAME} to resolve."
+      sleep 10
+    done
+
