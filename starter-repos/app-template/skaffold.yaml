@@ -1,0 +1,13 @@
+apiVersion: skaffold/v2beta7
+kind: Config
+metadata:
+  name: app-template
+build:
+  artifacts:
+  # Make sure the skaffold "default-repo" is set.
+  # Follow the doc for instructions https://github.com/GoogleCloudPlatform/solutions-modern-cicd-anthos/blob/master/docs/index.md#testing-the-change-locally-with-skaffold 
+  - image: app
+deploy:
+  kustomize:
+    paths:
+    - config/envs/dev

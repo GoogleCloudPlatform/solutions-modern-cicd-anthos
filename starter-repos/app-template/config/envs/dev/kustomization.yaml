@@ -11,11 +11,6 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
-# Customize the namespace to be the namespace name used for dev environment.
-# The namespace shouldn't be changed once it is customized.
-namespace: dev
-
 resources:
 - ../../base/app
 - ../../base/redis
@@ -40,23 +35,3 @@ vars:
 
 configurations:
 - varReference.yaml
-
-# To use a different redis host available at <HOST> with the password <PASSWORD>,
-# make the following change in the current kustomization.yaml.
-#
-# 1. remove - ../../base/redis from the resources. The resources will be
-#    resources:
-#    - ../../base.app
-#
-# 2. change the configmapGenerator to use <HOST>. The configmapGenerator will be
-# configmapGenerator:
-# - name: redishost
-#   literals:
-#    - REDISHOST=<HOST>
-#
-# 3. uncomment the following secretGenerator:
-# secretGenerator:
-# - name: redis
-#   literals:
-#   - redis-password=<PASSWORD>
-
