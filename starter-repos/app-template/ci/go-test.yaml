@@ -11,11 +11,16 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-#
 
-include:
-- '/ci/go-test.yaml'
+variables:
+  APP_NAME: app-template
+  SRC_PATH: ""
+  GO_TEST_VERSION: "1.13"
+  IMAGE_NAME: app-template
 
-stages:
-- test
-
+unit-test:
+  stage: test
+  image: golang:${GO_TEST_VERSION}
+  script:
+  - ln -s `pwd` /go/src/${APP_NAME}
+  - cd /go/src/${APP_NAME} && go test
