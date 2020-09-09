@@ -14,7 +14,8 @@
 #
 
 include:
-- '/ci/go-test.yaml'
+- project: 'platform-admins/shared-ci-cd'
+  file: 'ci/go-docker.yaml'
 
 stages:
 - test
