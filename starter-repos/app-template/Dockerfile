@@ -12,10 +12,15 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-FROM golang:1
-WORKDIR /app
-COPY *.go ./
+FROM golang:1.7.3 AS builder
+WORKDIR /go/src/app/
+COPY *.go .
 RUN go get github.com/gomodule/redigo/redis
-RUN go build -o golang-template
-CMD ["/app/golang-template"]
+RUN CGO_ENABLED=0 GOOS=linux go build -a -installsuffix cgo -o app-template .
+
+FROM alpine:latest
+RUN apk --no-cache add ca-certificates
+WORKDIR /root/
+COPY --from=builder /go/src/app/app-template .
+CMD ["./app-template"]
 

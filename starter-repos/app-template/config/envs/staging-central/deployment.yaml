@@ -8,10 +8,6 @@ spec:
       containers:
       - name: app
         env:
-        # Required for Skaffold to detect runtime language
-        # https://skaffold.dev/docs/workflows/debug/#go
-        - name: GOTRACEBACK
-          value: single
         - name: ENVIRONMENT
           value: staging-cental
 
