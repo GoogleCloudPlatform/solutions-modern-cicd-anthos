@@ -1,0 +1,15 @@
+resources:
+- redis_manifest.yaml
+
+# You can customize the installation namespace for redis.
+namespace: redis
+
+vars:
+- name: REDIS_INSTALL_NAMESPACE
+  objref:
+    kind: Service
+    name: redis-master
+    apiVersion: v1
+  fieldref:
+    fieldpath: metadata.namespace
+

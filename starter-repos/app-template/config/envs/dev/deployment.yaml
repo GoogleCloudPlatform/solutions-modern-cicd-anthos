@@ -1,0 +1,18 @@
+kind: Deployment
+apiVersion: apps/v1
+metadata:
+  name: app
+spec:
+  template:
+    spec:
+      containers:
+      - name: app
+        env:
+        # Required for Skaffold to detect runtime language
+        # https://skaffold.dev/docs/workflows/debug/#go
+        - name: GOTRACEBACK
+          value: single
+        - name: ENVIRONMENT
+          value: prod-central
+
+
