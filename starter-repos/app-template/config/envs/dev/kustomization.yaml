@@ -12,26 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 resources:
-- ../../base/app
-- ../../base/redis
+- ../../base
 
-# update the image in this patch.
 patches:
 - deployment.yaml
-
-configmapGenerator:
-- name: redishost
-  literals:
-  - REDISHOST=redis-master.$(NAMESPACE).svc.cluster.local
-
-vars:
-- name: NAMESPACE
-  objref:
-    kind: Service
-    name: redis-master
-    apiVersion: v1
-  fieldref:
-    fieldpath: metadata.namespace
-
-configurations:
-- varReference.yaml
