@@ -34,5 +34,3 @@ steps:
     terraform init
     terraform plan -out=terraform.tfplan
     terraform apply -auto-approve terraform.tfplan
-
-    ./enable_mci.sh ${_PROJECT_ID} prod-us-central1

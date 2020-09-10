@@ -14,24 +14,16 @@
  * limitations under the License.
  */
 
-locals {
-  gke_hub_sa_key = google_service_account_key.gke_hub_key.private_key
-}
-
-resource "google_service_account_key" "gke_hub_key" {
-  service_account_id = var.gke_hub_sa
-}
-
-module "gke_hub_registration" {
+module "mci" {
   source  = "terraform-google-modules/gcloud/google"
   version = "~> 2.0"
   
   platform           = "linux"
   upgrade            = true
-  module_depends_on  = [var.cluster_endpoint]
+  module_depends_on  = [var.wait]
 
-  create_cmd_entrypoint  = "${path.module}/scripts/gke_hub_registration.sh"
-  create_cmd_body        = "${var.location} ${var.cluster_name} ${local.gke_hub_sa_key}"
+  create_cmd_entrypoint  = "${path.module}/scripts/enable_mci.sh"
+  create_cmd_body        = "${var.project_id} ${var.cluster_name}"
   destroy_cmd_entrypoint = "gcloud"
-  destroy_cmd_body       = "container hub memberships unregister ${var.cluster_name} --gke-cluster=${var.location}/${var.cluster_name} --project ${var.project_id}"
+  destroy_cmd_body       = "alpha container hub ingress disable --force --project ${var.project_id}"
 }

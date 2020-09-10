@@ -21,22 +21,18 @@ if [ "$#" -lt 2 ]; then
 fi
 
 PROJECT_ID=$1
-CLUSTER_NAMES=$2
+CLUSTER_NAME=$2
 
-# IFS if we want to handle comma delimited list of clusters
-IFS="," 
-for CLUSTER_NAME in ${CLUSTER_NAMES}; do
-  gcloud alpha container hub ingress enable \
-    --config-membership=projects/${PROJECT_ID}/locations/global/memberships/${CLUSTER_NAME} || true
-done
+gcloud alpha container hub ingress enable \
+  --config-membership=projects/${PROJECT_ID}/locations/global/memberships/${CLUSTER_NAME} --project ${PROJECT_ID} || true
 
 # ingress enabling can timeout after 2 minutes, but still be OK, validate accordingly
-for i in {1..6}; do
-  RESULT=$(gcloud alpha container hub ingress describe --format="value(featureState.details.code)")
-  if [ $RESULT = "OK" ]; then
+for i in {1..30}; do
+  RESULT=$(gcloud alpha container hub ingress describe --project ${PROJECT_ID} --format="value(featureState.details.code)")
+  if [ ${RESULT} = "OK" ]; then
     break;
   fi
-  if [[ $i = 6 && $RESULT != "OK" ]]; then
+  if [[ ${i} = 30 && ${RESULT} != "OK" ]]; then
     exit 1
   fi
   sleep 10
