@@ -27,7 +27,8 @@ spec:
     spec:
       containers:
       - name: app
-        image: gcr.io/jingfangliu-194020/app:v1
+        # Please change the image to your own container registry address.
+        image: app
         imagePullPolicy: Always
         resources:
           limits:
