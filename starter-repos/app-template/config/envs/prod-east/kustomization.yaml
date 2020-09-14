@@ -18,46 +18,10 @@
 namespace: prod-east
 
 resources:
-- ../../base/app
-- ../../base/redis
+- ../../base
 
 # update the image in this patch.
 patches:
 - deployment.yaml
 
-configmapGenerator:
-- name: redishost
-  literals:
-  - REDISHOST=redis-master.$(NAMESPACE).svc.cluster.local
-
-vars:
-- name: NAMESPACE
-  objref:
-    kind: Service
-    name: redis-master
-    apiVersion: v1
-  fieldref:
-    fieldpath: metadata.namespace
-
-configurations:
-- varReference.yaml
-
-# To use a different redis host available at <HOST> with the password <PASSWORD>,
-# make the following change in the current kustomization.yaml.
-#
-# 1. remove - ../../base/redis from the resources. The resources will be
-#    resources:
-#    - ../../base.app
-#
-# 2. change the configmapGenerator to use <HOST>. The configmapGenerator will be
-# configmapGenerator:
-# - name: redishost
-#   literals:
-#    - REDISHOST=<HOST>
-#
-# 3. uncomment the following secretGenerator:
-# secretGenerator:
-# - name: redis
-#   literals:
-#   - redis-password=<PASSWORD>
 
