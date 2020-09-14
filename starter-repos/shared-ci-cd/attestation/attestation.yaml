@@ -1,0 +1,81 @@
+create-build-attestation:
+  variables:
+    ATTESTOR: "build"
+    IMAGE_TAG: "${CI_COMMIT_SHA}"
+  stage: render-manifests
+  extends:
+  - .create-attestation
+  artifacts:
+    when: on_failure
+    paths:
+    - "${CI_PROJECT_DIR}/notes/ec_signature"
+
+create-quality-attestation:
+  variables:
+    ATTESTOR: "quality"
+    IMAGE_TAG: "${CI_COMMIT_SHA}"
+  stage: deploy-staging-us-west2
+  when:
+  - manual
+  extends:
+  - .create-attestation
+  artifacts:
+    when: on_failure
+    paths:
+    - "${CI_PROJECT_DIR}/notes/ec_signature"
+
+create-security-attestation:
+  variables:
+    ATTESTOR: "security"
+    IMAGE_TAG: "${CI_COMMIT_SHA}"
+  stage: rollout-approval
+  extends:
+  - .create-attestation
+  artifacts:
+    when: on_failure
+    paths:
+    - "${CI_PROJECT_DIR}/notes/ec_signature"
+
+
+# Creates an attestation based on the ATTESTOR variable
+.create-attestation:
+  image: google/cloud-sdk:debian_component_based
+  before_script:
+    - "[ -z ${ATTESTOR} ] && echo 'Missing the Attestor name' && exit 1"
+    - "[ -z ${IMAGE_NAME} ] && echo 'Missing full path name of the image (without tag)' && exit 1"
+    - "[ -z ${IMAGE_TAG} ] && echo 'Missing the image tag' && exit 1"
+    - export GOOGLE_PROJECT_ID="$(gcloud config get-value core/project)"
+  script:
+    - mkdir -p ${CI_PROJECT_DIR}/notes
+    - export KEYRING_NAME="$(gcloud secrets versions access latest --secret='keyring-name')"
+    - export PUBLIC_KEY_ID=$(gcloud container binauthz attestors describe ${ATTESTOR}-attestor --format='value(userOwnedGrafeasNote.publicKeys[0].id)')
+    - "[ -z ${PUBLIC_KEY_ID} ] && echo 'Public Key was not found' && exit 1"
+
+    # Extract Image Path and Image Digest from generated file during image creation
+    - |
+      if [ -z ${IMAGE_DIGEST} ]; then
+        export FINAL_IMAGE_DIGEST="$(gcloud beta artifacts docker images list ${IMAGE_NAME} --include-tags --filter=tags=${IMAGE_TAG} --format=value'(DIGEST)')"
+      else
+        export FINAL_IMAGE_DIGEST=${IMAGE_DIGEST} #NOTE - GitLab pipelines cannot overwrite pipeline-variables, so duplication is required
+      fi
+    - export FULL_IMAGE_REF="${IMAGE_NAME}@${FINAL_IMAGE_DIGEST}"
+    # Create the file to sign
+    - gcloud container binauthz create-signature-payload --artifact-url="${FULL_IMAGE_REF}" > ${CI_PROJECT_DIR}/notes/generated_payload.json
+
+    # Sign generated_payload.json with KMS
+    - |
+      gcloud kms asymmetric-sign \
+      --location us-central1 \
+      --keyring ${KEYRING_NAME} \
+      --key ${ATTESTOR}-attestor-key \
+      --version 1 \
+      --digest-algorithm sha512 \
+      --input-file ${CI_PROJECT_DIR}/notes/generated_payload.json \
+      --signature-file ${CI_PROJECT_DIR}/notes/ec_signature
+    # Create attestation
+    - |
+      gcloud container binauthz attestations create \
+        --artifact-url="${FULL_IMAGE_REF}" \
+        --attestor="projects/${GOOGLE_PROJECT_ID}/attestors/${ATTESTOR}-attestor" \
+        --signature-file=${CI_PROJECT_DIR}/notes/ec_signature \
+        --public-key-id="${PUBLIC_KEY_ID}"

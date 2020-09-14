@@ -22,6 +22,7 @@ deploy-staging-us-west2:
   tags:
   - cluster:staging-us-west2
   script:
+    - if [ ! -f stg.yaml ]; then exit 0; fi # stops run if stg.yaml file does not exist in the branch (usually on initial install)
     # Work around for https://github.com/kubernetes/kubernetes/issues/36072
     # Stated solution is to use "--force" or "kubectl create"; gke-deploy does not have this option so the following works
     # Get all services that have the "kubectl.kubernetes.io/last-applied-configuration" annotation and put into an environment variable
@@ -40,6 +41,7 @@ deploy-prod-us-east1:
   tags:
   - cluster:prod-us-east1
   script:
+    - if [ ! -f prod.yaml ]; then exit 0; fi # stops run if stg.yaml file does not exist in the branch (usually on initial install)
     # Work around for https://github.com/kubernetes/kubernetes/issues/36072
     # Stated solution is to use "--force" or "kubectl create"; gke-deploy does not have this option so the following works
     # Get all services that have the "kubectl.kubernetes.io/last-applied-configuration" annotation and put into an environment variable
@@ -58,6 +60,7 @@ deploy-prod-us-central1:
   tags:
   - cluster:prod-us-central1
   script:
+    - if [ ! -f prod.yaml ]; then exit 0; fi # stops run if stg.yaml file does not exist in the branch (usually on initial install)
     # Work around for https://github.com/kubernetes/kubernetes/issues/36072
     # Stated solution is to use "--force" or "kubectl create"; gke-deploy does not have this option so the following works
     # Get all services that have the "kubectl.kubernetes.io/last-applied-configuration" annotation and put into an environment variable
@@ -75,3 +78,4 @@ rollout-approval:
   script:
   - echo "Continue with production rollout"
   when: manual
+  allow_failure: false

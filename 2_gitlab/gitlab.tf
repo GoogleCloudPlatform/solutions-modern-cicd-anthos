@@ -16,7 +16,7 @@
 
 module "gke-gitlab" {
   source  = "terraform-google-modules/gke-gitlab/google"
-  version = "~> 0.3.0"
+  version = "~> 0.4.0"
 
   project_id            = var.project_id
   domain                = "${trimprefix(module.cloud-endpoints-dns-gitlab.endpoint_computed, "gitlab.")}"
