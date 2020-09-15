@@ -18,8 +18,12 @@ include:
   file: 'ci/go-docker.yaml'
 - local: '/skaffold/build.yaml'
 - local: '/skaffold/render.yaml'
+- local: '/appctl/validate.yaml'
+- local: '/appctl/prepare.yaml'
 
 stages:
 - test
 - build
 - render-manifests
+- validate-manifests
+- prepare-manifests
