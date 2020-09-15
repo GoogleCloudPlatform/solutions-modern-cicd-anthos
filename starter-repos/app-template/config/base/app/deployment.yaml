@@ -27,8 +27,6 @@ spec:
     spec:
       containers:
       - name: app
-        # Please change the image to your own container registry address.
-        image: app
         imagePullPolicy: Always
         resources:
           limits:

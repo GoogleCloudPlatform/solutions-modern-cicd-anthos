@@ -10,5 +10,8 @@ spec:
         env:
         - name: ENVIRONMENT
           value: prod-central
-
-
+        # Please change the image to your own container registry address.
+        # "image" has to be placed in each individual deployment.yaml 
+        # rather than in the ../base/app/deployment.yaml. This allows 
+        # the skaffold kubectl deployer to attach the image digest
+        image: app
