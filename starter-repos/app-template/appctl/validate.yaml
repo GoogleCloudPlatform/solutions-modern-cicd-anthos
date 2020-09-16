@@ -14,7 +14,12 @@
 
 validate-manifests:
   stage: validate-manifests
-  image: gcr.io/cloud-solutions-images/appctl
+  image: gcr.io/cloud-solutions-images/appctl:app-delivery-demo
+  services:
+    - docker:dind
+  variables:
+    DOCKER_HOST: tcp://localhost:2375
+    DOCKER_TLS_CERTDIR: ""
   script:
   - |
     cat > /root/.appctlconfig <<EOF
