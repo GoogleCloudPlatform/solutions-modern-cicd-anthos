@@ -1,5 +1,5 @@
-kind: Deployment
 apiVersion: apps/v1
+kind: Deployment
 metadata:
   name: app
 spec:
@@ -15,8 +15,3 @@ spec:
         env:
         - name: ENVIRONMENT
           value: prod-central
-        - name: REDISHOST
-          valueFrom:
-            configMapKeyRef:
-              name: redishost
-              key: REDISHOST

@@ -15,8 +15,3 @@ spec:
         env:
         - name: ENVIRONMENT
           value: staging-cental
-        - name: REDISHOST
-          valueFrom:
-            configMapKeyRef:
-              name: redishost
-              key: REDISHOST
