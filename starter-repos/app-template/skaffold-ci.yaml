@@ -2,12 +2,17 @@ apiVersion: skaffold/v2beta7
 kind: Config
 metadata:
   name: app-template
-build:
-  artifacts:
-  # Make sure the skaffold "default-repo" is set.
-  # Follow the doc for instructions https://github.com/GoogleCloudPlatform/solutions-modern-cicd-anthos/blob/master/docs/index.md#testing-the-change-locally-with-skaffold 
-  - image: app
 profiles:
+  # Profile used when building images in CI
+  - name: ci
+    build:
+      cluster:
+        dockerConfig:
+          path: ~/.docker/config.json          
+  # Profile to render "staging-central" manifest.
+  # It is only aimed to add the image digest but not generates the fully
+  # hydrated config. So the `--validate` flag of kubectl should be
+  # disabled (disableValidation=true) and should not use kustomize deployer.
   - name: staging-central
     deploy:
       kubectl:
@@ -15,6 +20,10 @@ profiles:
         - config/envs/staging-central/deployment.yaml
         flags:
           disableValidation: true
+  # Profile to render "prod-central" manifest.
+  # It is only aimed to add the image digest but not generates the fully
+  # hydrated config. So the `--validate` flag of kubectl should be
+  # disabled (disableValidation=true) and should not use kustomize deployer.
   - name: prod-central
     deploy:
       kubectl:
@@ -22,6 +31,10 @@ profiles:
         - config/envs/prod-central/deployment.yaml
         flags:
           disableValidation: true
+  # Profile to render "prod-east" manifest.
+  # It is only aimed to add the image digest but not generates the fully
+  # hydrated config. So the `--validate` flag of kubectl should be
+  # disabled (disableValidation=true) and should not use kustomize deployer.
   - name: prod-east
     deploy:
       kubectl:

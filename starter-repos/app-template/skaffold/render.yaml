@@ -17,7 +17,7 @@
 # do not hydrate the resources. The resource hydration is done via `appctl prepare`  
 skaffold-render:
   stage: render-manifests
-  image: gcr.io/k8s-skaffold/skaffold
+  image: gcr.io/k8s-skaffold/skaffold:v1.14.0
   script:
     # Setup image registry credentials
     - "[ -z ${GCP_AR_KEY} ] && echo 'Artifact Registry credentials not available' && exit 1"

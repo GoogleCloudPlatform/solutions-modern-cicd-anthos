@@ -32,15 +32,6 @@ vars:
   fieldref:
     fieldpath: metadata.namespace
 
-- name: REDIS_INSTALL_NAMESPACE
-  objref:
-    kind: Service
-    name: redis-master
-    apiVersion: v1
-  fieldref:
-    fieldpath: metadata.namespace
-
-
 configurations:
 - varReference.yaml
 
