@@ -18,8 +18,7 @@ include:
   file: 'ci/go-docker.yaml'
 - project: 'platform-admins/shared-ci-cd'
   file: 'skaffold/build.yaml'
-- project: 'platform-admins/app-template'
-  file: 'skaffold/render.yaml'
+- local: '/skaffold/render.yaml'
 
 stages:
 - test

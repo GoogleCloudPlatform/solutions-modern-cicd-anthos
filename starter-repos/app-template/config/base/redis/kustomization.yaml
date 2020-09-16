@@ -1,12 +1,2 @@
 resources:
 - redis_manifest.yaml
-
-vars:
-- name: REDIS_INSTALL_NAMESPACE
-  objref:
-    kind: Service
-    name: redis-master
-    apiVersion: v1
-  fieldref:
-    fieldpath: metadata.namespace
-

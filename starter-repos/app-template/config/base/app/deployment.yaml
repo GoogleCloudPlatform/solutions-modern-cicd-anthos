@@ -37,11 +37,6 @@ spec:
           value: base
         - name: LOG_LEVEL
           value: info
-        - name: REDISHOST
-          valueFrom:
-            configMapKeyRef:
-              name: redishost
-              key: REDISHOST
         - name: REDISPASSWORD
           valueFrom:
             secretKeyRef:

@@ -37,7 +37,13 @@ func incrementHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func main() {
-	redisHost := os.Getenv("REDISHOST")
+	var redisHost string
+	if val, ok := os.LookupEnv("REDISHOST"); ok {
+		redisHost = val
+	} else {
+		redisHost = "localhost"
+	}
+
 	redisPort := "6379"
 	redisAddr := fmt.Sprintf("%s:%s", redisHost, redisPort)
 	password := os.Getenv("REDISPASSWORD")

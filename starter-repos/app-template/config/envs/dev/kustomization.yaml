@@ -12,11 +12,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-# Change `namespace` to what you create from 
-# https://github.com/GoogleCloudPlatform/solutions-modern-cicd-anthos/blob/master/docs/index.md. 
-namespace: $USER
 resources:
-- ../../base
+- ../../base/app/
+- ../../base/redis/
 
 patches:
 - deployment.yaml

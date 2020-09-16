@@ -14,3 +14,4 @@ spec:
           value: single
         - name: ENVIRONMENT
           value: dev
+        image: app
