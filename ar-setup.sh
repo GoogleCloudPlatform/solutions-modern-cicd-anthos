@@ -20,8 +20,7 @@ readonly project_var_name_gcp_ar_repo=GCP_AR_REPO
 readonly project_var_name_gcp_ar_key=GCP_AR_KEY
 
 usage () {
-    echo "usage: ./ar-setup.sh --app-name <app_name> --gitlab-access-token <token> --app-config-repo <app-config-repo> [--project <gcp_project>] [--artifact-registry-location <location>]"
-	echo "  OR   ./ar-setup.sh --app-name=<app_name> --gitlab-access-token=<token> --app-config-repo=<app-config-repo> [--project=<gcp_project>] [--artifact-registry-location=<location>]"
+	echo "usage: ./ar-setup.sh --app-name=APP_NAME --gitlab-access-token=TOKEN --app-config-repo=REPO_URL [--project=PROJECT_ID] [--artifact-registry-location=LOCATION]"
 	echo "  --app-name (required): the application name."
 	echo "  --app-config-repo (required): the URL to the application project. This is needed so that we can add the AR repository and the Google service account key as project variables of the application project."
 	echo "  --gitlab-access-token (required): the GitLab personal access token for accessing the GitLab APIs. If you don't have one, see https://docs.gitlab.com/ee/user/profile/personal_access_tokens.html for how to create personal access tokens with 'api' scope."
@@ -41,6 +40,7 @@ while [[ "$#" -gt 0 ]]; do
 		--app-config-repo=*) app_config_repo="${1#*=}" ;;
 		--gitlab-access-token) shift; gitlab_access_token="$1" ;;
 		--gitlab-access-token=*) gitlab_access_token="${1#*=}" ;;
+		-h|--help) usage; exit 0 ;;
 		*) echo "Unknown parameter passed: $1"; usage; exit 1 ;;
     esac
     shift
