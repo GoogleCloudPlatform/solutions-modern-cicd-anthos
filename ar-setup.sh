@@ -95,6 +95,16 @@ else
 	echo "Granted the service account ${service_account_email} \"roles/artifactregistry.writer\" on the artifact repository \"${app_name}\""
 fi
 
+check_gitlab_api_access_permission() {
+	cmd_output=$1
+	unauthorized_msg="401 Unauthorized"
+	insufficient_scope_msg="insufficient_scope"
+	if [[ "${cmd_output}" = *"${unauthorized_msg}"* ]] || [[ "${cmd_output}" = *"${insufficient_scope_msg}"* ]]; then
+		echo "Your personal access token does not has sufficent scope to access GitLab APIs. Please make sure your token has \`api\` scope: https://docs.gitlab.com/ee/user/profile/personal_access_tokens.html#limiting-scopes-of-a-personal-access-token"
+		exit 1
+	fi
+}
+
 add_gitlab_project_vars() {
 	# get the gitlab hostname and gitlab project name from app_config_repo
 	readonly https_prefix="https://"
@@ -111,6 +121,8 @@ add_gitlab_project_vars() {
 
 	# check whether the GitLab project exists
 	readonly output_project_existence=$(curl -s --header "PRIVATE-TOKEN: ${gitlab_access_token}" "${gitlab_hostname}api/v4/projects/${gitlab_project}")
+	check_gitlab_api_access_permission "${output_project_existence}"
+
 	readonly not_found_msg="Not Found"
 	if [[ "${output_project_existence}" = *"${not_found_msg}"* ]]; then
 		echo "The GitLab project \"${app_config_repo}\" does not exist. Please run \`appctl init\` to create the project first."
@@ -134,7 +146,8 @@ add_gitlab_project_vars() {
 		rm -f "${key_file}"
 		readonly artifact_repo_name="${artifact_registry_location}-docker.pkg.dev/${project}/${app_name}"
 
-		curl -s --request POST --header "PRIVATE-TOKEN: ${gitlab_access_token}" "${gitlab_hostname}api/v4/projects/${gitlab_project}/variables" --form "key=${project_var_name_gcp_ar_repo}" --form "value=${artifact_repo_name}" >/dev/null
+		output=$(curl -s --request POST --header "PRIVATE-TOKEN: ${gitlab_access_token}" "${gitlab_hostname}api/v4/projects/${gitlab_project}/variables" --form "key=${project_var_name_gcp_ar_repo}" --form "value=${artifact_repo_name}")
+		check_gitlab_api_access_permission "${output}"
 		curl -s --request POST --header "PRIVATE-TOKEN: ${gitlab_access_token}" "${gitlab_hostname}api/v4/projects/${gitlab_project}/variables" --form "key=${project_var_name_gcp_ar_key}" --form "value=${service_account_key}" >/dev/null
 	else
 		echo "${app_config_repo} already includes project variables ${project_var_name_gcp_ar_repo} and/or ${project_var_name_gcp_ar_key}, please delete them first."
