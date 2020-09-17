@@ -21,6 +21,7 @@ readonly project_var_name_gcp_ar_key=GCP_AR_KEY
 
 usage () {
     echo "usage: ./ar-setup.sh --app-name <app_name> --gitlab-access-token <token> --app-config-repo <app-config-repo> [--project <gcp_project>] [--artifact-registry-location <location>]"
+	echo "  OR   ./ar-setup.sh --app-name=<app_name> --gitlab-access-token=<token> --app-config-repo=<app-config-repo> [--project=<gcp_project>] [--artifact-registry-location=<location>]"
 	echo "  --app-name (required): the application name."
 	echo "  --app-config-repo (required): the URL to the application project. This is needed so that we can add the AR repository and the Google service account key as project variables of the application project."
 	echo "  --gitlab-access-token (required): the GitLab personal access token for accessing the GitLab APIs. If you don't have one, see https://docs.gitlab.com/ee/user/profile/personal_access_tokens.html for how to create personal access tokens with 'api' scope."
