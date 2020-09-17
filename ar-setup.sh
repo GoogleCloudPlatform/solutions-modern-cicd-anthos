@@ -67,8 +67,8 @@ else
 fi
 
 # check whether the service account already exists, and create the service account if it does not exist
-readonly service_account_name="${app_name}-push"
-readonly service_account_email="${service_account_name}@${project}.iam.gserviceaccount.com"
+service_account_name="${app_name}-push"
+service_account_email="${service_account_name}@${project}.iam.gserviceaccount.com"
 gcloud iam service-accounts describe "${service_account_email}" >/dev/null 2>&1
 if [ $? -ne 0 ]; then
 	echo "The service account ${service_account_email} does not exist"
@@ -108,44 +108,44 @@ check_gitlab_api_access_permission() {
 
 add_gitlab_project_vars() {
 	# get the gitlab hostname and gitlab project name from app_config_repo
-	readonly https_prefix="https://"
-	readonly https_prefix_len=${#https_prefix}
-	readonly app_config_repo_without_https_prefix=${app_config_repo:https_prefix_len}
+	https_prefix="https://"
+	https_prefix_len=${#https_prefix}
+	app_config_repo_without_https_prefix=${app_config_repo:https_prefix_len}
 
-	readonly end_of_gitlab_hostname_index=$(expr index ${app_config_repo_without_https_prefix} /)
-	readonly gitlab_hostname_len=https_prefix_len+end_of_gitlab_hostname_index
-	readonly gitlab_hostname=${app_config_repo:0:gitlab_hostname_len}
+	end_of_gitlab_hostname_index=$(expr index ${app_config_repo_without_https_prefix} /)
+	gitlab_hostname_len=https_prefix_len+end_of_gitlab_hostname_index
+	gitlab_hostname=${app_config_repo:0:gitlab_hostname_len}
 
 	gitlab_project=${app_config_repo:gitlab_hostname_len}
 	# replace the slash in the project name with %2F
-	readonly gitlab_project=${gitlab_project//\//%2F}
+	gitlab_project=${gitlab_project//\//%2F}
 
 	# check whether the GitLab project exists
-	readonly output_project_existence=$(curl -s --header "PRIVATE-TOKEN: ${gitlab_access_token}" "${gitlab_hostname}api/v4/projects/${gitlab_project}")
+	output_project_existence=$(curl -s --header "PRIVATE-TOKEN: ${gitlab_access_token}" "${gitlab_hostname}api/v4/projects/${gitlab_project}")
 	check_gitlab_api_access_permission "${output_project_existence}"
 
-	readonly not_found_msg="Not Found"
+	not_found_msg="Not Found"
 	if [[ "${output_project_existence}" = *"${not_found_msg}"* ]]; then
 		echo "The GitLab project \"${app_config_repo}\" does not exist. Please run \`appctl init\` to create the project first."
 		exit 1
 	fi
 
 	# add the AR repo and the service account key into the app project as GitLab project variables
-	readonly output_repo=$(curl -s --header "PRIVATE-TOKEN: ${gitlab_access_token}" "${gitlab_hostname}api/v4/projects/${gitlab_project}/variables/${project_var_name_gcp_ar_repo}")
-	readonly output_key=$(curl -s --header "PRIVATE-TOKEN: ${gitlab_access_token}" "${gitlab_hostname}api/v4/projects/${gitlab_project}/variables/${project_var_name_gcp_ar_key}")
+	output_repo=$(curl -s --header "PRIVATE-TOKEN: ${gitlab_access_token}" "${gitlab_hostname}api/v4/projects/${gitlab_project}/variables/${project_var_name_gcp_ar_repo}")
+	output_key=$(curl -s --header "PRIVATE-TOKEN: ${gitlab_access_token}" "${gitlab_hostname}api/v4/projects/${gitlab_project}/variables/${project_var_name_gcp_ar_key}")
 	
 	if [[ "${output_repo}" = *"${not_found_msg}"* ]] && [[ "${output_key}" = *"${not_found_msg}"* ]]; then
 		# create and download a service account key
 		# For each service account, only 12 keys can be created. So we only create the key when all the preconditions are met.
-		readonly key_file=$(mktemp)
+		key_file=$(mktemp)
 		gcloud iam service-accounts keys create --iam-account="${service_account_email}" "${key_file}"
 		if [ $? -ne 0 ]; then
 			echo "Failed to download a service account key for ${service_account_email}"
 			exit 1
 		fi
-		readonly service_account_key=$(cat "${key_file}")
+		service_account_key=$(cat "${key_file}")
 		rm -f "${key_file}"
-		readonly artifact_repo_name="${artifact_registry_location}-docker.pkg.dev/${project}/${app_name}"
+		artifact_repo_name="${artifact_registry_location}-docker.pkg.dev/${project}/${app_name}"
 
 		output=$(curl -s --request POST --header "PRIVATE-TOKEN: ${gitlab_access_token}" "${gitlab_hostname}api/v4/projects/${gitlab_project}/variables" --form "key=${project_var_name_gcp_ar_repo}" --form "value=${artifact_repo_name}")
 		check_gitlab_api_access_permission "${output}"
