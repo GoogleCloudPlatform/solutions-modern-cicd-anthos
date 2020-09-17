@@ -27,8 +27,6 @@ spec:
     spec:
       containers:
       - name: app
-        # Please change the image to your own container registry address.
-        image: app
         imagePullPolicy: Always
         resources:
           limits:
@@ -39,11 +37,6 @@ spec:
           value: base
         - name: LOG_LEVEL
           value: info
-        - name: REDISHOST
-          valueFrom:
-            configMapKeyRef:
-              name: redishost
-              key: REDISHOST
         - name: REDISPASSWORD
           valueFrom:
             secretKeyRef:

@@ -211,7 +211,7 @@ spec:
           value: slave
         - name: REDIS_MASTER_HOST
           value: >-
-            redis-master-0.redis-headless.$(REDIS_INSTALL_NAMESPACE).svc.cluster.local
+            redis-master-0.redis-headless.$(NAMESPACE).svc.cluster.local
         - name: REDIS_MASTER_PORT_NUMBER
           value: '6379'
         - name: REDIS_PASSWORD

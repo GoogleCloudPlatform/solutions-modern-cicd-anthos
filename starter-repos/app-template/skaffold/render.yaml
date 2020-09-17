@@ -1,0 +1,41 @@
+# Copyright 2020 Google LLC
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#      http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+# Different from the render in ../shared-ci-cd/skaffold/render.yaml,
+# this skaffold-render updates the *DRY* config with the new skaffold image and
+# do not hydrate the resources. The resource hydration is done via `appctl prepare`  
+skaffold-render:
+  stage: render-manifests
+  image: gcr.io/k8s-skaffold/skaffold:v1.14.0
+  script:
+    # Setup image registry credentials
+    - "[ -z ${GCP_AR_KEY} ] && echo 'Artifact Registry credentials not available' && exit 1"
+    - "[ -z ${GCP_AR_REPO} ] && echo 'Artifact Registry location not available' && exit 1"
+    - printf '%s\n' "${GCP_AR_KEY}" | docker login -u _json_key --password-stdin "${GCP_AR_REPO}"
+    # Configure git auth
+    - git config --global url."https://gitlab-ci-token:${CI_JOB_TOKEN}@${CI_SERVER_HOST}".insteadOf "https://${CI_SERVER_HOST}"
+    # Setup environment
+    - export SKAFFOLD_DEFAULT_REPO=${GCP_AR_REPO}
+    - export SKAFFOLD_LOUD=true
+    - export SKAFFOLD_TAG=${CI_COMMIT_SHA}
+    # The `skaffold render` tags the new image with the actual digest.
+    - skaffold render --filename=skaffold-ci.yaml --add-skaffold-labels=false --digest-source=remote -p staging-central --output /tmp/staging-central-deployment.yaml
+    - skaffold render --filename=skaffold-ci.yaml --add-skaffold-labels=false --digest-source=remote -p prod-central --output /tmp/prod-central-deployment.yaml
+    - skaffold render --filename=skaffold-ci.yaml --add-skaffold-labels=false --digest-source=remote -p prod-east --output /tmp/prod-east-deployment.yaml
+    - cp /tmp/staging-central-deployment.yaml config/envs/staging-central/deployment.yaml
+    - cp /tmp/prod-central-deployment.yaml config/envs/prod-central/deployment.yaml
+    - cp /tmp/prod-east-deployment.yaml config/envs/prod-east/deployment.yaml
+  artifacts:
+    paths:
+      - config/envs

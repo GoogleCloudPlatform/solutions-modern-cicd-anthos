@@ -16,6 +16,10 @@
 include:
 - project: 'platform-admins/shared-ci-cd'
   file: 'ci/go-docker.yaml'
+- local: '/skaffold/build.yaml'
+- local: '/skaffold/render.yaml'
 
 stages:
 - test
+- build
+- render-manifests
