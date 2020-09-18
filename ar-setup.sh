@@ -46,17 +46,17 @@ while [[ "$#" -gt 0 ]]; do
     shift
 done
 
-if [ -z "${app_name}" ] || [ -z "${app-config-repo}" ] || [ -z "${gitlab_access_token}" ]; then
+if [[ -z "${app_name}" ]] || [[ -z "${app-config-repo}" ]] || [[ -z "${gitlab_access_token}" ]]; then
 	usage
 	exit 1
 fi
 
 # check whether the artifact repository already exists, and create the repository if it does not exist
 gcloud beta artifacts repositories describe "${app_name}" --location="${artifact_registry_location}" >/dev/null 2>&1
-if [ $? -ne 0 ]; then
+if [[ $? -ne 0 ]]; then
 	echo "The artifact repository \"${app_name}\" does not exist"
 	gcloud beta artifacts repositories create "${app_name}" --location="${artifact_registry_location}" --repository-format=docker >/dev/null 2>&1
-	if [ $? -ne 0 ]; then
+	if [[ $? -ne 0 ]]; then
 		echo "Failed to create the artifact repository \"${app_name}\" at the location ${artifact_registry_location}"
 		exit 1
 	else 
@@ -70,11 +70,11 @@ fi
 service_account_name="${app_name}-push"
 service_account_email="${service_account_name}@${project}.iam.gserviceaccount.com"
 gcloud iam service-accounts describe "${service_account_email}" >/dev/null 2>&1
-if [ $? -ne 0 ]; then
+if [[ $? -ne 0 ]]; then
 	echo "The service account ${service_account_email} does not exist"
 	service_account_description="Service Account for accessing the artifact repository \"${app_name}\""
 	gcloud iam service-accounts create "${service_account_name}" --description "${service_account_description}" >/dev/null 2>&1
-	if [ $? -ne 0 ]; then
+	if [[ $? -ne 0 ]]; then
 		echo "Failed to create the service account ${service_account_email}"
 		exit 1
 	else
@@ -89,7 +89,7 @@ gcloud beta artifacts repositories add-iam-policy-binding "${app_name}" \
 	--location="${artifact_registry_location}" \
 	--member=serviceAccount:"${service_account_email}" \
 	--role=roles/artifactregistry.writer >/dev/null
-if [ $? -ne 0 ]; then
+if [[ $? -ne 0 ]]; then
 	echo "Failed to grant the service account ${service_account_email} \"roles/artifactregistry.writer\" on the artifact repository \"${app_name}\""
 	exit 1
 else
@@ -139,7 +139,7 @@ add_gitlab_project_vars() {
 		# For each service account, only 12 keys can be created. So we only create the key when all the preconditions are met.
 		key_file=$(mktemp)
 		gcloud iam service-accounts keys create --iam-account="${service_account_email}" "${key_file}"
-		if [ $? -ne 0 ]; then
+		if [[ $? -ne 0 ]]; then
 			echo "Failed to download a service account key for ${service_account_email}"
 			exit 1
 		fi
@@ -157,7 +157,7 @@ add_gitlab_project_vars() {
 }
 
 add_gitlab_project_vars
-if [ $? -ne 0 ]; then
+if [[ $? -ne 0 ]]; then
 	echo "Failed to add the artifact repository and the service account key into the app project as GitLab project variables"
 	exit 1
 else
