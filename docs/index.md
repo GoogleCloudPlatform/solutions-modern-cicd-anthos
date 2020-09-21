@@ -277,8 +277,11 @@ If you want to add another cluster (like asia-east1 in the above screenshots), r
    metadata:
      name: config-management
    spec:
+     channel: cs
      # clusterName is required and must be unique among all managed clusters
      clusterName: $SHORT_CLUSTERNAME
+     enableMultiRepo: true
+     enableLegacyFields: true
      git:
        syncRepo: git@$GITLAB_HOSTNAME:platform-admins/anthos-config-management.git
        syncBranch: master
