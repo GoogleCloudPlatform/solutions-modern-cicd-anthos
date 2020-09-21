@@ -15,6 +15,11 @@
 validate-manifests:
   stage: validate-manifests
   image: gcr.io/cloud-solutions-images/appctl:app-delivery-demo
+  only:
+    changes:
+    - config/**/*
+    - delivery/**/*
+    - validation/**/*
   services:
     - docker:dind
   variables:

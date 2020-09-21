@@ -16,6 +16,10 @@ prepare-manifests:
   only:
     refs:
     - master
+    changes:
+    - config/**/*
+    - delivery/**/*
+    - validation/**/*
   stage: prepare-manifests
   image: gcr.io/cloud-solutions-images/appctl:app-delivery-demo
   services:
