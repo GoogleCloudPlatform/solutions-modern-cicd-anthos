@@ -70,6 +70,10 @@ steps:
     gcloud container clusters get-credentials gitlab --region us-central1 --project=${_PROJECT_ID}
     export GITLAB_PASSWORD=$(kubectl get secrets gitlab-gitlab-initial-root-password -o jsonpath="{.data.password}" | base64 -d)
 
+    # Set the gitlab-runner in the privileged mode
+    # Set the pull policy to always pull the latest images
+    kubectl set env deployments/gitlab-gitlab-runner KUBERNETES_PRIVILEGED=true KUBERNETES_PULL_POLICY=always
+
     # Create a personal access token with the value of the root password
     export WEBSERVICE_POD=$(kubectl get pods -l=app=webservice -o jsonpath='{.items[0].metadata.name}')
     export GITLAB_TOKEN=$${GITLAB_PASSWORD}

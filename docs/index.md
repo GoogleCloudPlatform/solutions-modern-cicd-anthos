@@ -357,6 +357,7 @@ If you want to add another cluster (like asia-east1 in the above screenshots), r
       CI_SERVER_URL: https://$GITLAB_HOSTNAME/
       KUBERNETES_IMAGE: ubuntu:16.04
       KUBERNETES_NAMESPACE: acm-tests
+      KUBERNETES_PRIVILEGED: "true"
       REGISTER_LOCKED: "true"
       RUNNER_EXECUTOR: kubernetes
       RUNNER_REQUEST_CONCURRENCY: "1"
@@ -397,6 +398,7 @@ If you want to add another cluster (like asia-east1 in the above screenshots), r
       RUNNER_TAG_LIST: "app:$APP_NAME, cluster:$SHORT_CLUSTERNAME"
       KUBERNETES_IMAGE: "ubuntu:16.04"
       KUBERNETES_NAMESPACE: "$APP_NAME"
+      KUBERNETES_PRIVILEGED: "true"
       KUBERNETES_PULL_POLICY: "always"
     EOF
     ```
