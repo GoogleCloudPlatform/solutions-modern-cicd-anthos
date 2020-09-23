@@ -43,4 +43,4 @@ validate-manifests:
     appctl init ${APP_NAME} --app-config-repo ${APP_REPO_URL} \
     --deployment-repo ${DEPLOYMENT_REPO_URL}
   - cd ${APP_NAME}
-  - appctl validate staging-central --from-revision=${CI_COMMIT_BRANCH}
+  - appctl validate staging-west --from-revision=${CI_COMMIT_BRANCH}

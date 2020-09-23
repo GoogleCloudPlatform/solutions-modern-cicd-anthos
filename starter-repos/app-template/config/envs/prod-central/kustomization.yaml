@@ -15,7 +15,7 @@
 # Customize the namespace to be the namespace name used for prod-central environment.
 # This change should be made before `appcel env add prod-central`.
 # Once the prod-central environment is added, the namespace shouldn't be changed.
-namespace: prod-central
+namespace: go-app
 
 resources:
 - ../../base

@@ -30,10 +30,10 @@ skaffold-render:
     - export SKAFFOLD_LOUD=true
     - export SKAFFOLD_TAG=${CI_COMMIT_SHA}
     # The `skaffold render` tags the new image with the actual digest.
-    - skaffold render --filename=skaffold-ci.yaml --add-skaffold-labels=false --digest-source=remote -p staging-central --output /tmp/staging-central-deployment.yaml
+    - skaffold render --filename=skaffold-ci.yaml --add-skaffold-labels=false --digest-source=remote -p staging-west --output /tmp/staging-west-deployment.yaml
     - skaffold render --filename=skaffold-ci.yaml --add-skaffold-labels=false --digest-source=remote -p prod-central --output /tmp/prod-central-deployment.yaml
     - skaffold render --filename=skaffold-ci.yaml --add-skaffold-labels=false --digest-source=remote -p prod-east --output /tmp/prod-east-deployment.yaml
-    - cp /tmp/staging-central-deployment.yaml config/envs/staging-central/deployment.yaml
+    - cp /tmp/staging-west-deployment.yaml config/envs/staging-west/deployment.yaml
     - cp /tmp/prod-central-deployment.yaml config/envs/prod-central/deployment.yaml
     - cp /tmp/prod-east-deployment.yaml config/envs/prod-east/deployment.yaml
   artifacts:

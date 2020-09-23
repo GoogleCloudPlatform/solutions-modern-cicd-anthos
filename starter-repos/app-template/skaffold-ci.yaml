@@ -9,15 +9,15 @@ profiles:
       cluster:
         dockerConfig:
           path: ~/.docker/config.json          
-  # Profile to render "staging-central" manifest.
+  # Profile to render "staging-west" manifest.
   # It is only aimed to add the image digest but not generates the fully
   # hydrated config. So the `--validate` flag of kubectl should be
   # disabled (disableValidation=true) and should not use kustomize deployer.
-  - name: staging-central
+  - name: staging-west
     deploy:
       kubectl:
         manifests:
-        - config/envs/staging-central/deployment.yaml
+        - config/envs/staging-west/deployment.yaml
         flags:
           disableValidation: true
   # Profile to render "prod-central" manifest.
