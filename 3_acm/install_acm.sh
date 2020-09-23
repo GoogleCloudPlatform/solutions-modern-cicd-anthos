@@ -52,6 +52,8 @@ for CONTEXT in ${CLUSTERS}; do
     cat config-management.yaml.tpl | envsubst > ${CONFIGMAGFILE}
     kubectl apply -f ${CONFIGMAGFILE}
     rm ${CONFIGMAGFILE}
+    echo "Sleep for 1 minute to allow RootSync CRD to be created so the RootSync resource can be applied"
+    sleep 1m
     ROOTSYNCFILE=root-sync-${CONTEXT}.yaml
     cat root-sync.yaml.tpl | envsubst > ${ROOTSYNCFILE}
     kubectl apply -f ${ROOTSYNCFILE}
