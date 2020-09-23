@@ -279,12 +279,32 @@ If you want to add another cluster (like asia-east1 in the above screenshots), r
    spec:
      # clusterName is required and must be unique among all managed clusters
      clusterName: $SHORT_CLUSTERNAME
-     git:
-       syncRepo: git@$GITLAB_HOSTNAME:platform-admins/anthos-config-management.git
-       syncBranch: master
-       secretType: ssh
+     enableMultiRepo: true
+     enableLegacyFields: false
      policyController:
        enabled: true
+   EOF
+   ```
+
+1. Create a Root Sync configuration for your cluster
+
+   ```shell
+   export NEW_REGION="asia-east1"
+   export SHORT_CLUSTERNAME="prod-${NEW_REGION}"
+   cat > root-sync.yaml <<EOF
+   apiVersion: configsync.gke.io/v1alpha1
+   kind: RootSync
+   metadata:
+     name: root-sync
+     namespace: config-management-system
+   spec:
+     sourceFormat: hierarchy
+     git:
+       repo: git@${GITLAB_HOSTNAME}:platform-admins/anthos-config-management.git
+       branch: master
+       auth: ssh
+       secretRef:
+         name: git-creds
    EOF
    ```
   
@@ -292,6 +312,7 @@ If you want to add another cluster (like asia-east1 in the above screenshots), r
 
     ```shell
     kubectl apply -f config-management.yaml
+    kubectl apply -f root-sync.yaml
     ```
   
 1. Check the status of the installation with the following command. Your cluster should now be synced.
@@ -408,6 +429,8 @@ If you want to add another cluster (like asia-east1 in the above screenshots), r
     git commit -m "adding $NEW_REGION"
     git push origin master
     ```
+
+<!---TODO: Update the following steps to use appctl.--->
 
 1. Add the new cluster to the Shared CI/CD configuration repo:
 

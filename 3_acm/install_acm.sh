@@ -48,9 +48,14 @@ for CONTEXT in ${CLUSTERS}; do
     GITLAB_ADDRESS=$(gcloud compute addresses describe gitlab --region us-central1 --format 'value(address)')
     export GITLAB_HOSTNAME=${GITLAB_HOSTNAME}
     export CONTEXT=${CONTEXT}
-    cat config-management.yaml.tpl | envsubst > config-management-${CONTEXT}.yaml
-    kubectl apply -f config-management-${CONTEXT}.yaml
-    rm config-management-${CONTEXT}.yaml
+    CONFIGMAGFILE=config-management-${CONTEXT}.yaml
+    cat config-management.yaml.tpl | envsubst > ${CONFIGMAGFILE}
+    kubectl apply -f ${CONFIGMAGFILE}
+    rm ${CONFIGMAGFILE}
+    ROOTSYNCFILE=root-sync-${CONTEXT}.yaml
+    cat root-sync.yaml.tpl | envsubst > ${ROOTSYNCFILE}
+    kubectl apply -f ${ROOTSYNCFILE}
+    rm ${ROOTSYNCFILE}
   # Runner is already installed, make sure the token is up to date
   # If not up to date, re-create the secret and restart the runner pod
   else
