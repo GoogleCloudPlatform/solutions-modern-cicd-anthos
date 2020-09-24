@@ -45,4 +45,4 @@ prepare-manifests:
     appctl init ${APP_NAME} --app-config-repo ${APP_REPO_URL} \
     --deployment-repo ${DEPLOYMENT_REPO_URL}
   - cd ${APP_NAME}
-  - appctl prepare staging-central --from-revision=master
+  - appctl prepare staging-west --from-revision=master

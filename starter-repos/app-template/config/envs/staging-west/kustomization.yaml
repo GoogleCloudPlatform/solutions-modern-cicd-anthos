@@ -12,10 +12,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-# Customize the namespace to be the namespace name used for staging-central environment.
-# This change should be made before `appcel env add staging-cental`.
-# Once the staging-cental environment is added, the namespace shouldn't be changed.
-namespace: staging-central
+# Customize the namespace to be the namespace name used for staging-west environment.
+# This change should be made before `appcel env add staging-west`.
+# Once the staging-west environment is added, the namespace shouldn't be changed.
+namespace: go-app
 
 resources:
 - ../../base
