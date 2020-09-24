@@ -103,6 +103,14 @@ resource "gitlab_project" "java-template-env" {
   default_branch   = "master"
 }
 
+resource "gitlab_project" "app-template" {
+  name             = "app-template"
+  description      = "Template for new Go applications using app delivery"
+  namespace_id     = gitlab_group.platform-admins.id
+  visibility_level = "internal"
+  default_branch   = "master"
+}
+
 resource "gitlab_deploy_key" "acm-staging-us-west2" {
   project    = "platform-admins/anthos-config-management"
   title      = "Staging deploy key"
@@ -193,5 +201,13 @@ resource "gitlab_deploy_key" "local-user-java-template-env-push" {
   title      = "Local User deploy key"
   key        = file("${local.ssh-key-path}/java-template-env.pub")
   depends_on = [gitlab_project.java-template-env]
+  can_push   = true
+}
+
+resource "gitlab_deploy_key" "local-user-app-template-push" {
+  project    = "platform-admins/app-template"
+  title      = "Local User deploy key"
+  key        = file("${local.ssh-key-path}/app-template.pub")
+  depends_on = [gitlab_project.app-template]
   can_push   = true
 }

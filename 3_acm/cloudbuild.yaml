@@ -34,7 +34,7 @@ steps:
       gcloud config set project ${_PROJECT_ID}
 
       # Grab latest ACM Operator
-      gsutil cp gs://config-management-release/released/latest/config-management-operator.yaml config-management-operator.yaml
+      gsutil cp gs://config-management-release/operator-rc/20200923173059-op/config-management-operator.yaml config-management-operator.yaml
 
       terraform init
       terraform apply
