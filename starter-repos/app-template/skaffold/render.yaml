@@ -53,7 +53,7 @@ skaffold-render:
         echo "No changes found in env repository."
       else
         git add config
-        git commit -m "update built manfiests"
+        git commit -m "[${CI_COMMIT_SHA:0:7}] update built manfiests"
         git push origin HEAD:${CI_COMMIT_REF_NAME}
       fi
 
