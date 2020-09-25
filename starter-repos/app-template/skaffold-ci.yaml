@@ -2,6 +2,10 @@ apiVersion: skaffold/v2beta7
 kind: Config
 metadata:
   name: app-template
+# Profile.build depends on the top-tier build "artifacts".
+build:
+  artifacts:
+  - image: app
 profiles:
   # Profile used when building images in CI
   - name: ci
