@@ -23,8 +23,18 @@ skaffold-render:
     - "[ -z ${GCP_AR_KEY} ] && echo 'Artifact Registry credentials not available' && exit 1"
     - "[ -z ${GCP_AR_REPO} ] && echo 'Artifact Registry location not available' && exit 1"
     - printf '%s\n' "${GCP_AR_KEY}" | docker login -u _json_key --password-stdin "${GCP_AR_REPO}"
-    # Configure git auth
-    - git config --global url."https://gitlab-ci-token:${CI_JOB_TOKEN}@${CI_SERVER_HOST}".insteadOf "https://${CI_SERVER_HOST}"
+    # Setup git authentication
+    - apt-get update -qq && apt-get install -y -qq openssh-client
+    - mkdir -p ~/.ssh && echo "StrictHostKeyChecking no " > ~/.ssh/config
+    - |
+      cat > ~/.ssh/id_rsa <<EOF
+      ${MANIFEST_WRITER_KEY}
+      EOF
+    - chmod 400 ~/.ssh/id_rsa
+    - git remote set-url --push origin git@${CI_SERVER_HOST}:${CI_PROJECT_NAMESPACE}/${CI_PROJECT_NAME}.git
+    - git config --global user.email "${CI_PROJECT_NAME}-ci@${CI_SERVER_HOST}"
+    - git config --global user.name "${CI_PROJECT_NAMESPACE}/${CI_PROJECT_NAME}"
+
     # Setup environment
     - export SKAFFOLD_DEFAULT_REPO=${GCP_AR_REPO}
     - export SKAFFOLD_LOUD=true
@@ -36,6 +46,15 @@ skaffold-render:
     - cp /tmp/staging-west-deployment.yaml config/envs/staging-west/deployment.yaml
     - cp /tmp/prod-central-deployment.yaml config/envs/prod-central/deployment.yaml
     - cp /tmp/prod-east-deployment.yaml config/envs/prod-east/deployment.yaml
-  artifacts:
-    paths:
-      - config/envs
+
+    - |
+      # If files have changed, commit them back to the env repo in the staging branch
+      if [ -z "$(git status --porcelain)" ]; then
+        echo "No changes found in env repository."
+      else
+        git add config
+        git commit -m "update built manfiests"
+        git push origin HEAD:${CI_COMMIT_REF_NAME}
+      fi
+
+
