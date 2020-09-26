@@ -13,6 +13,12 @@
 # limitations under the License.
 #
 
+workflow:
+  # Only Merge request will trigger a CICD pipeline. This avoid skaffold render
+  # (push new commit) repeatedly create new pipelines.
+  rules:
+    - if: '$CI_PIPELINE_SOURCE!="pipeline"'  
+
 include:
 - project: 'platform-admins/shared-ci-cd'
   file: 'ci/go-docker.yaml'
