@@ -20,11 +20,11 @@ readonly project_var_name_gcp_ar_repo=GCP_AR_REPO
 readonly project_var_name_gcp_ar_key=GCP_AR_KEY
 
 usage () {
-	echo "usage: ./ar-setup.sh --app-name=APP_NAME --gitlab-access-token=TOKEN --app-config-repo=REPO_URL [--project=PROJECT_ID] [--artifact-registry-location=LOCATION]"
+	echo "usage: ./ar-setup.sh --app-name=APP_NAME --gitlab-access-token=TOKEN --app-config-repo=REPO_URL [--artifact-registry-location=LOCATION]"
 	echo "  --app-name (required): the application name."
 	echo "  --app-config-repo (required): the URL to the application project. This is needed so that we can add the AR repository and the Google service account key as project variables of the application project."
-	echo "  --gitlab-access-token (required): the GitLab personal access token for accessing the GitLab APIs. If you don't have one, see https://docs.gitlab.com/ee/user/profile/personal_access_tokens.html for how to create personal access tokens with 'api' scope."
-	echo "  --project (optional): the GCP project ID. If not specified, using the output of \`gcloud config get-value core/project\`."
+	echo -n "  --gitlab-access-token (required): a GitLab personal access token with 'api' scope for accessing the GitLab APIs. "
+	echo "If you don't have one, create one at https://<YOUR-GITLAB-HOSTNAME>/profile/personal_access_tokens. See https://docs.gitlab.com/ee/user/profile/personal_access_tokens.html for more info."
 	echo "  --artifact-registry-location (optional): the artifact registry location (default to us-central1)."
 }
 
@@ -32,8 +32,6 @@ while [[ "$#" -gt 0 ]]; do
     case $1 in
 		--app-name) shift; app_name="$1" ;;
 		--app-name=*) app_name="${1#*=}" ;;
-		--project) shift; project="$1" ;;
-		--project=*) project="${1#*=}" ;;
 		--artifact-registry-location) shift; artifact_registry_location="$1" ;;
 		--artifact-registry-location=*) artifact_registry_location="${1#*=}" ;;
 		--app-config-repo) shift; app_config_repo="$1" ;;
@@ -163,3 +161,4 @@ if [[ $? -ne 0 ]]; then
 else
 	echo "Added the artifact repository and the service account key into the app project as GitLab project variables"
 fi
+echo "***** Successfully completed the Artifact Registry Repository setup ******"
