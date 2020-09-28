@@ -100,17 +100,17 @@ steps:
     - trigger-gitlab
 
 # Apps
-- name: "gcr.io/cloud-builders/gcloud"
-  id: "trigger-app-install"
-  dir: "4_demo"
-  entrypoint: bash
-  args:
-    - -c
-    - |
-      [[ "${_INSTALL_APPS}" == "false" ]] && exit 0
-      gcloud builds submit --substitutions _PROJECT_ID=${_PROJECT_ID}
-  waitFor:
-    - trigger-acm-install
+#- name: "gcr.io/cloud-builders/gcloud"
+#  id: "trigger-app-install"
+#  dir: "4_demo"
+#  entrypoint: bash
+#  args:
+#    - -c
+#    - |
+#      [[ "${_INSTALL_APPS}" == "false" ]] && exit 0
+#      gcloud builds submit --substitutions _PROJECT_ID=${_PROJECT_ID}
+#  waitFor:
+#    - trigger-acm-install
 
 - name: "gcr.io/cloud-builders/gcloud"
   id: "output-connect-details"
