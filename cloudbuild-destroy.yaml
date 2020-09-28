@@ -63,15 +63,15 @@ steps:
       gcloud builds submit --config=cloudbuild-destroy.yaml --substitutions _PROJECT_ID=${_PROJECT_ID}
 
 # 4 Apps
-#- name: "gcr.io/cloud-builders/gcloud"
-#  id: "trigger-destroy-demo-apps"
-#  dir: "4_demo"
-#  entrypoint: bash
-#  args:
-#    - -c
-#    - |
-#      gcloud builds submit --config=cloudbuild-destroy.yaml --substitutions _PROJECT_ID=${_PROJECT_ID}
-#  waitFor: ["trigger-destroy-output"]
+- name: "gcr.io/cloud-builders/gcloud"
+  id: "trigger-destroy-demo-apps"
+  dir: "4_demo"
+  entrypoint: bash
+  args:
+    - -c
+    - |
+      gcloud builds submit --config=cloudbuild-destroy.yaml --substitutions _PROJECT_ID=${_PROJECT_ID}
+  waitFor: ["trigger-destroy-output"]
 
 # 3 ACM
 - name: "gcr.io/cloud-builders/gcloud"
