@@ -41,6 +41,6 @@ validate-manifests:
   - git config --global user.name ${CI_PROJECT_NAMESPACE}/${CI_PROJECT_NAME}
   - |
     appctl init ${APP_NAME} --app-config-repo ${APP_REPO_URL} \
-    --deployment-repo ${DEPLOYMENT_REPO_URL}
+    --deployment-repo ${DEPLOYMENT_REPO_URL} --env-namespace app-environment
   - cd ${APP_NAME}
   - appctl validate staging-west --from-revision=${CI_COMMIT_BRANCH}
