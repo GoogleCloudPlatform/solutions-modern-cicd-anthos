@@ -25,4 +25,8 @@ skaffold-build:
     - export SKAFFOLD_LOUD=true
     - export SKAFFOLD_TAG=${CI_COMMIT_SHA}
     # Build the images
-    - skaffold build --filename=skaffold-ci.yaml -p ci
+    - skaffold build --filename=skaffold-ci.yaml -p ci --file-output build-image.json
+  # build digest is exported for the next skaffold/render step.
+  artifacts:
+    paths:
+      - build-image.json
