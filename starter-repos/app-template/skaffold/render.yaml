@@ -40,18 +40,21 @@ skaffold-render:
     - export SKAFFOLD_LOUD=true
     - export SKAFFOLD_TAG=${CI_COMMIT_SHA}
     # The `skaffold render` tags the new image with the actual digest.
-    - skaffold render --filename=skaffold-ci.yaml --build-artifacts=build-image.json --add-skaffold-labels=false --digest-source=remote -p staging-west --output /tmp/staging-west-deployment.yaml
-    - skaffold render --filename=skaffold-ci.yaml --build-artifacts=build-image.json --add-skaffold-labels=false --digest-source=remote -p prod-central --output /tmp/prod-central-deployment.yaml
-    - skaffold render --filename=skaffold-ci.yaml --build-artifacts=build-image.json --add-skaffold-labels=false --digest-source=remote -p prod-east --output /tmp/prod-east-deployment.yaml
+    - skaffold render --filename=skaffold-ci.yaml --add-skaffold-labels=false --digest-source=remote -p staging-west --output /tmp/staging-west-deployment.yaml
+    - skaffold render --filename=skaffold-ci.yaml --add-skaffold-labels=false --digest-source=remote -p prod-central --output /tmp/prod-central-deployment.yaml
+    - skaffold render --filename=skaffold-ci.yaml --add-skaffold-labels=false --digest-source=remote -p prod-east --output /tmp/prod-east-deployment.yaml
     - cp /tmp/staging-west-deployment.yaml config/envs/staging-west/deployment.yaml
     - cp /tmp/prod-central-deployment.yaml config/envs/prod-central/deployment.yaml
     - cp /tmp/prod-east-deployment.yaml config/envs/prod-east/deployment.yaml
-    - rm build-image.json
+
     - |
+      # If files have changed, commit them back to the env repo in the staging branch
       if [ -z "$(git status --porcelain)" ]; then
-        echo "No changes found in the repo."
+        echo "No changes found in env repository."
       else
-        git add .
+        git add config
         git commit -m "[${CI_COMMIT_SHA:0:7}] update built manfiests"
         git push origin HEAD:${CI_COMMIT_REF_NAME}
       fi
+
+
