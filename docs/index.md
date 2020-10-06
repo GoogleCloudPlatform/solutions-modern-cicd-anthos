@@ -11,41 +11,11 @@ The following Critical User Journeys (CUJs) are covered:
   * [Setting up your change for production](#setting-up-your-change-for-production)
 * [Promoting changes from Staging to Production](#promoting-changes-from-staging-to-production)
 * [Adding a cluster to the platform](#adding-a-cluster-to-the-platform)
-* WIP [Deleting an application (using CLI)](#deleting-an-application-using-cli)
 * [Deleting an application (manually)](#deleting-an-application-manually)
 
 ## Adding a new application (using CLI)
 
-The following instructions use a command line utility ([anthos-platform-cli](cli/) to onboard an application into the system.
-
-1. Download the `anthos-platform-cli` binary to your machine. Take note of getting the binary for the correct operating system.
-
-    [Mac OS](https://storage.googleapis.com/solutions-public-assets/anthos-platform-cli/latest/anthos-platform-cli-vlatest-darwin-amd64)
-
-    [Linux](https://storage.googleapis.com/solutions-public-assets/anthos-platform-cli/latest/anthos-platform-cli-vlatest-linux-amd64)
-
-    [Windows](https://storage.googleapis.com/solutions-public-assets/anthos-platform-cli/latest/anthos-platform-cli-vlatest-windows-amd64)
-
-1. After downloading the binary, rename it and make it executable:
-
-    ```shell
-    mv anthos-platform-cli-* anthos-platform-cli
-    chmod +x anthos-platform-cli
-    ```
-1. Run the app creation command:
-
-    ```shell
-    ./anthos-platform-cli add app \
-      --name $APP_NAME \
-      --gitlab-hostname $GITLAB_HOSTNAME \
-      --gitlab-token $GITLAB_ROOT_PASSWORD \
-      --template-name golang-template
-    ```
-
-    * `--name` Application name (i.e. `go-app`)
-    * `--gitlab-hostname` Your configured GitLab hostname (i.e. gitlab.your.domain.com)
-    * `--gitlab-token` GitLab root user password with the parameter
-
+TODO: Update the user guide to use `appctl` instead.
 
 ## Adding a new feature/version of the application
 
@@ -133,51 +103,17 @@ The following steps are performed by a **developer**, and can be performed local
 
 ### Setting up your change for production
 
-1. After your MR into your app succeeds, the CI pipeline will perform a few actions: unit-test, build, kustomize, push-manifests.
-
-1. The last step, push-manifests actually pushes a file into the app-env repo's staging branch, go check it out and you'll see the output:
-
-    ```console
-    remote: To create a merge request for staging, visit:
-    remote:   https://gitlab.smcghee.dev/go-team-go/go-app-env/merge_requests/new?merge_request%5Bsource_branch%5D=staging
-    ```
-
-1. You can now find your app running in the staging cluster:
-
-     ```shell
-     kubectx staging
-     kubectl get po -n $APP_NAME
-     kubectl get svc -n $APP_NAME
-     ```
-
-1. You can port-forward the staging build as well:
-
-     ```shell
-     kubectl port-forward svc/$APP_NAME-app -n $APP_NAME 8080:8080
-     ```
+TODO: Update the user guide to reference the new CI pipeline that leverages `appctl`.
 
 1. At this point your feature is ready to be deployed to production.  An Operator will perform this.
 
 ## Promoting changes from Staging to Production
 
-The following steps are performed by an **Operator**.
-
-1. Once you are ready to deploy whatever is in Staging to the Production clusters (you may pull in many changes from various developers), you will do so by creating a Merge Request in the ${APP}-env **staging** branch onto **master**.
-1. In Gitlab UI, navigate to the ${APP}-env repo (not the ${APP} repo).
-![env repo branch](../images/env-repo-branch.png)
-
-1. Create a new MR (ie `https://$GITLAB_HOSTNAME/$APP_NAME/$APP_NAME-env/merge_requests`)
-
-1. Get a peer to approve this MR (or approve it yourself if you are feeling lucky)
-
-1. Click "Merge".
-
-1. The CICD in GitLab will kick off your deployment to all clusters, in order:
-![Production pipeline](../images/prod-deployment-pipeline-ui.png)
+TODO: Update the user guide to use `appctl prepare`
 
 1. You are live in all production clusters!
 
-If you want to add another cluster (like asia-east1 in the above screenshots), read on!
+If you want to add another cluster, read on!
 
 ## Adding a cluster to the platform
 
@@ -498,24 +434,6 @@ If you want to add another cluster (like asia-east1 in the above screenshots), r
    Note that for $app-env, you will have to push to staging branch first, then perform an MR.
 
 1. Now your deploys will go to your new region too!
-
-## Deleting an application (using CLI)
-
-The following steps are performed by an operator.
-
-1. Run the app removal command:
-
-    ```shell
-    ./anthos-platform-cli remove app \
-      --name $APP_NAME \
-      --gitlab-hostname $GITLAB_HOSTNAME \
-      --gitlab-token $GITLAB_ROOT_PASSWORD \
-    ```
-
-    * `--name` Application name (i.e. `go-app`)
-    * `--gitlab-hostname` Your configured GitLab hostname (i.e. gitlab.your.domain.com)
-    * `--gitlab-token` GitLab root user password with the parameter
-
 
 ## Deleting an application (manually)
 
