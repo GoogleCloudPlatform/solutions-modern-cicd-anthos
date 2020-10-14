@@ -95,7 +95,7 @@ The following steps are performed by a **developer**, and can be performed local
     skaffold dev --port-forward
     ```
 
-1. Change code and look at the logs in your console to ensure the expected results. If you are running skaffold on your local machine, point your browser to `http://localhost:8080`, if in Cloud Shell hit the "Web Preview" button.
+1. Change code and look at the logs in your console to ensure the expected results.
 
 1. Commit code, push to branch and create a merge request.
 
