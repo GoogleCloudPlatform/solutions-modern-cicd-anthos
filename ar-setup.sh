@@ -110,9 +110,9 @@ add_gitlab_project_vars() {
 	https_prefix_len=${#https_prefix}
 	app_config_repo_without_https_prefix=${app_config_repo:https_prefix_len}
 
-	end_of_gitlab_hostname_index="$(expr index ${app_config_repo_without_https_prefix} /)"
-	gitlab_hostname_len=https_prefix_len+end_of_gitlab_hostname_index
-	gitlab_hostname=${app_config_repo:0:gitlab_hostname_len}
+	gitlab_hostname_without_https_prefix="$(echo ${app_config_repo_without_https_prefix} | cut -d'/' -f1)"
+	gitlab_hostname="${https_prefix}${gitlab_hostname_without_https_prefix}/"
+	gitlab_hostname_len=${#gitlab_hostname}
 
 	gitlab_project=${app_config_repo:gitlab_hostname_len}
 	# replace the slash in the project name with %2F
