@@ -2,7 +2,6 @@ apiVersion: skaffold/v2beta7
 kind: Config
 metadata:
   name: app-template
-# Profile.build depends on the top-tier build "artifacts".
 build:
   artifacts:
   - image: app
@@ -11,8 +10,19 @@ profiles:
   - name: ci
     build:
       cluster:
+        # Note: `skaffold build` may fail with
+        # 'secrets "docker-cfg" already exists' error.
+        # If that happens, do not use "dockerConfig 1"
+        # but "dockerConfig 2" as a workaround.
+
+        # dockerConfig 1
         dockerConfig:
-          path: ~/.docker/config.json          
+          path: ~/.docker/config.json
+
+        # # dockerConfig 2
+        # dockerConfig:
+        #   secretName: docker-cfg
+
   # Profile to render "staging-west" manifest.
   # It is only aimed to add the image digest but not generates the fully
   # hydrated config. So the `--validate` flag of kubectl should be
