@@ -80,8 +80,10 @@ Within GitLab you will have the following repo structure:
     gcloud services enable cloudbuild.googleapis.com
     gcloud services enable anthos.googleapis.com
     gcloud services enable serviceusage.googleapis.com
+    gcloud services enable binaryauthorization.googleapis.com
     gcloud services enable cloudkms.googleapis.com
     gcloud services enable containeranalysis.googleapis.com
+    gcloud services enable secretmanager.googleapis.com
     gcloud projects add-iam-policy-binding ${PROJECT_ID} --member serviceAccount:${PROJECT_NUMBER}@cloudbuild.gserviceaccount.com --role roles/owner
     gcloud projects add-iam-policy-binding ${PROJECT_ID} --member serviceAccount:${PROJECT_NUMBER}@cloudbuild.gserviceaccount.com --role roles/containeranalysis.admin
     ```
