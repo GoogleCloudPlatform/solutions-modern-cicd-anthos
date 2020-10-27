@@ -14,7 +14,7 @@
 
 # Different from the render in ../shared-ci-cd/skaffold/render.yaml,
 # this skaffold-render updates the *DRY* config with the new skaffold image and
-# do not hydrate the resources. The resource hydration is done via `appctl prepare`  
+# do not hydrate the resources. The resource hydration is done via `appctl prepare`
 skaffold-render:
   stage: render-manifests
   image: gcr.io/k8s-skaffold/skaffold:v1.14.0
@@ -35,6 +35,10 @@ skaffold-render:
     - git config --global user.email "${CI_PROJECT_NAME}-ci@${CI_SERVER_HOST}"
     - git config --global user.name "${CI_PROJECT_NAMESPACE}/${CI_PROJECT_NAME}"
 
+    - |
+      sed -i "s/image:.*/image: app/g" config/envs/prod-central/deployment.yaml
+      sed -i "s/image:.*/image: app/g" config/envs/prod-east/deployment.yaml
+      sed -i "s/image:.*/image: app/g" config/envs/staging-west/deployment.yaml
     # Setup environment
     - export SKAFFOLD_DEFAULT_REPO=${GCP_AR_REPO}
     - export SKAFFOLD_LOUD=true
@@ -56,5 +60,3 @@ skaffold-render:
         git commit -m "[${CI_COMMIT_SHA:0:7}] update built manfiests"
         git push origin HEAD:${CI_COMMIT_REF_NAME}
       fi
-
-
