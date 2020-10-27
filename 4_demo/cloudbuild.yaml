@@ -36,7 +36,7 @@ steps:
       gsutil -m cp -r gs://${_PROJECT_ID}-starter-repos/starter-repos .
 
       terraform init
-      terraform apply
+      terraform apply -auto-approve
 
       export GITLAB_HOSTNAME=$(terraform output gitlab_hostname)
       export GITLAB_PASSWORD=$(gcloud secrets versions access latest --secret="gitlab-password")
