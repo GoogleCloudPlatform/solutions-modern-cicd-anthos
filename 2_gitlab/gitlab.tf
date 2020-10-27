@@ -15,11 +15,12 @@
  */
 
 module "gke-gitlab" {
-  source  = "terraform-google-modules/gke-gitlab/google"
-  version = "~> 0.3.0"
+  source  = "github.com/bgood/terraform-google-gke-gitlab?ref=gitlab_url_output"
+  #source  = "terraform-google-modules/gke-gitlab/google"
+  #version = "~> 0.3.0"
 
   project_id            = var.project_id
-  domain                = "${trimprefix(module.cloud-endpoints-dns-gitlab.endpoint_computed, "gitlab.")}"
+  domain                = trimprefix(module.cloud-endpoints-dns-gitlab.endpoint_computed, "gitlab.")
   certmanager_email     = "no-reply@${var.project_id}.example.com"
   gitlab_runner_install = true
   gitlab_address_name   = google_compute_address.gitlab.name
