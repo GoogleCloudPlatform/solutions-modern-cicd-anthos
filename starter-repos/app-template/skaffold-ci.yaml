@@ -12,16 +12,10 @@ profiles:
       cluster:
         # Note: `skaffold build` may fail with
         # 'secrets "docker-cfg" already exists' error.
-        # If that happens, do not use "dockerConfig 1"
-        # but "dockerConfig 2" as a workaround.
-
-        # dockerConfig 1
+        # If that happens, please rerun the build.
         dockerConfig:
           path: ~/.docker/config.json
 
-        # # dockerConfig 2
-        # dockerConfig:
-        #   secretName: docker-cfg
 
   # Profile to render "staging-west" manifest.
   # It is only aimed to add the image digest but not generates the fully
