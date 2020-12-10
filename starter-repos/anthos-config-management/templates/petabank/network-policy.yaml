@@ -15,7 +15,7 @@
 apiVersion: networking.k8s.io/v1
 kind: NetworkPolicy
 metadata:
-  name: allow-external-hipster-frontend
+  name: allow-online-boutique-frontend
 spec:
   podSelector:
     # Apply policy to all pods in this namespace.
@@ -24,9 +24,9 @@ spec:
   - from:
     # Allow traffic between all pods in this namespace.
     - podSelector: {}
-# Petabank Integration: Uncomment to allow ingress traffic from hipster-shop namespace
+# Petabank Integration: Uncomment to allow ingress traffic from online-boutique-frontend namespace
 # IMPORTANT: Ensure proper YAML indentation after deleting the # below, both "- from:" should be aligned
 #  - from:
 #    - namespaceSelector:
 #        matchLabels:
-#          app: hipster-frontend
+#          app: online-boutique-frontend
