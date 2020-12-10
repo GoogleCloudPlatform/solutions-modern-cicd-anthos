@@ -18,7 +18,7 @@ tags:
   - modern-cicd-anthos-demo-apps
 substitutions:
   _BUILD_IMAGES: "true"
-  _APPS: "hipster-loadgenerator hipster-shop hipster-frontend petabank"
+  _APPS: "online-boutique-loadgen online-boutique online-boutique-frontend petabank"
   _PROJECT_ID: ${PROJECT_ID}
 options:
   substitution_option: 'ALLOW_LOOSE'
@@ -36,30 +36,31 @@ steps:
       gsutil -m cp -r gs://${_PROJECT_ID}-starter-repos/starter-repos .
 
       terraform init
-      terraform apply
+      terraform apply -auto-approve
 
       export GITLAB_HOSTNAME=$(terraform output gitlab_hostname)
       export GITLAB_PASSWORD=$(gcloud secrets versions access latest --secret="gitlab-password")
       export GITLAB_TOKEN="$${GITLAB_PASSWORD}"
+      export PROJECT_ID=${_PROJECT_ID}
       export APPS="${_APPS}"
 
       git config --global user.email "anthos-platform-installer@example.com"
       git config --global user.name "Anthos Platform Installer"
 
+      # Use anthos-platform-cli to provision Gitlab environments for each app
       ./provision-applications.sh
 
-      # Add IAM policies to GSA service accounts
-      export PROJECT_ID=${_PROJECT_ID}
+      # Add IAM policies to each app GSA service accounts
       ./add-gsa-iam-policies.sh
 
       # Copy source code to repositories and trigger pipelines
       ./build-applications.sh
+
+      # Delete apps created from initial pipeline run
+      ./delete-templates.sh
 
       # Modify default Network Policies
       ./modify-network-policies.sh
 
       # Prepare for MCI
       ./mci-prepare.sh
-
-      # Delete apps created from initial pipeline run
-      ./delete-templates.sh

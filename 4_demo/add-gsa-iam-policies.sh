@@ -18,13 +18,19 @@ if [ -z ${PROJECT_ID} ]; then
   read -s -p "What is the GCP Project ID that will contain the GSAs and their IAM Role Bindings?" PROJECT_ID
 fi
 
-APPS="hipster-loadgenerator hipster-shop hipster-frontend petabank"
+# TODO: Check APPS environment variable, otherwise set APPS to default list
+APPS="online-boutique-loadgen online-boutique online-boutique-frontend petabank"
 
+# Give each Online Boutique/Petabank app GSA the appropriate IAM roles
 for appname in ${APPS}; do
     GSA="${appname}-gsa@${PROJECT_ID}.iam.gserviceaccount.com"
     gcloud projects add-iam-policy-binding ${PROJECT_ID} --member serviceAccount:${GSA} --role 'roles/monitoring.metricWriter'
+    gcloud projects add-iam-policy-binding ${PROJECT_ID} --member serviceAccount:${GSA} --role 'roles/monitoring.viewer'
+    gcloud projects add-iam-policy-binding ${PROJECT_ID} --member serviceAccount:${GSA} --role 'roles/stackdriver.resourceMetadata.writer'
     gcloud projects add-iam-policy-binding ${PROJECT_ID} --member serviceAccount:${GSA} --role 'roles/cloudtrace.agent'
+    gcloud projects add-iam-policy-binding ${PROJECT_ID} --member serviceAccount:${GSA} --role 'roles/logging.logWriter'
     gcloud projects add-iam-policy-binding ${PROJECT_ID} --member serviceAccount:${GSA} --role 'roles/cloudprofiler.agent'
     gcloud projects add-iam-policy-binding ${PROJECT_ID} --member serviceAccount:${GSA} --role 'roles/clouddebugger.agent'
     gcloud projects add-iam-policy-binding ${PROJECT_ID} --member serviceAccount:${GSA} --role 'roles/errorreporting.writer'
+    gcloud projects add-iam-policy-binding ${PROJECT_ID} --member serviceAccount:${GSA} --role 'roles/artifactregistry.reader'
 done

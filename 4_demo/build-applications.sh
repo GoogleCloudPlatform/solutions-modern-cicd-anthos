@@ -21,10 +21,8 @@ if [ -z ${GITLAB_TOKEN} ];then
   read -p "What is the GitLab token? " GITLAB_TOKEN
 fi
 
-if [ -z ${SERVICES} ];then
-  # Default list of services it not passed from builder
-  SERVICES="hipster-loadgenerator hipster-shop hipster-frontend petabank"
-fi
+# TODO: Check APPS environment variable, otherwise set SERVICES to default list
+SERVICES="online-boutique-loadgen online-boutique online-boutique-frontend petabank"
 
 for service in ${SERVICES}; do
   SERVICE_DIRECTORY="${service}-clone"
@@ -32,11 +30,11 @@ for service in ${SERVICES}; do
   git -c http.sslVerify=false clone https://root:${GITLAB_TOKEN}@${GITLAB_HOSTNAME}/${service}/${service}.git ${SERVICE_DIRECTORY}
   pushd ${SERVICE_DIRECTORY}
     # TODO: Remove when each microservice has it's own Gitlab project
-    if [ "${service}" == "hipster-shop" ]; then
-      HIPSTER_EXISTS=$(ls k8s/stg | grep -e "adservice.yaml")
-      if [ -z "${HIPSTER_EXISTS}" ]; then
+    if [ "${service}" == "online-boutique" ]; then
+      BOUTIQUE_EXISTS=$(ls k8s/stg | grep -e "adservice.yaml")
+      if [ -z "${BOUTIQUE_EXISTS}" ]; then
         git rm -r Dockerfile main.go skaffold.yaml k8s .gitlab-ci.yml
-        cp -r ../starter-repos/hipster-shop/. ./
+        cp -r ../starter-repos/online-boutique/. ./
         sed -i.bak "s/GITLAB_HOSTNAME/${GITLAB_HOSTNAME}/g" k8s/stg/kustomization.yaml
         sed -i.bak "s/GITLAB_HOSTNAME/${GITLAB_HOSTNAME}/g" k8s/prod/kustomization.yaml
         sed -i.bak "s/GITLAB_HOSTNAME/${GITLAB_HOSTNAME}/g" k8s/dev/kustomization.yaml
@@ -48,7 +46,7 @@ for service in ${SERVICES}; do
         git commit -m "Initial commit"
         git -c http.sslVerify=false push -u origin master
       else
-        echo "Hipster Shop source code is already pushed to remote master!"
+        echo "Online Boutique source code is already pushed to remote master!"
       fi
     else
       # Check if template files have already been replaced
