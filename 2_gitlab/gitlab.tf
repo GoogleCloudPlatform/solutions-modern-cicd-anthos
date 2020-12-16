@@ -15,7 +15,6 @@
  */
 
 module "gke-gitlab" {
-<<<<<<< HEAD
   source  = "github.com/terraform-google-modules/terraform-google-gke-gitlab?ref=master"
   #source  = "terraform-google-modules/gke-gitlab/google"
   #version = "~> 0.4.0"
