@@ -15,8 +15,7 @@
  */
 
 module "gke-gitlab" {
-  source  = "github.com/bgood/terraform-google-gke-gitlab?ref=dependency_fixes"
-  #source  = "github.com/terraform-google-modules/terraform-google-gke-gitlab?ref=master"
+  source  = "github.com/terraform-google-modules/terraform-google-gke-gitlab?ref=master"
   #source  = "../../terraform-google-gke-gitlab"
   #version = "~> 0.3.0"
 
