@@ -29,6 +29,8 @@ module "project-services" {
     "container.googleapis.com",
     "cloudresourcemanager.googleapis.com",
     "sqladmin.googleapis.com",
-    "artifactregistry.googleapis.com"
+    "artifactregistry.googleapis.com",
+    "gkehub.googleapis.com",
+    "multiclusteringress.googleapis.com"    
   ]
 }

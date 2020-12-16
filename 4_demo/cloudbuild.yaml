@@ -58,5 +58,8 @@ steps:
       # Modify default Network Policies
       ./modify-network-policies.sh
 
+      # Prepare for MCI
+      ./mci-prepare.sh
+
       # Delete apps created from initial pipeline run
       ./delete-templates.sh

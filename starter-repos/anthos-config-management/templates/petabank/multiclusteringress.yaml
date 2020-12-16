@@ -12,24 +12,15 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-include:
-- project: 'platform-admins/shared-ci-cd'
-  file: 'ci/java-docker.yaml'
-- project: 'platform-admins/shared-ci-cd'
-  file: 'skaffold/build.yaml'
-- project: 'platform-admins/shared-ci-cd'
-  file: 'attestation/attestation.yaml'
-- project: 'platform-admins/shared-ci-cd'
-  file: 'skaffold/render.yaml'
-- project: 'platform-admins/shared-ci-cd'
-  file: 'cd/validate.yaml'
-- project: 'platform-admins/shared-ci-cd'
-  file: 'cd/push-manifests.yaml'
-
-stages:
-  - test
-  - build
-  - render-manifests
-  - prepare-config
-  - validate-config
-  - push-manifests
+apiVersion: networking.gke.io/v1
+kind: MultiClusterIngress
+metadata:
+  name: petabank-ingress
+  annotations:
+    configmanagement.gke.io/cluster-selector: prod-us-central1
+spec:
+  template:
+    spec:
+      backend:
+        serviceName: petabank-mcs
+        servicePort: 8080

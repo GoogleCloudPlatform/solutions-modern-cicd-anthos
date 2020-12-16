@@ -1,3 +1,4 @@
+#!/bin/bash -xe
 # Copyright 2020 Google LLC
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -12,24 +13,21 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-include:
-- project: 'platform-admins/shared-ci-cd'
-  file: 'ci/java-docker.yaml'
-- project: 'platform-admins/shared-ci-cd'
-  file: 'skaffold/build.yaml'
-- project: 'platform-admins/shared-ci-cd'
-  file: 'attestation/attestation.yaml'
-- project: 'platform-admins/shared-ci-cd'
-  file: 'skaffold/render.yaml'
-- project: 'platform-admins/shared-ci-cd'
-  file: 'cd/validate.yaml'
-- project: 'platform-admins/shared-ci-cd'
-  file: 'cd/push-manifests.yaml'
+set -e
 
-stages:
-  - test
-  - build
-  - render-manifests
-  - prepare-config
-  - validate-config
-  - push-manifests
+if [ "$#" -lt 3 ]; then
+    >&2 echo "Not all expected arguments set."
+    exit 1
+fi
+
+CLUSTER_LOCATION=$1
+CLUSTER_NAME=$2
+SERVICE_ACCOUNT_KEY=$3
+
+#write temp key, cleanup at exit
+tmp_file=$(mktemp)
+# shellcheck disable=SC2064
+trap "rm -rf $tmp_file" EXIT
+echo "${SERVICE_ACCOUNT_KEY}" | base64 --decode > "$tmp_file"
+
+gcloud container hub memberships register "${CLUSTER_NAME}" --gke-cluster="${CLUSTER_LOCATION}"/"${CLUSTER_NAME}" --service-account-key-file="${tmp_file}" --quiet

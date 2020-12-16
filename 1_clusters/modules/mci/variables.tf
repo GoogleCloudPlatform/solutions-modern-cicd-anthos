@@ -14,22 +14,17 @@
  * limitations under the License.
  */
 
-output "service_account" {
-  value       = module.anthos_platform_cluster.service_account
-  description = "Service account used to create the cluster and node pool(s)"
+variable "cluster_name" {
+  description = "The unique name to identify the cluster in ASM."
+  type        = string
 }
 
-output "region" {
-  value       = var.region
-  description = "Region for development cluster"
+variable "project_id" {
+  description = "The project in which the resource belongs."
+  type        = string
 }
 
-output "cluster-name" {
-  value       = var.name
-  description = "Cluster Name"
-}
-
-output "endpoint" {
-  value       = module.anthos_platform_cluster.endpoint
-  description = "Cluster endpoint used to identify the cluster"
+variable "wait" {
+  description = "A variable for waiting for a dependent job to finish."
+  type       = number
 }

@@ -30,6 +30,30 @@ resource "google_kms_key_ring" "keyring" {
   depends_on = [null_resource.resource-to-wait-on]
 }
 
+# Create a Google Secret containing the keyring name
+resource "google_secret_manager_secret" "keyring-secret" {
+  provider = google-beta
+
+  secret_id = "keyring-name"
+
+  labels = {
+    label = "keyring_for_binauthz_attestors"
+  }
+
+  replication {
+    automatic = true
+  }
+
+}
+
+resource "google_secret_manager_secret_version" "keyring-secret-version" {
+  provider = google-beta
+
+  secret = google_secret_manager_secret.keyring-secret.id
+
+  secret_data = google_kms_key_ring.keyring.name
+}
+
 locals {
   attestors = [
     # Note: module for_each support coming soon

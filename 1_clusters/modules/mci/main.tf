@@ -14,22 +14,16 @@
  * limitations under the License.
  */
 
-output "service_account" {
-  value       = module.anthos_platform_cluster.service_account
-  description = "Service account used to create the cluster and node pool(s)"
-}
+module "mci" {
+  source  = "terraform-google-modules/gcloud/google"
+  version = "~> 2.0"
+  
+  platform           = "linux"
+  upgrade            = true
+  module_depends_on  = [var.wait]
 
-output "region" {
-  value       = var.region
-  description = "Region for development cluster"
-}
-
-output "cluster-name" {
-  value       = var.name
-  description = "Cluster Name"
-}
-
-output "endpoint" {
-  value       = module.anthos_platform_cluster.endpoint
-  description = "Cluster endpoint used to identify the cluster"
+  create_cmd_entrypoint  = "${path.module}/scripts/enable_mci.sh"
+  create_cmd_body        = "${var.project_id} ${var.cluster_name}"
+  destroy_cmd_entrypoint = "gcloud"
+  destroy_cmd_body       = "alpha container hub ingress disable --force --project ${var.project_id}"
 }

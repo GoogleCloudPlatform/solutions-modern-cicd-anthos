@@ -63,3 +63,9 @@ variable "maximum_node_pool_instances" {
   description = "Maximum number of node-pool instances to scale to"
   default     = 3
 }
+
+variable "release_channel" {
+  type        = string
+  description = "(Beta) The release channel of this cluster. Accepted values are `UNSPECIFIED`, `RAPID`, `REGULAR` and `STABLE`. Defaults to `UNSPECIFIED`."
+  default     = "STABLE"
+}

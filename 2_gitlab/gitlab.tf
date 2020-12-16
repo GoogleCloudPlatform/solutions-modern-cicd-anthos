@@ -15,9 +15,10 @@
  */
 
 module "gke-gitlab" {
+<<<<<<< HEAD
   source  = "github.com/terraform-google-modules/terraform-google-gke-gitlab?ref=master"
-  #source  = "../../terraform-google-gke-gitlab"
-  #version = "~> 0.3.0"
+  #source  = "terraform-google-modules/gke-gitlab/google"
+  #version = "~> 0.4.0"
 
   project_id            = var.project_id
   domain                = trimprefix(module.cloud-endpoints-dns-gitlab.endpoint_computed, "gitlab.")
