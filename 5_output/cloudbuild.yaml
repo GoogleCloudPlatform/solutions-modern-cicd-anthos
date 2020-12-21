@@ -30,7 +30,7 @@ steps:
       sed -i "s/YOUR_PROJECT_ID/${_PROJECT_ID}/g" backend.tf
 
       terraform init
-      terraform apply
+      terraform apply -auto-approve
       export GITLAB_HOSTNAME=$(terraform output gitlab_hostname)
 
       echo ""
