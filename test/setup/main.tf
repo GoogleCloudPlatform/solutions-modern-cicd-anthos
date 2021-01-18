@@ -36,7 +36,7 @@ resource "random_id" "folder_rand" {
 
 module "project" {
   source  = "terraform-google-modules/project-factory/google"
-  version = "~> 8.0"
+  version = "~> 9.0"
 
   name              = "ci-anthos-platform"
   random_project_id = true

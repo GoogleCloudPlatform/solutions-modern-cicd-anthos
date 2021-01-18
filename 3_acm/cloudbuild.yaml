@@ -37,7 +37,7 @@ steps:
       gsutil cp gs://config-management-release/released/latest/config-management-operator.yaml config-management-operator.yaml
 
       terraform init
-      terraform apply
+      terraform apply -auto-approve
       export GITLAB_HOSTNAME=$(terraform output gitlab_hostname)
       export GITLAB_PASSWORD=$(gcloud secrets versions access latest --secret="gitlab-password")
 
