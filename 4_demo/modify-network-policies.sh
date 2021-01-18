@@ -25,27 +25,27 @@ rm -rf anthos-config-management
 git -c http.sslVerify=false clone https://root:${GITLAB_TOKEN}@${GITLAB_HOSTNAME}/platform-admins/anthos-config-management.git
 cd anthos-config-management
 
-HIPSTER_NAMESPACE=namespaces/managed-apps/hipster-shop
+BOUTIQUE_NAMESPACE=namespaces/managed-apps/online-boutique
 PETABANK_NAMESPACE=namespaces/managed-apps/petabank
-FRONTEND_NAMESPACE=namespaces/managed-apps/hipster-frontend
+FRONTEND_NAMESPACE=namespaces/managed-apps/online-boutique-frontend
 
-pushd ${HIPSTER_NAMESPACE}
-  HS_ALLOW_EXTERNAL_FRONTEND=$(grep -e "name: allow-external-hipster-frontend" network-policy.yaml)
-  if [ -z "${HS_ALLOW_EXTERNAL_FRONTEND}" ]; then
+pushd ${BOUTIQUE_NAMESPACE}
+  OB_ALLOW_FRONTEND=$(grep -e "name: allow-online-boutique-frontend" network-policy.yaml)
+  if [ -z "${OB_ALLOW_FRONTEND}" ]; then
     rm network-policy.yaml
-    cp ../../../templates/hipster-shop/network-policy.yaml ./
+    cp ../../../templates/online-boutique/network-policy.yaml ./
   else
-    echo "Network Policy already allows Hipster Shop's Frontend traffic"
+    echo "Network Policy already allows Online Boutique's Frontend traffic"
   fi
 popd
 
 pushd ${PETABANK_NAMESPACE}
-  PB_ALLOW_EXTERNAL_FRONTEND=$(grep -e "name: allow-external-hipster-frontend" network-policy.yaml)
-  if [ -z "${PB_ALLOW_EXTERNAL_FRONTEND}" ]; then
+  PB_ALLOW_FRONTEND=$(grep -e "name: allow-online-boutique-frontend" network-policy.yaml)
+  if [ -z "${PB_ALLOW_FRONTEND}" ]; then
     rm network-policy.yaml
     cp ../../../templates/petabank/network-policy.yaml ./
   else
-    echo "Network Policy already allows Hipster Shop's Frontend traffic"
+    echo "Network Policy already allows Online Boutique's Frontend traffic"
   fi
 popd
 
@@ -53,15 +53,15 @@ pushd ${FRONTEND_NAMESPACE}
   FE_ALLOW_EXTERNAL_WEB=$(grep -e "name: allow-external-web" network-policy.yaml)
   if [ -z "${FE_ALLOW_EXTERNAL_WEB}" ]; then
     rm network-policy.yaml
-    cp ../../../templates/hipster-frontend/network-policy.yaml ./
+    cp ../../../templates/online-boutique-frontend/network-policy.yaml ./
   else
     echo "Network Policy already allows external web traffic"
   fi
 popd
 
-if [ -z "${HS_ALLOW_EXTERNAL_FRONTEND}" ] || [ -z "${PB_ALLOW_EXTERNAL_FRONTEND}" ] || [ -z "${FE_ALLOW_EXTERNAL_WEB}" ]; then
+if [ -z "${OB_ALLOW_FRONTEND}" ] || [ -z "${PB_ALLOW_FRONTEND}" ] || [ -z "${FE_ALLOW_EXTERNAL_WEB}" ]; then
   git add .
-  git commit -m "Setup Network Policies for Hipster Shop and Petabank"
+  git commit -m "Setup Network Policies for Online Boutique and Petabank"
   git -c http.sslVerify=false push -u origin master
 else
   echo "No configuration changes needeed."

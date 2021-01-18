@@ -68,6 +68,7 @@ steps:
     # https://github.com/terraform-google-modules/terraform-google-gke-gitlab/issues/49
     gsutil rm "gs://${_PROJECT_ID}-gitlab-artifacts/**" || true
     gsutil rm "gs://${_PROJECT_ID}-registry/**" || true
+    gsutil rm "gs://${_PROJECT_ID}-runner-cache/**" || true
 
     terraform init
     terraform destroy -auto-approve

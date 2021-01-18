@@ -21,13 +21,10 @@ if [ -z ${GITLAB_TOKEN} ];then
   read -p "What is the GitLab token? " GITLAB_TOKEN
 fi
 
+# TODO: Check APPS environment variable, otherwise set APPS to default list
+APPS="online-boutique-loadgen online-boutique online-boutique-frontend petabank"
 
-if [ -z ${APPS} ];then
-  # If ${_APPS} is empty, use these apps to install
-  APPS="hipster-loadgenerator hipster-shop hipster-frontend petabank"
-fi
-
-# Install Hipster Shop app (by microservice) and Petabank app
+# Install Online Boutique app (by microservice) and Petabank app
 for appname in ${APPS}; do
   APP_DEPLOYMENT="${appname}-app"
   APP_EXISTS="$(kubectl get deployment ${APP_DEPLOYMENT} -n ${appname})"

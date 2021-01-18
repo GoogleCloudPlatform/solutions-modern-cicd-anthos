@@ -61,7 +61,7 @@ resource "google_compute_subnetwork" "anthos-platform-west1" {
   ip_cidr_range = "10.4.0.0/16"
   region        = "us-west1"
   network       = google_compute_network.anthos-platform.self_link
-  
+
   secondary_ip_range {
     range_name    = "anthos-platform-pods-dev"
     ip_cidr_range = "172.18.0.0/16"
@@ -77,7 +77,7 @@ resource "google_compute_subnetwork" "anthos-platform-west2" {
   ip_cidr_range = "10.5.0.0/16"
   region        = "us-west2"
   network       = google_compute_network.anthos-platform.self_link
-  
+
   secondary_ip_range {
     range_name    = "anthos-platform-pods-staging"
     ip_cidr_range = "172.19.0.0/16"

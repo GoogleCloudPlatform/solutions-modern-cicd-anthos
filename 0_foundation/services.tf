@@ -31,6 +31,6 @@ module "project-services" {
     "sqladmin.googleapis.com",
     "artifactregistry.googleapis.com",
     "gkehub.googleapis.com",
-    "multiclusteringress.googleapis.com"    
+    "multiclusteringress.googleapis.com"
   ]
 }

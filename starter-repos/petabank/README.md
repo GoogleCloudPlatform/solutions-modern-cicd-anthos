@@ -1,1 +1,1 @@
-Petabank app for Anthos CI/CD demo.
+Petabank app for Modern CI/CD with Anthos demo.
