@@ -15,5 +15,6 @@
 FROM golang:1
 WORKDIR /app
 COPY *.go ./
+COPY go.mod ./
 RUN go build -o golang-template
 CMD ["/app/golang-template"]
