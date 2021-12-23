@@ -17,7 +17,7 @@ push-manifests:
     refs:
       - master
   stage: push-manifests
-  image: gcr.io/cloud-solutions-images/kustomize
+  image: gcr.io/cloud-builders/git
   script:
   - |
     cat > deploy-key <<EOF

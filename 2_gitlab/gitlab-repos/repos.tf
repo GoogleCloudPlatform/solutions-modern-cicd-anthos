@@ -18,6 +18,7 @@ provider "gitlab" {
   token    = var.gitlab_token
   base_url = "https://${data.terraform_remote_state.gitlab.outputs.gitlab_hostname}/api/v4/"
   insecure = true
+  version  = "3.3.0"
 }
 
 locals {
@@ -42,22 +43,6 @@ resource "gitlab_project" "anthos-config-management" {
 resource "gitlab_project" "shared-kustomize-bases" {
   name             = "shared-kustomize-bases"
   description      = "Kubernetes Application Configuration Bases"
-  namespace_id     = gitlab_group.platform-admins.id
-  visibility_level = "internal"
-  default_branch   = "master"
-}
-
-resource "gitlab_project" "kaniko-docker" {
-  name             = "kaniko-docker"
-  description      = "Docker+Kaniko Docker image"
-  namespace_id     = gitlab_group.platform-admins.id
-  visibility_level = "internal"
-  default_branch   = "master"
-}
-
-resource "gitlab_project" "kustomize-docker" {
-  name             = "kustomize-docker"
-  description      = "Kustomize Docker image"
   namespace_id     = gitlab_group.platform-admins.id
   visibility_level = "internal"
   default_branch   = "master"
@@ -122,22 +107,6 @@ resource "gitlab_deploy_key" "acm-prod-us-east1" {
   title      = "Production East deploy key"
   key        = file("${local.ssh-key-path}/prod-us-east1.pub")
   depends_on = [gitlab_project.anthos-config-management]
-}
-
-resource "gitlab_deploy_key" "local-user-kaniko-docker-push" {
-  project    = "platform-admins/kaniko-docker"
-  title      = "Local User deploy key"
-  key        = file("${local.ssh-key-path}/kaniko-docker.pub")
-  can_push   = true
-  depends_on = [gitlab_project.kaniko-docker]
-}
-
-resource "gitlab_deploy_key" "local-user-kustomize-docker-push" {
-  project    = "platform-admins/kustomize-docker"
-  title      = "Local User deploy key"
-  key        = file("${local.ssh-key-path}/kustomize-docker.pub")
-  can_push   = true
-  depends_on = [gitlab_project.kustomize-docker]
 }
 
 resource "gitlab_deploy_key" "local-user-acm-push" {

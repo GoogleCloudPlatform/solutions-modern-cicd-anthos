@@ -11,13 +11,3 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
-kustomize-build:
-  stage: build
-  image: gcr.io/cloud-solutions-images/kustomize
-  script:
-  - mkdir -p output
-  - kustomize build golang -o output/golang.yaml
-  artifacts:
-    paths:
-      - output/

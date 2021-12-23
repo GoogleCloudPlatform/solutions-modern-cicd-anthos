@@ -20,12 +20,12 @@ locals {
 
 provider "google" {
   project = var.project_id
-  version = "~> 3.44.0"
+  version = "~> 3.79.0"
 }
 
 provider "google-beta" {
   project = var.project_id
-  version = "~> 3.44.0"
+  version = "~> 3.79.0"
 }
 
 data "google_compute_network" "anthos-platform" {
@@ -100,6 +100,7 @@ module "anthos-platform-prod-east" {
   release_channel   = "STABLE"
 }
 
+/*
 resource "google_service_account" "gke_hub_sa" {
   project      = var.project_id
   account_id   = var.gke_hub_sa_name
@@ -128,6 +129,29 @@ module "anthos-platform-hub-prod-east" {
   cluster_name      = module.anthos-platform-prod-east.cluster-name
   cluster_endpoint  = module.anthos-platform-prod-east.endpoint
   location          = module.anthos-platform-prod-east.region
+}
+*/
+
+module "anthos-platform-hub-prod-central" {
+  source           = "terraform-google-modules/kubernetes-engine/google//modules/hub"
+
+  project_id       = var.project_id
+  cluster_name     = module.anthos-platform-prod-central.cluster-name
+  location         = module.anthos-platform-prod-central.region
+  cluster_endpoint = module.anthos-platform-prod-central.endpoint
+  gke_hub_membership_name = module.anthos-platform-prod-central.cluster-name
+  gke_hub_sa_name  = "gke-hub-sa-central"
+}
+
+module "anthos-platform-hub-prod-east" {
+  source           = "terraform-google-modules/kubernetes-engine/google//modules/hub"
+
+  project_id       = var.project_id
+  cluster_name     = module.anthos-platform-prod-east.cluster-name
+  location         = module.anthos-platform-prod-east.region
+  cluster_endpoint = module.anthos-platform-prod-east.endpoint
+  gke_hub_membership_name = module.anthos-platform-prod-east.cluster-name
+  gke_hub_sa_name  = "gke-hub-sa-east"
 }
 
 module "anthos-platform-mci-central" {
