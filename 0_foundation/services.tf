@@ -16,7 +16,7 @@
 
 module "project-services" {
   source  = "terraform-google-modules/project-factory/google//modules/project_services"
-  version = "~> 9.0"
+  version = "~> 11.0"
 
   project_id = var.project_id
 

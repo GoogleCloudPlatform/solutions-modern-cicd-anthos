@@ -15,7 +15,7 @@
  */
 
 provider "google" {
-  version = "~> 3.44.0"
+  version = "~> 3.79.0"
   project = var.project_id
 }
 
