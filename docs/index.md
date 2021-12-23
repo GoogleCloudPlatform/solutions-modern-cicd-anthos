@@ -18,20 +18,19 @@ The following Critical User Journeys (CUJs) are covered:
 
 The following instructions use a command line utility ([anthos-platform-cli](cli/) to onboard an application into the system.
 
-1. Download the `anthos-platform-cli` binary to your machine. Take note of getting the binary for the correct operating system.
+1. Build the `anthos-platform-cli`. Take note the build process creates binaries for Mac OS, Linux and Windows, be sure to get the correct binary for the correct operating system.
 
-    [Mac OS](https://storage.googleapis.com/solutions-public-assets/anthos-platform-cli/latest/anthos-platform-cli-vlatest-darwin-amd64)
+   ```shell
+   cd cli
+   make release
+   ```
 
-    [Linux](https://storage.googleapis.com/solutions-public-assets/anthos-platform-cli/latest/anthos-platform-cli-vlatest-linux-amd64)
-
-    [Windows](https://storage.googleapis.com/solutions-public-assets/anthos-platform-cli/latest/anthos-platform-cli-vlatest-windows-amd64)
-
-1. After downloading the binary, rename it and make it executable:
+1. After building the binary, rename it for easier use:
 
     ```shell
-    mv anthos-platform-cli-* anthos-platform-cli
-    chmod +x anthos-platform-cli
+    mv anthos-platform-cli-<YOUR OS HERE> anthos-platform-cli
     ```
+
 1. Run the app creation command:
 
     ```shell
@@ -45,7 +44,6 @@ The following instructions use a command line utility ([anthos-platform-cli](cli
     * `--name` Application name (i.e. `go-app`)
     * `--gitlab-hostname` Your configured GitLab hostname (i.e. gitlab.your.domain.com)
     * `--gitlab-token` GitLab root user password with the parameter
-
 
 ## Adding a new feature/version of the application
 
