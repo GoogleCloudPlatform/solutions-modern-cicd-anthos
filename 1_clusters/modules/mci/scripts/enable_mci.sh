@@ -28,7 +28,7 @@ gcloud alpha container hub ingress enable \
 
 # ingress enabling can timeout after 2 minutes, but still be OK, validate accordingly
 for i in {1..30}; do
-  RESULT=$(gcloud alpha container hub ingress describe --project ${PROJECT_ID} --format="value(featureState.details.code)")
+  RESULT=$(gcloud alpha container hub ingress describe --project ${PROJECT_ID} --format="value(state.state.code)")
   if [ ${RESULT} = "OK" ]; then
     break;
   fi

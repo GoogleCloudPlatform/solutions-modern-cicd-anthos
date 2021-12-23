@@ -15,7 +15,8 @@
  */
 
 module "gke-gitlab" {
-  source  = "github.com/terraform-google-modules/terraform-google-gke-gitlab?ref=master"
+  source                     = "terraform-google-modules/gke-gitlab/google"
+  version = "~> 0.5.0"
 
   project_id            = var.project_id
   domain                = trimprefix(module.cloud-endpoints-dns-gitlab.endpoint_computed, "gitlab.")
@@ -23,7 +24,7 @@ module "gke-gitlab" {
   gitlab_runner_install = true
   gitlab_db_name        = "gitlab-${lower(random_id.database_id.hex)}"
   helm_chart_version    = "4.0.7"
-  gke_version           = "1.15"
+  gke_version           = "1.19"
 }
 
 module "cloud-endpoints-dns-gitlab" {

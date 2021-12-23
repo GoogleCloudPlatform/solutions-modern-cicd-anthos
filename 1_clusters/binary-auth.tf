@@ -73,7 +73,7 @@ locals {
 # APIs required for Binary Authorization
 module "project-services" {
   source  = "terraform-google-modules/project-factory/google//modules/project_services"
-  version = "~> 9.0"
+  version = "~> 11.0"
 
   project_id = var.project_id
 
@@ -84,8 +84,9 @@ module "project-services" {
 
 # Create Quality Assurance attestor
 module "quality-attestor" {
-  source = "github.com/terraform-google-modules/terraform-google-kubernetes-engine/modules/binary-authorization"
-
+  source = "terraform-google-modules/kubernetes-engine/google//modules/binary-authorization"
+  version = "~> 17.0"
+  
   project_id = var.project_id
 
   attestor-name = local.attestors[0]
@@ -97,7 +98,8 @@ module "quality-attestor" {
 
 # Create Builder attestor
 module "build-attestor" {
-  source = "github.com/terraform-google-modules/terraform-google-kubernetes-engine/modules/binary-authorization"
+  source = "terraform-google-modules/kubernetes-engine/google//modules/binary-authorization"
+  version = "~> 17.0"
 
   project_id = var.project_id
 
@@ -110,9 +112,8 @@ module "build-attestor" {
 
 # Create Security attestor
 module "security-attestor" {
-  source = "github.com/terraform-google-modules/terraform-google-kubernetes-engine/modules/binary-authorization"
-  #source = "terraform-google-modules/kubernetes-engine/google//modules/binary-authorization"
-  #version = "~> 12.0.0"
+  source = "terraform-google-modules/kubernetes-engine/google//modules/binary-authorization"
+  version = "~> 17.0"
 
   project_id = var.project_id
 
