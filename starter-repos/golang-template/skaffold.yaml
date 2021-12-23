@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-apiVersion: skaffold/v2beta5
+apiVersion: skaffold/v2beta8
 kind: Config
 # Defaults are configured for local dev
 build:
