@@ -16,7 +16,7 @@ The following Critical User Journeys (CUJs) are covered:
 
 ## Adding a new application (using CLI)
 
-The following instructions use a command line utility ([anthos-platform-cli](cli/) to onboard an application into the system.
+The following instructions to use a command line utility ([anthos-platform-cli](../cli/) to onboard an application into the system.
 
 1. Build the `anthos-platform-cli`. Take note the build process creates binaries for Mac OS, Linux and Windows, be sure to get the correct binary for the correct operating system.
 
