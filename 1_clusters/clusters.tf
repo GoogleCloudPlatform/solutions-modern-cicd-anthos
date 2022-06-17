@@ -133,7 +133,7 @@ module "anthos-platform-hub-prod-east" {
 */
 
 module "anthos-platform-hub-prod-central" {
-  source           = "terraform-google-modules/kubernetes-engine/google//modules/hub"
+  source           = "terraform-google-modules/kubernetes-engine/google//modules/hub-legacy"
 
   project_id       = var.project_id
   cluster_name     = module.anthos-platform-prod-central.cluster-name
@@ -144,7 +144,7 @@ module "anthos-platform-hub-prod-central" {
 }
 
 module "anthos-platform-hub-prod-east" {
-  source           = "terraform-google-modules/kubernetes-engine/google//modules/hub"
+  source           = "terraform-google-modules/kubernetes-engine/google//modules/hub-legacy"
 
   project_id       = var.project_id
   cluster_name     = module.anthos-platform-prod-east.cluster-name
